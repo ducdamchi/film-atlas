@@ -1,5 +1,5 @@
 /* Libraries */
-import { React, useEffect, useState, useContext, useRef } from "react"
+import React, { useEffect, useState, useContext, useRef } from "react"
 import { useLocation, useParams, Link } from "react-router-dom"
 import axios from "axios"
 
@@ -45,6 +45,14 @@ export default function FilmLanding() {
 
   /* Create the request body for API call to App's DB when user 'like' a film */
   function createReqBody() {
+    const directorsList = directors.map((director) => ({
+      name: director.name,
+      profile_path: director.profile_path,
+    }))
+    const directorNamesForSorting = directors
+      .map((director) => director.name)
+      .join(", ")
+
     const req = {
       tmdbId: movieDetails.id,
       title: movieDetails.title,
@@ -53,7 +61,8 @@ export default function FilmLanding() {
       backdrop_path: movieDetails.backdrop_path,
       origin_country: movieDetails.origin_country,
       release_date: movieDetails.release_date,
-      director: directors,
+      directors: directorsList,
+      directorNamesForSorting: directorNamesForSorting,
     }
     return req
   }
@@ -61,6 +70,7 @@ export default function FilmLanding() {
   /* Make API call to App's DB when user 'like' a film */
   function likeFilm() {
     const req = createReqBody()
+    console.log(req)
     axios
       .post(`http://localhost:3002/profile/me/liked-films`, req, {
         headers: {

@@ -123,9 +123,16 @@ export default function QuickSearchModal({
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   const inputValue = event.target.value
-                  navigate(`${returnToPage}`, {
-                    state: { searchInputFromQuickSearch: inputValue },
-                  })
+                  if (returnToPage === undefined || returnToPage === null) {
+                    navigate(`${returnToPage}`, {
+                      state: { searchInputFromQuickSearch: inputValue },
+                    })
+                  } else {
+                    // By default, navigate to home page
+                    navigate("/", {
+                      state: { searchInputFromQuickSearch: inputValue },
+                    })
+                  }
                 }
               }}></input>
           </div>

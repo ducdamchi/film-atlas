@@ -1,1 +1,30 @@
 @import "tailwindcss";
+/* Customize the popup close button */
+.maplibregl-popup-close-button {
+  /* background-color: rgba(0, 0, 0, 0.7) !important; */
+  /* color: white !important; */
+  /* border-radius: 50% !important; */
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+  /* font-size: 1rem !important; */
+  /* line-height: 1 !important; */
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s ease !important;
+  /* border-width: 2px !important;
+  border-color: black !important; */
+}
+
+/* .maplibregl-popup-close-button:hover {
+  background-color: rgba(0, 0, 0, 0.9) !important;
+  transform: scale(1.1) !important;
+} */
+
+/* Optional: Customize the popup container */
+/* .maplibregl-popup-content {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  padding: 0 !important;
+} */

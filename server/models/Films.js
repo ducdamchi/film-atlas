@@ -14,9 +14,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    director: {
+    directors: {
+      //directorObject containing names and profile_path
       type: DataTypes.JSON,
       allowNull: false,
+    },
+    directorNamesForSorting: {
+      //a comma separated string of director names, used for sorting only
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     poster_path: {
       type: DataTypes.STRING,

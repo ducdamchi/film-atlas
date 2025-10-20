@@ -8,6 +8,33 @@ const { validateToken } = require("../middlewares/AuthMiddleware")
 router.get("/", validateToken, async (req, res) => {
   try {
     const jwtUserId = req.user.id //UserId in signed JWT
+    const sortBy = req.query.sortBy || "added_date"
+    const sortDirection = req.query.sortDirection || "desc"
+    const sortCommand = `${sortBy}_${sortDirection}`
+    let order
+    switch (sortCommand) {
+      case "added_date_desc":
+        order = [["likedFilms", "createdAt", "DESC"]]
+        break
+      case "added_date_asc":
+        order = [["likedFilms", "createdAt", "ASC"]]
+        break
+      case "released_date_desc":
+        order = [["likedFilms", "release_date", "DESC"]]
+        break
+      case "released_date_asc":
+        order = [["likedFilms", "release_date", "ASC"]]
+        break
+      case "director_name_desc":
+        //"put ASC here to get A-Z"
+        order = [["likedFilms", "directorNamesForSorting", "ASC"]]
+        break
+      case "director_name_asc":
+        //"put DESC here to get Z-A"
+        order = [["likedFilms", "directorNamesForSorting", "DESC"]]
+        break
+    }
+
     const userWithLikedFilms = await Users.findByPk(jwtUserId, {
       include: [
         {
@@ -17,15 +44,21 @@ router.get("/", validateToken, async (req, res) => {
             "id",
             "title",
             "runtime",
-            "director",
+            "directors",
+            "directorNamesForSorting",
             "poster_path",
             "backdrop_path",
             "origin_country",
             "release_date",
           ],
+          through: {
+            attributes: [["createdAt", "likedAt"]],
+          },
         },
       ],
+      order: order,
     })
+
     if (!userWithLikedFilms) {
       return res.status(404).json({ error: "User Not Found" })
     } else {
@@ -79,7 +112,8 @@ router.post("/", validateToken, async (req, res) => {
         id: likeData.tmdbId,
         title: likeData.title,
         runtime: likeData.runtime,
-        director: likeData.director,
+        directors: likeData.directors,
+        directorNamesForSorting: likeData.directorNamesForSorting,
         poster_path: likeData.poster_path,
         backdrop_path: likeData.backdrop_path,
         origin_country: likeData.origin_country,

@@ -35,49 +35,27 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
       params: {
         query: searchInput,
         api_key: apiKey,
+        include_adult: false,
+        append_to_response: "credits",
       },
     })
     .then((response) => {
-      // console.log("Response:", response.data.results)
-      setSearchResult(response.data.results)
+      const original_results = response.data.results
+      const filtered_results = original_results.filter(
+        (movie) => !(movie.backdrop_path === null || movie.poster_path === null)
+      )
+      // .filter((movie) => movie.popularity > 1 || movie.vote_count > 10)
+
+      const sorted_filtered_results = filtered_results.sort(
+        (a, b) => b.popularity - a.popularity
+      )
+      setSearchResult(sorted_filtered_results)
+      console.log("Filtered results:", sorted_filtered_results)
     })
     .catch((err) => {
       console.log("Error: ", err)
     })
 }
-
-/* Fetch info of one film (with known id) from TMDB
-@params:
-- tmdbId: unique TMDB id assigned to film
-@return: Object with
-{movieDetails, directorsList, dopsList, mainCastList}
-*/
-// export async function fetchFilmFromTMDB(tmdbId) {
-//   const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
-//   const apiKey = "14b22a55c02218f84058041c5f553d3d"
-
-//   try {
-//     const response = await axios.get(
-//       `${movieDetailsUrl}${tmdbId}?append_to_response=credits&api_key=${apiKey}`
-//     )
-
-//     const directorsList = response.data.credits.crew.filter(
-//       (crewMember) => crewMember.job === "Director"
-//     )
-//     const dopsList = response.data.credits.crew.filter(
-//       (crewMember) => crewMember.job === "Director of Photography"
-//     )
-//     const mainCastList = response.data.credits.cast.slice(0, 5)
-//     return {
-//       movieDetails: response.data,
-//       directorsList: directorsList,
-//       dopsList: dopsList,
-//       mainCastList: mainCastList,
-//     }
-//   } catch (err) {
-//     console.log("Client: Error fetching film from TMDB", err)
-//   }
-// }
 
 /* Fetch info of one film (with known id) from TMDB
 @params:

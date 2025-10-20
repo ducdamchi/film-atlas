@@ -1,14 +1,15 @@
+import axios from "axios"
 import { useState, useEffect } from "react"
-
 import { HashRouter, Route, Routes } from "react-router-dom"
 import "./App.css"
+
 import LoadingPage from "./Components/Shared/LoadingPage"
 import Home from "./Components/Home"
 import Watchlist from "./Components/Watchlist"
 import FilmLanding from "./Components/FilmLanding"
 import Register from "./Components/Register"
 import LogIn from "./Components/Login"
-import axios from "axios"
+import MapPage from "./Components/MapPage"
 
 import { AuthContext } from "./Utils/authContext"
 
@@ -67,6 +68,7 @@ function App() {
             <Route path="/films/:tmdbId" element={<FilmLanding />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<LogIn />} />
+            <Route path="/map" element={<MapPage />} />
           </Routes>
         </HashRouter>
       </AuthContext.Provider>
