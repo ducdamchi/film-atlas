@@ -1,12 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
-  const Saves = sequelize.define("Saves", {
+  const WatchedDirectors = sequelize.define("WatchedDirectors", {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       allowNull: false,
       primaryKey: true,
     },
-    filmId: {
+    directorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    num_watched_films: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    num_stars_total: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   })
-  return Saves
+  return WatchedDirectors
 }

@@ -1,5 +1,6 @@
 import axios from "axios"
 
+/* Converts ISO_A2 country codes into full country name */
 export function getCountryName(code) {
   // Check if the Intl.DisplayNames API is supported
   if (Intl && Intl.DisplayNames) {
@@ -11,6 +12,7 @@ export function getCountryName(code) {
   return undefined
 }
 
+/* Converts full date of format yyyy-mm-dd to yyyy only */
 export function getReleaseYear(release_date) {
   const date = new Date(release_date)
   const year = date.getFullYear()
@@ -22,6 +24,30 @@ export function getReleaseYear(release_date) {
   }
 }
 
+/* Converts date of format yyyy-mm (e.g. 2025-10) to Month Year string (e.g. October 2025)*/
+export function getNiceMonthYear(dateString) {
+  const [year, month] = dateString.split("-")
+  const inputDate = new Date(year, month - 1)
+  const currentDate = new Date()
+
+  if (
+    inputDate.getFullYear() === currentDate.getFullYear() &&
+    inputDate.getMonth() === currentDate.getMonth()
+  ) {
+    return "This Month"
+  } else if (
+    inputDate.getFullYear() === currentDate.getFullYear() &&
+    inputDate.getMonth() === currentDate.getMonth() - 1
+  ) {
+    return "Last Month"
+  } else {
+    return inputDate.toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    })
+  }
+}
+
 /* Query for films from TMDB (search with provided input)
 @params:
 - searchInput: A useState object containing the search input
@@ -30,7 +56,7 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
   const searchUrl = "https://api.themoviedb.org/3/search/movie"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
-  axios
+  return axios
     .get(searchUrl, {
       params: {
         query: searchInput,
@@ -45,15 +71,85 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
         (movie) => !(movie.backdrop_path === null || movie.poster_path === null)
       )
       // .filter((movie) => movie.popularity > 1 || movie.vote_count > 10)
-
       const sorted_filtered_results = filtered_results.sort(
         (a, b) => b.popularity - a.popularity
       )
       setSearchResult(sorted_filtered_results)
-      console.log("Filtered results:", sorted_filtered_results)
+      // console.log("Filtered results:", sorted_filtered_results)
+      return response.data
     })
     .catch((err) => {
       console.log("Error: ", err)
+      throw err
+    })
+}
+
+/* Query for films from TMDB (search with provided input)
+@params:
+- searchInput: A useState object containing the search input
+- setSearchResult: A useState function that updates the search result  */
+// export async function discoverDirectorFromTMDB(directorsName, setSearchResult) {
+//   const discoverUrl = "https://api.themoviedb.org/3/discover/movie"
+//   const searchPersonUrl = "https://api.themoviedb.org/3/search/person"
+//   const apiKey = "14b22a55c02218f84058041c5f553d3d"
+
+//   try {
+//     const directorResult = await axios.get(searchPersonUrl, {
+//       params: {
+//         query: directorsName,
+//         api_key: apiKey,
+//         include_adult: false,
+//       },
+//     })
+
+//     console.log("DirectorResult: ", directorResult)
+//     const director = directorResult.data.results.find(
+//       (person) => person.known_for_department === "Directing"
+//     )
+
+//     if (!director) {
+//       throw new Error("Director not found.")
+//     }
+//     const discoverResult = await axios.get(discoverUrl, {
+//       params: {
+//         api_key: apiKey,
+//         with_crew: director.id,
+//         include_adult: false,
+//         include_video: false,
+//         sort_by: "popularity.desc",
+//       },
+//     })
+//     console.log("DiscoverResult: ", discoverResult.data)
+//     setSearchResult(discoverResult.data.results)
+//     return discoverResult.data
+//   } catch (err) {
+//     console.log("Error searching for director: ", err)
+//     throw err
+//   }
+// }
+
+export function queryDirectorFromTMDB(searchInput, setSearchResult) {
+  const searchPersonUrl = "https://api.themoviedb.org/3/search/person"
+  const apiKey = "14b22a55c02218f84058041c5f553d3d"
+
+  return axios
+    .get(searchPersonUrl, {
+      params: {
+        query: searchInput,
+        api_key: apiKey,
+        include_adult: false,
+      },
+    })
+    .then((response) => {
+      const directorResult = response.data.results.filter(
+        (person) => person.known_for_department === "Directing"
+      )
+      // console.log("All Directors Found: ", directorResult)
+      setSearchResult(directorResult)
+    })
+    .catch((err) => {
+      console.log("Client: Error querying director from TMDB", err)
+      throw err
     })
 }
 
@@ -72,7 +168,7 @@ export function fetchFilmFromTMDB(
   const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
-  axios
+  return axios
     .get(
       `${movieDetailsUrl}${tmdbId}?append_to_response=credits&api_key=${apiKey}`
     )
@@ -89,9 +185,39 @@ export function fetchFilmFromTMDB(
       setDirectors(directorsList)
       setDops(dopsList)
       setMainCast(mainCastList)
+      return response.data
     })
     .catch((err) => {
       console.log("Client: Error fetching film from TMDB", err)
+      throw err
+    })
+}
+
+export function fetchListByParams(
+  queryString,
+  sortBy,
+  sortDirection,
+  numStars,
+  setUserFilmList
+) {
+  return axios
+    .get(`http://localhost:3002/profile/me/${queryString}`, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+      params: {
+        sortBy: sortBy,
+        sortDirection: sortDirection,
+        numStars: numStars,
+      },
+    })
+    .then((response) => {
+      setUserFilmList(response.data)
+      return response.data
+    })
+    .catch((err) => {
+      console.log("Error: ", err)
+      throw err
     })
 }
 
@@ -101,8 +227,8 @@ export function fetchFilmFromTMDB(
 - setLike: useState() method that updates the like status in the calling component
 */
 export function checkLikeStatus(tmdbId, setIsLiked) {
-  axios
-    .get(`http://localhost:3002/profile/me/liked-films/${tmdbId}`, {
+  return axios
+    .get(`http://localhost:3002/profile/me/watched/${tmdbId}`, {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       },
@@ -117,9 +243,11 @@ export function checkLikeStatus(tmdbId, setIsLiked) {
           setIsLiked(false)
         }
       }
+      return response.data
     })
     .catch((err) => {
       console.error("Client: Error checking like status", err)
+      throw err
     })
 }
 
@@ -129,8 +257,8 @@ export function checkLikeStatus(tmdbId, setIsLiked) {
 - setLike: useState() method that updates the like status in the calling component
 */
 export function checkSaveStatus(tmdbId, setIsSaved) {
-  axios
-    .get(`http://localhost:3002/profile/me/watchlist/${tmdbId}`, {
+  return axios
+    .get(`http://localhost:3002/profile/me/watchlisted/${tmdbId}`, {
       headers: {
         accessToken: localStorage.getItem("accessToken"),
       },
@@ -145,8 +273,40 @@ export function checkSaveStatus(tmdbId, setIsSaved) {
           setIsSaved(false)
         }
       }
+      return response.data
     })
     .catch((err) => {
-      console.error("Client: Error checking like status", err)
+      console.error("Client: Error checking save status", err)
+      throw err
+    })
+}
+
+/* Check the Saved status of a film for logged in users from App's DB
+@params:
+- tmdbId: unique TMDB id assigned to film
+- setLike: useState() method that updates the like status in the calling component
+*/
+export function checkRateStatus(tmdbId, setOfficialRating) {
+  return axios
+    .get(`http://localhost:3002/profile/me/starred/${tmdbId}`, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      if (response.data.error) {
+        console.log("Server: ", response.data.error)
+      } else {
+        if (response.data.starred) {
+          setOfficialRating(response.data.stars)
+        } else {
+          setOfficialRating(0)
+        }
+      }
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error checking rate status", err)
+      throw err
     })
 }

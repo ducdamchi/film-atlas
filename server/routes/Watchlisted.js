@@ -8,6 +8,24 @@ const { validateToken } = require("../middlewares/AuthMiddleware")
 router.get("/", validateToken, async (req, res) => {
   try {
     const jwtUserId = req.user.id //UserId in signed JWT
+    const sortBy = req.query.sortBy || "added_date"
+    const sortDirection = req.query.sortDirection || "desc"
+    const sortCommand = `${sortBy}_${sortDirection}`
+    let order
+    switch (sortCommand) {
+      case "added_date_desc":
+        order = [["savedFilms", "createdAt", "DESC"]]
+        break
+      case "added_date_asc":
+        order = [["savedFilms", "createdAt", "ASC"]]
+        break
+      case "released_date_desc":
+        order = [["savedFilms", "release_date", "DESC"]]
+        break
+      case "released_date_asc":
+        order = [["savedFilms", "release_date", "ASC"]]
+        break
+    }
     const userWithSavedFilms = await Users.findByPk(jwtUserId, {
       include: [
         {
@@ -17,14 +35,19 @@ router.get("/", validateToken, async (req, res) => {
             "id",
             "title",
             "runtime",
-            "director",
+            "directors",
+            "directorNamesForSorting",
             "poster_path",
             "backdrop_path",
             "origin_country",
             "release_date",
           ],
+          through: {
+            attributes: [["createdAt", "addedAt"]],
+          },
         },
       ],
+      order: order,
     })
     if (!userWithSavedFilms) {
       return res.status(404).json({ error: "User Not Found" })
@@ -69,6 +92,11 @@ router.post("/", validateToken, async (req, res) => {
   try {
     const jwtUserId = req.user.id //UserId in signed JWT
     const likeData = req.body
+    const user = await Users.findByPk(jwtUserId)
+
+    if (!user) {
+      return res.status(404).json({ error: "User Not Found" })
+    }
 
     /* Either find existing film or create new film */
     const [film, created] = await Films.findOrCreate({
@@ -86,14 +114,9 @@ router.post("/", validateToken, async (req, res) => {
         release_date: likeData.release_date,
       },
     })
-    const user = await Users.findByPk(jwtUserId)
 
-    if (!user) {
-      return res.status(404).json({ error: "User Not Found" })
-    } else {
-      await user.addSavedFilm(film)
-      return res.status(200).json("Success")
-    }
+    await user.addSavedFilm(film)
+    return res.status(200).json("Success")
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: "Error Adding Entry" })

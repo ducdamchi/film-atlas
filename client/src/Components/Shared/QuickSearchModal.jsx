@@ -11,7 +11,7 @@ import { BiSearchAlt2 } from "react-icons/bi"
 export default function QuickSearchModal({
   searchModalOpen,
   setSearchModalOpen,
-  returnToPage,
+  // queryString,
 }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const [searchInput, setSearchInput] = useState("")
@@ -101,12 +101,12 @@ export default function QuickSearchModal({
   }, [searchModalOpen, searchInput])
 
   return (
-    <div className="absolute top-[30%] left-0 border-green-700 w-screen h-auto z-10 flex justify-center">
+    <div className="absolute top-[30%] left-0 border-green-700 w-screen h-auto z-10 flex justify-center ">
       <div
-        className="relative w-[60%] h-auto min-w-[20rem] max-w-[45rem] bg-stone-900/80 text-white backdrop-blur-sm border-1 border-stone-500/80"
+        className="relative w-[60%] h-auto min-w-[20rem] max-w-[45rem] bg-stone-900/80 text-white backdrop-blur-sm border-1 border-stone-500/80 rounded-xl"
         ref={modalRef}>
         {/* Search bar */}
-        <div className="relative flex justify-start h-auto border-b-1 border-stone-500/80">
+        <div className="relative flex justify-start h-auto  border-stone-500/80">
           <div className="relative w-full min-w-[10rem] h-[3.5rem] p-2 flex items-center gap-3 ">
             <BiSearchAlt2 className="border-white text-2xl ml-3 mt-1" />
             <input
@@ -123,16 +123,9 @@ export default function QuickSearchModal({
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   const inputValue = event.target.value
-                  if (returnToPage === undefined || returnToPage === null) {
-                    navigate(`${returnToPage}`, {
-                      state: { searchInputFromQuickSearch: inputValue },
-                    })
-                  } else {
-                    // By default, navigate to home page
-                    navigate("/", {
-                      state: { searchInputFromQuickSearch: inputValue },
-                    })
-                  }
+                  navigate("/", {
+                    state: { searchInputFromQuickSearch: inputValue },
+                  })
                 }
               }}></input>
           </div>
@@ -152,7 +145,9 @@ export default function QuickSearchModal({
                     key={key}
                     id={`result-${key}`}
                     className="search-result film-item w-full h-[5rem] flex justify-center items-start gap-1 p-2 focus:bg-stone-950/70 hover:bg-stone-950/70 focus:outline-0"
-                    to={`/films/${filmObject.id}`}>
+                    to={`/films/${filmObject.id}`}
+                    // state={{ currentViewMode: queryString }}
+                  >
                     {/* Backdrop */}
                     <div className="group/thumbnail relative max-h-[5rem] max-w-[8rem] aspect-16/10 h-full">
                       <img

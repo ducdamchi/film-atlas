@@ -1,6 +1,6 @@
 /* Libraries */
 import React, { useEffect, useState, useContext, useRef } from "react"
-import { useLocation, useParams, Link } from "react-router-dom"
+import { useLocation, useParams, useNavigate, Link } from "react-router-dom"
 import axios from "axios"
 
 /* Custom functions */
@@ -10,6 +10,7 @@ import {
   fetchFilmFromTMDB,
   checkLikeStatus,
   checkSaveStatus,
+  checkRateStatus,
 } from "../Utils/helperFunctions"
 import { AuthContext } from "../Utils/authContext"
 import useCommandK from "../Utils/useCommandK"
@@ -18,13 +19,22 @@ import useCommandK from "../Utils/useCommandK"
 import NavBar from "./Shared/NavBar"
 import LoadingPage from "./Shared/LoadingPage"
 import QuickSearchModal from "./Shared/QuickSearchModal"
+import TripleStarRating from "./Shared/TripleStarRating"
 
 /* Icons */
-import { BiListPlus, BiListCheck, BiHeart, BiSolidHeart } from "react-icons/bi"
+import {
+  BiListPlus,
+  BiListCheck,
+  BiHeart,
+  BiSolidHeart,
+  BiStar,
+  BiSolidStar,
+} from "react-icons/bi"
+import { GiLotusFlower } from "react-icons/gi"
 
 export default function FilmLanding() {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
-
+  const [isLoading, setIsLoading] = useState(false)
   const [movieDetails, setMovieDetails] = useState({})
   const [directors, setDirectors] = useState([]) //director
   const [dops, setDops] = useState([]) //director of photography
@@ -32,11 +42,14 @@ export default function FilmLanding() {
   const [isLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
   const [searchModalOpen, setSearchModalOpen] = useState(false)
-  const [returnToPage, setReturnToPage] = useState("/")
+  const [returnToViewMode, setReturnToViewMode] = useState("")
+  const [officialRating, setOfficialRating] = useState(0) //0 for unrated; 1, 2, 3 for corresponding stars.
+  const [requestedRating, setRequestedRating] = useState(-1) //-1 when neutral (no requests), 0 for unrated; 1, 2, 3 for stars.
 
   const { authState, loading } = useContext(AuthContext)
   const { tmdbId } = useParams()
   const location = useLocation()
+  const navigate = useNavigate()
 
   function toggleSearchModal() {
     setSearchModalOpen((status) => !status)
@@ -46,6 +59,7 @@ export default function FilmLanding() {
   /* Create the request body for API call to App's DB when user 'like' a film */
   function createReqBody() {
     const directorsList = directors.map((director) => ({
+      tmdbId: director.id,
       name: director.name,
       profile_path: director.profile_path,
     }))
@@ -70,9 +84,8 @@ export default function FilmLanding() {
   /* Make API call to App's DB when user 'like' a film */
   function likeFilm() {
     const req = createReqBody()
-    console.log(req)
-    axios
-      .post(`http://localhost:3002/profile/me/liked-films`, req, {
+    return axios
+      .post(`http://localhost:3002/profile/me/watched`, req, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -80,19 +93,21 @@ export default function FilmLanding() {
       .then((response) => {
         if (response.data.error) {
           console.log("Server: ", response.data.error)
+          throw new Error(response.data.error)
         } else {
           setIsLiked(true)
+          return response.data
         }
       })
       .catch((err) => {
         console.error("Client: Error liking film", err)
+        throw err
       })
   }
-
   /* Make API call to App's DB when user 'unlike' a film */
   function unlikeFilm() {
-    axios
-      .delete(`http://localhost:3002/profile/me/liked-films`, {
+    return axios
+      .delete(`http://localhost:3002/profile/me/watched`, {
         data: {
           tmdbId: movieDetails.id,
         },
@@ -103,21 +118,24 @@ export default function FilmLanding() {
       .then((response) => {
         if (response.data.error) {
           console.log("Server: ", response.data.error)
-          console.log(authState)
+          throw new Error(response.data.error)
+
+          // console.log(authState)
         } else {
           setIsLiked(false)
+          return response.data
         }
       })
       .catch((err) => {
         console.error("Client: Error unliking film", err)
+        throw err
       })
   }
-
   /* Make API call to App's DB when user 'like' a film */
   function saveFilm() {
     const req = createReqBody()
-    axios
-      .post(`http://localhost:3002/profile/me/watchlist`, req, {
+    return axios
+      .post(`http://localhost:3002/profile/me/watchlisted`, req, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -125,117 +143,287 @@ export default function FilmLanding() {
       .then((response) => {
         if (response.data.error) {
           console.log("Server: ", response.data.error)
+          throw new Error(response.data.error)
         } else {
           setIsSaved(true)
+          return response.data
         }
       })
       .catch((err) => {
-        console.error("Client: Error liking film", err)
+        console.error("Client: Error saving film", err)
+        throw err
+      })
+  }
+  /* Make API call to App's DB when user 'unlike' a film */
+  function unsaveFilm() {
+    return axios
+      .delete(`http://localhost:3002/profile/me/watchlisted`, {
+        data: {
+          tmdbId: movieDetails.id,
+        },
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      })
+      .then((response) => {
+        if (response.data.error) {
+          console.log("Server: ", response.data.error)
+          throw new Error(response.data.error)
+
+          // console.log(authState)
+        } else {
+          setIsSaved(false)
+          return response.data
+        }
+      })
+      .catch((err) => {
+        console.error("Client: Error unliking film", err)
+        throw err
+      })
+  }
+  function rateFilm(rating) {
+    const req = createReqBody()
+    req["stars"] = rating
+
+    // console.log(req)
+    return axios
+      .post(`http://localhost:3002/profile/me/starred`, req, {
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      })
+      .then((response) => {
+        if (response.data.error) {
+          console.log("Server: ", response.data.error)
+          throw new Error(response.data.error)
+        } else {
+          setOfficialRating(rating)
+          setRequestedRating(-1)
+          return response.data
+        }
+      })
+      .catch((err) => {
+        console.error("Client: Error rating film", err)
+        throw err
+      })
+  }
+  function updateFilmRating(rating) {
+    const req = createReqBody()
+    req["stars"] = rating
+
+    // console.log(req)
+    return axios
+      .put(`http://localhost:3002/profile/me/starred`, req, {
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      })
+      .then((response) => {
+        if (response.data.error) {
+          console.log("Server: ", response.data.error)
+          throw new Error(response.data.error)
+        } else {
+          setOfficialRating(rating)
+          setRequestedRating(-1)
+          return response.data
+        }
+      })
+      .catch((err) => {
+        console.error("Client: Error rating film", err)
+        throw err
+      })
+  }
+  function unrateFilm() {
+    return axios
+      .delete(`http://localhost:3002/profile/me/starred`, {
+        data: {
+          tmdbId: movieDetails.id,
+        },
+        headers: {
+          accessToken: localStorage.getItem("accessToken"),
+        },
+      })
+      .then((response) => {
+        if (response.data.error) {
+          console.log("Server: ", response.data.error)
+          throw new Error(response.data.error)
+
+          // console.log(authState)
+        } else {
+          setOfficialRating(0)
+          setRequestedRating(-1)
+          return response.data
+        }
+      })
+      .catch((err) => {
+        console.error("Client: Error unrating film", err)
+        throw err
       })
   }
 
   /* Handle user Like/Unlike interaction */
-  function handleLike() {
+  async function handleLike() {
     /* If user is logged in, they can like/unlike. */
     if (authState.status) {
-      /* If film has not been liked */
-      if (!isLiked) {
-        likeFilm()
-        /* If film has already been liked */
-      } else {
-        unlikeFilm()
-      }
-      /* If user not logged in, alert */
-    } else {
-      alert("Sign In to Like Movies!")
-    }
-  }
+      setIsLoading(true)
 
-  /* Make API call to App's DB when user 'unlike' a film */
-  function unsaveFilm() {
-    axios
-      .delete(`http://localhost:3002/profile/me/watchlist`, {
-        data: {
-          tmdbId: movieDetails.id,
-        },
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          console.log(authState)
+      try {
+        /* If film has not been liked */
+        if (!isLiked) {
+          await likeFilm()
+          /* Automatically removes film from watchlist if it's watched */
+          if (isSaved) {
+            await unsaveFilm()
+          }
+          /* If film has already been liked */
         } else {
-          setIsSaved(false)
+          /* Important: Automatically unrate a film FIRST if it's unliked, THEN unrate it. */
+          if (officialRating > 0) {
+            await unrateFilm()
+          }
+          await unlikeFilm()
         }
-      })
-      .catch((err) => {
-        console.error("Client: Error unliking film", err)
-      })
-  }
-
-  function handleSave() {
-    /* If user is logged in, they can like/unlike. */
-    if (authState.status) {
-      /* If film has not been liked */
-      if (!isSaved) {
-        saveFilm()
-        /* If film has already been liked */
-      } else {
-        unsaveFilm()
+      } catch (err) {
+        alert("Error handling Like/Unlike, please try again.")
+        console.error("Error in handleLike(): ", err)
+      } finally {
+        setIsLoading(false)
       }
       /* If user not logged in, alert */
     } else {
       alert("Sign In to Like Movies!")
     }
   }
+  async function handleSave() {
+    /* If user is logged in, they can save/unsave */
+    if (authState.status) {
+      setIsLoading(true)
+      try {
+        /* If film has not been saved */
+        if (!isSaved) {
+          await saveFilm()
+          /* Automatically unlikes and unrate a film if it's added to watchlist */
+          if (isLiked) {
+            await unlikeFilm()
+          }
+
+          if (officialRating > 0) {
+            await unrateFilm()
+          }
+          /* If film has already been liked */
+        } else {
+          await unsaveFilm()
+        }
+      } catch (err) {
+        alert("Error handling Like/Unlike, please try again.")
+        console.error("Error in handleLike(): ", err)
+      } finally {
+        setIsLoading(false)
+      }
+
+      /* If user not logged in, alert */
+    } else {
+      alert("Sign In to Save Movies!")
+    }
+  }
+  async function handleRate() {
+    /* If user is logged in, they can like/unlike. */
+    if (authState.status) {
+      try {
+        /* Only take action if requested rating differs from official rating */
+        if (requestedRating !== officialRating) {
+          /* Rate film if requested rating is in valid range */
+          if (requestedRating > 0 && requestedRating <= 3) {
+            /* IMPORTANT: If a film has not been liked when it is rated, automatically likes it FIRST, THEN rate the film. */
+            if (!isLiked) {
+              await likeFilm()
+            }
+            /* Automatically removes film from watchlist if user rates it */
+            if (isSaved) {
+              await unsaveFilm()
+            }
+
+            // If rating film for first time
+            if (officialRating === 0) {
+              await rateFilm(requestedRating)
+            } else {
+              // If modifying existing rating
+              await updateFilmRating(requestedRating)
+            }
+          } else if (requestedRating === 0) {
+            // console.log("Trying to unrate film.")
+            await unrateFilm()
+          } else if (requestedRating == -1) {
+            // console.log("Requested rating: back to neutral (-1)")
+          } else {
+            console.error("Requested rating out of range.")
+          }
+        }
+      } catch (err) {
+        alert("Error handling Like/Unlike, please try again.")
+        console.error("Error in handleLike(): ", err)
+      } finally {
+        setIsLoading(false)
+      }
+      /* If user not logged in, alert */
+    } else {
+      alert("Sign In to Rate Movies!")
+    }
+  }
+
+  useEffect(() => {
+    handleRate()
+  }, [requestedRating])
 
   /* Fetch film info for Landing Page */
   useEffect(() => {
-    if (tmdbId) {
-      setSearchModalOpen(false)
-      fetchFilmFromTMDB(
-        tmdbId,
-        setMovieDetails,
-        setDirectors,
-        setDops,
-        setMainCast
-      )
-      checkLikeStatus(tmdbId, setIsLiked)
-      checkSaveStatus(tmdbId, setIsSaved)
-    }
-  }, [tmdbId])
-
-  useEffect(() => {
-    if (location.state) {
-      const { fromPage } = location.state || {}
-      console.log("Location.state:", location.state)
-      console.log("From Page:", fromPage)
-      if (fromPage === "liked-films") {
-        setReturnToPage("/")
-      } else {
-        setReturnToPage("/watchlist")
+    const fetchPageData = async () => {
+      if (tmdbId) {
+        setSearchModalOpen(false)
+        setIsLoading(true)
+        try {
+          fetchFilmFromTMDB(
+            tmdbId,
+            setMovieDetails,
+            setDirectors,
+            setDops,
+            setMainCast
+          )
+          checkLikeStatus(tmdbId, setIsLiked)
+          checkSaveStatus(tmdbId, setIsSaved)
+          checkRateStatus(tmdbId, setOfficialRating)
+        } catch (err) {
+          console.error("Error loading film data: ", err)
+        } finally {
+          setIsLoading(false)
+        }
       }
     }
-  }, [location.state])
+    fetchPageData()
+  }, [tmdbId])
+
+  // useEffect(() => {
+  //   if (location.state) {
+  //     const { currentViewMode } = location.state || {}
+  //     console.log("Location.state:", location.state)
+  //     console.log("Current View Mode:", currentViewMode)
+  //     setReturnToViewMode(currentViewMode)
+  //   }
+  // }, [location.state])
 
   if (!movieDetails) {
     return <div>Error loading film. Please try again.</div>
   }
 
-  if (loading) {
-    return <LoadingPage />
-  }
-
   return (
     <>
+      {/* {isLoading && <LoadingPage />} */}
+
       {/* Quick Search Modal */}
       {searchModalOpen && (
         <QuickSearchModal
           searchModalOpen={searchModalOpen}
           setSearchModalOpen={setSearchModalOpen}
-          returnToPage={returnToPage}
         />
       )}
 
@@ -254,7 +442,16 @@ export default function FilmLanding() {
         </div>
         <div className="border-2 border-red-500 w-[100%] h-[90%] top-[5%] bg-zinc-50 text-black">
           <NavBar />
-
+          <button
+            onClick={() => {
+              navigate("/", {
+                state: {
+                  returnToViewMode: returnToViewMode,
+                },
+              })
+            }}>
+            BACK TO FILMS
+          </button>
           <img
             className="w-[20rem] min-w-[20rem] aspect-2/3 object-cover transition-all duration-300 ease-out border-2 border-blue-500"
             src={
@@ -265,11 +462,11 @@ export default function FilmLanding() {
             alt=""
           />
 
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 border-1 h-[4rem]">
             <button
-              alt="Add to feed"
-              title="Add to feed"
-              className="hover:text-blue-800 transition-all duration-200 ease-out hover:bg-zinc-200 p-3"
+              alt="Add to watched"
+              title="Add to watched"
+              className="hover:text-blue-800 transition-all duration-200 ease-out hover:bg-zinc-200/30 p-3 h-full flex items-center"
               onClick={handleLike}>
               {isLiked ? (
                 <div className="flex items-center gap-1">
@@ -286,7 +483,7 @@ export default function FilmLanding() {
             <button
               alt="Add to watchlist"
               title="Add to watchlist"
-              className="hover:text-blue-800 transition-all duration-200 ease-out"
+              className="hover:text-blue-800 hover:bg-zinc-200/30 transition-all duration-200 ease-out p-3 h-full flex items-center"
               onClick={handleSave}>
               {isSaved ? (
                 <div className="flex items-center gap-1">
@@ -300,6 +497,10 @@ export default function FilmLanding() {
                 </div>
               )}
             </button>
+            <TripleStarRating
+              officialRating={officialRating}
+              setRequestedRating={setRequestedRating}
+            />
           </div>
 
           {movieDetails.overview && (

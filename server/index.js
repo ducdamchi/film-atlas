@@ -7,16 +7,23 @@ const cors = require("cors")
 app.use(express.json())
 app.use(cors())
 
-const authRouter = require("./routes/Auth.js")
-const userLikesRouter = require("./routes/UserLikes.js")
-const userSavesRouter = require("./routes/UserSaves.js")
+/* IMPORTANT:
+These terms are used interchangeably to adapt to different logic in frontend and backend:
+"Watched" router interact with "Likes" model
+"Watchlisted" router interact with "Saves" model
+"Starred" router interacts with "Stars" model*/
 
-const filmsRouter = require("./routes/Film.js")
+const authRouter = require("./routes/Auth.js")
+const watchedRouter = require("./routes/Watched.js")
+const watchlistedRouter = require("./routes/Watchlisted.js")
+const starredRouter = require("./routes/Starred.js")
+const directorsRouter = require("./routes/Directors.js")
 
 app.use("/auth", authRouter)
-app.use("/profile/me/liked-films", userLikesRouter)
-app.use("/profile/me/watchlist", userSavesRouter)
-app.use("/film", filmsRouter)
+app.use("/profile/me/watched", watchedRouter)
+app.use("/profile/me/watchlisted", watchlistedRouter)
+app.use("/profile/me/starred", starredRouter)
+app.use("/profile/me/directors", directorsRouter)
 
 /* Notes:
 db.sequelize.sync() synchronizes Sequelize models with database tables by either:

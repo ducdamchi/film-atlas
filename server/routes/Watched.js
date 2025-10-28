@@ -2,6 +2,8 @@ const express = require("express")
 const router = express.Router()
 const { Users } = require("../models")
 const { Films } = require("../models")
+const { Directors } = require("../models")
+const { WatchedDirectors } = require("../models")
 const { validateToken } = require("../middlewares/AuthMiddleware")
 
 /* GET: Fetch all films liked by a user */
@@ -25,14 +27,6 @@ router.get("/", validateToken, async (req, res) => {
       case "released_date_asc":
         order = [["likedFilms", "release_date", "ASC"]]
         break
-      case "director_name_desc":
-        //"put ASC here to get A-Z"
-        order = [["likedFilms", "directorNamesForSorting", "ASC"]]
-        break
-      case "director_name_asc":
-        //"put DESC here to get Z-A"
-        order = [["likedFilms", "directorNamesForSorting", "DESC"]]
-        break
     }
 
     const userWithLikedFilms = await Users.findByPk(jwtUserId, {
@@ -52,7 +46,7 @@ router.get("/", validateToken, async (req, res) => {
             "release_date",
           ],
           through: {
-            attributes: [["createdAt", "likedAt"]],
+            attributes: [["createdAt", "addedAt"]],
           },
         },
       ],
@@ -97,12 +91,16 @@ router.get("/:tmdbId", validateToken, async (req, res) => {
   }
 })
 
-/* POST: Add a film liked by User to junction table */
+/* POST: Handle when user Likes a film */
 router.post("/", validateToken, async (req, res) => {
   try {
     const jwtUserId = req.user.id //UserId in signed JWT
     const likeData = req.body
+    const user = await Users.findByPk(jwtUserId)
 
+    if (!user) {
+      return res.status(404).json({ error: "User Not Found" })
+    }
     /* Either find existing film or create new film */
     const [film, created] = await Films.findOrCreate({
       where: {
@@ -120,14 +118,51 @@ router.post("/", validateToken, async (req, res) => {
         release_date: likeData.release_date,
       },
     })
-    const user = await Users.findByPk(jwtUserId)
+    // add film to Liked junction table
+    await user.addLikedFilm(film)
 
-    if (!user) {
-      return res.status(404).json({ error: "User Not Found" })
-    } else {
-      await user.addLikedFilm(film)
-      return res.status(200).json("Success")
+    /* Now, handle the Director model and WatchedDirector junction table */
+    for (const director of likeData.directors) {
+      /* Either find the director or create a new entry */
+      const [entry, entryCreated] = await Directors.findOrCreate({
+        where: {
+          id: director.tmdbId,
+        },
+        defaults: {
+          id: director.tmdbId,
+          name: director.name,
+          profile_path: director.profile_path,
+        },
+      })
+
+      // If no previous record of director, it means this is the user's first watched film by the director. Set num_watched_films = 1.
+      if (entryCreated) {
+        await user.addWatchedDirector(entry, {
+          through: { num_watched_films: 1 },
+        })
+      } else {
+        // Otherwise, find or create an instance of User x Director in junction table and set the appropriate film count and number of stars that director has in total.
+        const [junctionEntry, junctionEntryCreated] =
+          await WatchedDirectors.findOrCreate({
+            where: {
+              directorId: entry.id,
+              userId: jwtUserId,
+            },
+            defaults: {
+              directorId: entry.id,
+              userId: jwtUserId,
+              num_watched_films: 1,
+              num_stars_total: 0,
+            },
+          })
+        if (!junctionEntryCreated) {
+          junctionEntry.num_watched_films += 1
+          await junctionEntry.save()
+        }
+      }
     }
+
+    return res.status(200).json("Success")
   } catch (err) {
     console.error(err)
     return res.status(500).json({ error: "Error Adding Entry" })
@@ -153,6 +188,30 @@ router.delete("/", validateToken, async (req, res) => {
     }
 
     await user.removeLikedFilm(film)
+
+    /* Locate each instance of watched director in junction table */
+    for (const director of film.directors) {
+      const watchedDirector = await WatchedDirectors.findOne({
+        where: {
+          directorId: director.tmdbId,
+          userId: jwtUserId,
+        },
+      })
+      if (!watchedDirector) {
+        return res.status(404).json({
+          error: `Cannot find entry for director ${director.name}, id: ${director.tmdbId} in WatchedDirector junction table.`,
+        })
+      }
+
+      // If current num_watched_films by a director is 1, remove director from junction table
+      if (watchedDirector.num_watched_films <= 1) {
+        await watchedDirector.destroy()
+      } else {
+        watchedDirector.num_watched_films -= 1
+        await watchedDirector.save()
+      }
+    }
+
     return res.status(200).json("Success")
   } catch (err) {
     console.error(err)

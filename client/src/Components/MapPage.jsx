@@ -6,7 +6,10 @@ import * as maptilersdk from "@maptiler/sdk"
 import "@maptiler/sdk/dist/maptiler-sdk.css"
 
 import { getCountryName } from "../Utils/helperFunctions"
+import useCommandK from "../Utils/useCommandK"
+
 import NavBar from "./Shared/NavBar"
+import QuickSearchModal from "./Shared/QuickSearchModal"
 
 // import "maplibre-gl/dist/maplibre-gl.css"`
 
@@ -16,15 +19,21 @@ export default function MapPage() {
   const [firstSymbolId, setFirstSymbolId] = useState(null)
   const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [popupInfo, setPopupInfo] = useState(null)
+  const [searchModalOpen, setSearchModalOpen] = useState(false)
 
   const [filmsPerCountryData, setFilmsPerCountryData] = useState({})
+
+  function toggleSearchModal() {
+    setSearchModalOpen((status) => !status)
+  }
+  useCommandK(toggleSearchModal)
 
   const mapRef = useRef(null)
 
   /* Fetch User's film list (liked or watchlisted) from App's DB */
   useEffect(() => {
     axios
-      .get(`http://localhost:3002/profile/me/liked-films`, {
+      .get(`http://localhost:3002/profile/me/watched`, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -56,7 +65,7 @@ export default function MapPage() {
         }
       })
     })
-    console.log(data)
+    // console.log(data)
     setFilmsPerCountryData(data)
   }, [userFilmList])
 
@@ -88,7 +97,7 @@ export default function MapPage() {
       }
       //921 & 907: iso_i3 for West Bank and Gaza
       if (country.id === 921 || country.id === 907) {
-        console.log("Detected films from PS.")
+        // console.log("Detected films from PS.")
         map.setFeatureState(
           {
             source: "countriesData",
@@ -196,101 +205,113 @@ export default function MapPage() {
   }, [onData])
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center">
+    <div>
+      {/* Quick Search Modal */}
+      {searchModalOpen && (
+        <QuickSearchModal
+          searchModalOpen={searchModalOpen}
+          setSearchModalOpen={setSearchModalOpen}
+          // queryString={queryString}
+        />
+      )}
       <NavBar />
-      <Map
-        ref={mapRef}
-        onLoad={onMapLoad}
-        onClick={onMapClick}
-        mapboxAccessToken={MAPTILER_API_KEY}
-        initialViewState={{ latitude: 25, longitude: 150, zoom: 1.2 }}
-        mapStyle={
-          "https://api.maptiler.com/maps/0199f849-b24f-7c0c-a482-2c1149331519/style.json?key=0bsarBRVUOINHDtiYsY0"
-        }>
-        <Source
-          id="countriesData"
-          type="vector"
-          url="https://api.maptiler.com/tiles/countries/tiles.json?key=0bsarBRVUOINHDtiYsY0">
-          <Layer
-            id="countriesLayer"
-            source="countriesData"
-            source-layer="administrative"
-            type="fill"
-            paint={{
-              "fill-color": [
-                "case",
-                [
-                  "!=",
-                  ["to-number", ["feature-state", "num_watched_films"]],
-                  0,
+      <div className="w-screen h-[40rem] flex flex-col items-center border-2 relative">
+        <Map
+          className=""
+          ref={mapRef}
+          onLoad={onMapLoad}
+          onClick={onMapClick}
+          mapboxAccessToken={MAPTILER_API_KEY}
+          initialViewState={{ latitude: 25, longitude: 150, zoom: 1.2 }}
+          mapStyle={
+            "https://api.maptiler.com/maps/0199f849-b24f-7c0c-a482-2c1149331519/style.json?key=0bsarBRVUOINHDtiYsY0"
+          }>
+          <Source
+            id="countriesData"
+            type="vector"
+            url="https://api.maptiler.com/tiles/countries/tiles.json?key=0bsarBRVUOINHDtiYsY0">
+            <Layer
+              id="countriesLayer"
+              source="countriesData"
+              source-layer="administrative"
+              type="fill"
+              paint={{
+                "fill-color": [
+                  "case",
+                  [
+                    "!=",
+                    ["to-number", ["feature-state", "num_watched_films"]],
+                    0,
+                  ],
+                  [
+                    "interpolate",
+                    ["linear"],
+                    ["feature-state", "num_watched_films"],
+                    1,
+                    "rgba(247, 227, 222, 1)",
+                    10,
+                    "rgba(140, 23, 10, 1)",
+                  ],
+                  "rgba(126, 126, 126, 0)",
                 ],
-                [
-                  "interpolate",
-                  ["linear"],
-                  ["feature-state", "num_watched_films"],
-                  1,
-                  "rgba(247, 227, 222, 1)",
-                  10,
-                  "rgba(140, 23, 10, 1)",
+                "fill-opacity": 1,
+                "fill-outline-color": "rgba(140, 206, 34, 0.7)",
+              }}
+              filter={["==", "level", 0]}
+              beforeId={firstSymbolId}></Layer>
+            <Layer
+              id="countriesLayer"
+              source="countriesData"
+              source-layer="administrative"
+              type="symbol"
+              layout={{
+                "text-field": [
+                  "case",
+                  ["!=", ["feature-state", "custom_name"], ""],
+                  ["feature-state", "custom_name"], // Use custom name if available
+                  ["get", "NAME"], // Fallback to original name
                 ],
-                "rgba(126, 126, 126, 0)",
-              ],
-              "fill-opacity": 1,
-              "fill-outline-color": "rgba(140, 206, 34, 0.7)",
-            }}
-            filter={["==", "level", 0]}
-            beforeId={firstSymbolId}></Layer>
-          <Layer
-            id="countriesLayer"
-            source="countriesData"
-            source-layer="administrative"
-            type="symbol"
-            layout={{
-              "text-field": [
-                "case",
-                ["!=", ["feature-state", "custom_name"], ""],
-                ["feature-state", "custom_name"], // Use custom name if available
-                ["get", "NAME"], // Fallback to original name
-              ],
-              "text-size": 12,
-              "text-font": ["Open Sans Bold"],
-              "text-allow-overlap": false,
-              "text-optional": true,
-            }}
-            paint={{
-              "text-color": "#000000",
-              "text-halo-color": "#ffffff",
-              "text-halo-width": 1,
-            }}
-            filter={["==", "level", 0]}
-            beforeId={firstSymbolId}></Layer>
-        </Source>
+                "text-size": 12,
+                "text-font": ["Open Sans Bold"],
+                "text-allow-overlap": false,
+                "text-optional": true,
+              }}
+              paint={{
+                "text-color": "#000000",
+                "text-halo-color": "#ffffff",
+                "text-halo-width": 1,
+              }}
+              filter={["==", "level", 0]}
+              beforeId={firstSymbolId}></Layer>
+          </Source>
 
-        {popupInfo && (
-          <Popup
-            longitude={popupInfo.longitude}
-            latitude={popupInfo.latitude}
-            anchor="bottom"
-            closeOnClick={false}
-            onClose={() => setPopupInfo(null)}>
-            <div className="flex flex-col items-center justify-center">
-              {popupInfo.custom_name !== undefined && (
-                <span className="font-bold">{popupInfo.custom_name}</span>
-              )}
-              {popupInfo.custom_name === undefined && (
-                <span className="font-bold">{popupInfo.country_name}</span>
-              )}
+          {popupInfo && (
+            <Popup
+              longitude={popupInfo.longitude}
+              latitude={popupInfo.latitude}
+              anchor="bottom"
+              closeOnClick={false}
+              onClose={() => setPopupInfo(null)}>
+              <div className="flex flex-col items-center justify-center">
+                {popupInfo.custom_name !== undefined && (
+                  <span className="font-bold">{popupInfo.custom_name}</span>
+                )}
+                {popupInfo.custom_name === undefined && (
+                  <span className="font-bold">{popupInfo.country_name}</span>
+                )}
 
-              <span>
-                <span className="font-bold">
-                  {`${popupInfo.num_watched_films}`}&nbsp;
+                <span>
+                  <span className="font-bold">
+                    {`${popupInfo.num_watched_films}`}&nbsp;
+                  </span>
+                  <span>{`watched films`}</span>
                 </span>
-                <span>{`watched films`}</span>
-              </span>
-            </div>
-          </Popup>
-        )}
-      </Map>
+              </div>
+            </Popup>
+          )}
+        </Map>
+      </div>
+      <div className="relative"></div>
     </div>
   )
 }

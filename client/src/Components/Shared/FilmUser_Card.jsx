@@ -1,0 +1,136 @@
+import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
+
+import { getCountryName, getReleaseYear } from "../../Utils/helperFunctions"
+
+export default function FilmUser_Card({ filmObject, queryString }) {
+  const imgBaseUrl = "https://image.tmdb.org/t/p/original"
+  const navigate = useNavigate()
+  const [isDirectorHover, setIsDirectorHover] = useState(false)
+  return (
+    <div className="film-item w-[30rem] min-w-[20rem] aspect-16/10 flex flex-col justify-center items-start gap-0 bg-zinc-200">
+      {/* Poster */}
+      <div className="group/thumbnail overflow-hidden">
+        <img
+          className="w-[30rem] min-w-[20rem] aspect-16/10 object-cover transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03]"
+          src={
+            filmObject.backdrop_path !== null
+              ? `${imgBaseUrl}${filmObject.backdrop_path}`
+              : `backdropnotfound.jpg`
+          }
+          alt=""
+          onClick={() => {
+            navigate(`/films/${filmObject.id}`, {
+              state: {
+                currentViewMode: queryString,
+              },
+            })
+          }}
+        />
+      </div>
+
+      {/* Text below poster */}
+      <div className="text-black w-full p-3  flex justify-between ">
+        {/* Left side - Title, year, directors name*/}
+        <div className="border-amber-400 flex flex-col items-start justify-center gap-0">
+          {/* Film Title */}
+          <div className="max-w-[18rem] text-wrap">
+            <span
+              onClick={() => {
+                navigate(`/films/${filmObject.id}`)
+              }}
+              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
+              {`${filmObject.title.slice(0, 50)}`}
+            </span>
+            {filmObject.title.length >= 50 && (
+              <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
+                ...
+              </span>
+            )}
+          </div>
+          {/* Release year & Director's name */}
+          <div className="flex items-center uppercase text-sm gap-1">
+            {filmObject.release_date && (
+              <span className="">
+                {`${getReleaseYear(filmObject.release_date)}`}
+              </span>
+            )}
+            {queryString && filmObject.origin_country && (
+              <span className="">
+                <span className="flex gap-1">
+                  <span>|</span>
+                  {filmObject.origin_country.map((country, key) => {
+                    return (
+                      <span key={key}>
+                        <span>{`${getCountryName(country)}`}</span>
+                        {/* Add a comma if it's not the last country on the list */}
+                        {key !== filmObject.origin_country.length - 1 && (
+                          <span>,</span>
+                        )}
+                      </span>
+                    )
+                  })}
+                </span>
+              </span>
+            )}
+          </div>
+        </div>
+        {/* Right side - director's photo*/}
+        <div className="flex flex-col items-center justify-center gap-1 max-w-[20rem]">
+          {queryString && filmObject.directors && (
+            <div className="border-amber-400 flex items-center gap-1 justify-center">
+              {filmObject.directors.map((dir, key) => {
+                return (
+                  <div
+                    key={key}
+                    className="flex flex-col items-center justify-center gap-1"
+                    onMouseLeave={() => {
+                      setIsDirectorHover(false)
+                    }}>
+                    <div className="relative max-w-[8rem] h-[4rem] aspect-1/1 overflow-hidden rounded-full">
+                      <img
+                        className="object-cover grayscale transform -translate-y-2/11 hover:scale-[1.05] transition-all duration-300 ease-out"
+                        src={
+                          dir.profile_path !== null
+                            ? `${imgBaseUrl}${dir.profile_path}`
+                            : "profilepicnotfound.jpg"
+                        }
+                        onMouseEnter={() => {
+                          setIsDirectorHover(true)
+                        }}
+                      />
+                    </div>
+                    {/* {isDirectorHover && (
+                      <span className="absolute uppercase text-xs italic font-semibold text-center text-black">{`${dir.name}`}</span>
+                    )} */}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// {
+//   queryString && filmObject.directors && (
+//     <span className="">
+//       <span className="flex gap-1 uppercase text-xs italic font-semibold">
+//         {/* <span>|</span> */}
+//         {filmObject.directors.map((dir, key) => {
+//           return (
+//             <span key={key}>
+//               <span>{`${dir.name}`}</span>
+//               {/* Add a comma if it's not the last country on the list */}
+//               {key !== filmObject.directors.length - 1 && (
+//                 <span>,</span>
+//               )}
+//             </span>
+//           )
+//         })}
+//       </span>
+//     </span>
+//   )
+// }

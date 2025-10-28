@@ -37,15 +37,18 @@ export default function NavBar() {
 
         {!authState.status ? (
           <>
-            <CustomLink to="/">HOME</CustomLink>
+            <CustomLink to="/">FILMS</CustomLink>
+            <CustomLink to="/directors">DIRECTORS</CustomLink>
+            <CustomLink to="/map">MAP</CustomLink>
             <CustomLink to="/login">LOG IN</CustomLink>
             <CustomLink to="/register">REGISTER</CustomLink>
           </>
         ) : (
           <>
-            <CustomLink to="/">HOME</CustomLink>
+            <CustomLink to="/">FILMS</CustomLink>
+            <CustomLink to="/directors">DIRECTORS</CustomLink>
             <CustomLink to="/map">MAP</CustomLink>
-            <CustomLink to="/watchlist">WATCHLIST</CustomLink>
+            {/* <CustomLink to="/watchlist">WATCHLIST</CustomLink> */}
 
             <button onClick={logOut}>LOG OUT</button>
           </>
