@@ -22,7 +22,7 @@ const directorsRouter = require("./routes/Directors.js")
 app.use("/auth", authRouter)
 app.use("/profile/me/watched", watchedRouter)
 app.use("/profile/me/watchlisted", watchlistedRouter)
-app.use("/profile/me/starred", starredRouter)
+// app.use("/profile/me/starred", starredRouter)
 app.use("/profile/me/directors", directorsRouter)
 
 /* Notes:

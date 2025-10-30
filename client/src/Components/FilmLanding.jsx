@@ -10,7 +10,6 @@ import {
   fetchFilmFromTMDB,
   checkLikeStatus,
   checkSaveStatus,
-  checkRateStatus,
 } from "../Utils/helperFunctions"
 import { AuthContext } from "../Utils/authContext"
 import useCommandK from "../Utils/useCommandK"
@@ -43,7 +42,7 @@ export default function FilmLanding() {
   const [isSaved, setIsSaved] = useState(false)
   const [searchModalOpen, setSearchModalOpen] = useState(false)
   const [returnToViewMode, setReturnToViewMode] = useState("")
-  const [officialRating, setOfficialRating] = useState(0) //0 for unrated; 1, 2, 3 for corresponding stars.
+  const [officialRating, setOfficialRating] = useState(null) //0 for liked but unrated; 1, 2, 3 for corresponding stars; null when film unliked
   const [requestedRating, setRequestedRating] = useState(-1) //-1 when neutral (no requests), 0 for unrated; 1, 2, 3 for stars.
 
   const { authState, loading } = useContext(AuthContext)
@@ -55,9 +54,8 @@ export default function FilmLanding() {
     setSearchModalOpen((status) => !status)
   }
   useCommandK(toggleSearchModal)
-
   /* Create the request body for API call to App's DB when user 'like' a film */
-  function createReqBody() {
+  function createReqBody(requestString) {
     const directorsList = directors.map((director) => ({
       tmdbId: director.id,
       name: director.name,
@@ -67,23 +65,37 @@ export default function FilmLanding() {
       .map((director) => director.name)
       .join(", ")
 
-    const req = {
-      tmdbId: movieDetails.id,
-      title: movieDetails.title,
-      runtime: movieDetails.runtime,
-      poster_path: movieDetails.poster_path,
-      backdrop_path: movieDetails.backdrop_path,
-      origin_country: movieDetails.origin_country,
-      release_date: movieDetails.release_date,
-      directors: directorsList,
-      directorNamesForSorting: directorNamesForSorting,
+    let req
+    switch (requestString) {
+      case "like":
+      case "save":
+        req = {
+          tmdbId: movieDetails.id,
+          title: movieDetails.title,
+          runtime: movieDetails.runtime,
+          poster_path: movieDetails.poster_path,
+          backdrop_path: movieDetails.backdrop_path,
+          origin_country: movieDetails.origin_country,
+          release_date: movieDetails.release_date,
+          directors: directorsList,
+          directorNamesForSorting: directorNamesForSorting,
+        }
+        break
+      case "rate":
+        req = {
+          tmdbId: movieDetails.id,
+          directors: directorsList,
+          stars: requestedRating,
+        }
     }
+
     return req
   }
-
   /* Make API call to App's DB when user 'like' a film */
-  function likeFilm() {
-    const req = createReqBody()
+  function likeFilm(requestedRating) {
+    const req = createReqBody("like")
+    req["stars"] = requestedRating ? requestedRating : 0
+
     return axios
       .post(`http://localhost:3002/profile/me/watched`, req, {
         headers: {
@@ -95,7 +107,10 @@ export default function FilmLanding() {
           console.log("Server: ", response.data.error)
           throw new Error(response.data.error)
         } else {
-          setIsLiked(true)
+          setIsLiked(response.data.liked)
+          setOfficialRating(response.data.stars)
+          setRequestedRating(-1)
+          setIsSaved(false) //positively "unsave" film on client side. upon reload this value will get updated with actual Save status.
           return response.data
         }
       })
@@ -122,7 +137,8 @@ export default function FilmLanding() {
 
           // console.log(authState)
         } else {
-          setIsLiked(false)
+          setIsLiked(response.data.liked)
+          setOfficialRating(response.data.stars)
           return response.data
         }
       })
@@ -133,7 +149,7 @@ export default function FilmLanding() {
   }
   /* Make API call to App's DB when user 'like' a film */
   function saveFilm() {
-    const req = createReqBody()
+    const req = createReqBody("save")
     return axios
       .post(`http://localhost:3002/profile/me/watchlisted`, req, {
         headers: {
@@ -145,7 +161,10 @@ export default function FilmLanding() {
           console.log("Server: ", response.data.error)
           throw new Error(response.data.error)
         } else {
-          setIsSaved(true)
+          setIsSaved(response.data.saved)
+          //positively "unlike" film on client side. upon reload this value will get updated with actual Like status (incl ratings).
+          setIsLiked(false)
+          setOfficialRating(null)
           return response.data
         }
       })
@@ -169,10 +188,8 @@ export default function FilmLanding() {
         if (response.data.error) {
           console.log("Server: ", response.data.error)
           throw new Error(response.data.error)
-
-          // console.log(authState)
         } else {
-          setIsSaved(false)
+          setIsSaved(response.data.saved)
           return response.data
         }
       })
@@ -181,13 +198,12 @@ export default function FilmLanding() {
         throw err
       })
   }
+  /* Make API call to App's DB to rate a film that has already been liked */
   function rateFilm(rating) {
-    const req = createReqBody()
+    const req = createReqBody("rate")
     req["stars"] = rating
-
-    // console.log(req)
     return axios
-      .post(`http://localhost:3002/profile/me/starred`, req, {
+      .put(`http://localhost:3002/profile/me/watched`, req, {
         headers: {
           accessToken: localStorage.getItem("accessToken"),
         },
@@ -197,66 +213,13 @@ export default function FilmLanding() {
           console.log("Server: ", response.data.error)
           throw new Error(response.data.error)
         } else {
-          setOfficialRating(rating)
-          setRequestedRating(-1)
+          setOfficialRating(response.data.stars)
+          setRequestedRating(-1) //neutral state
           return response.data
         }
       })
       .catch((err) => {
         console.error("Client: Error rating film", err)
-        throw err
-      })
-  }
-  function updateFilmRating(rating) {
-    const req = createReqBody()
-    req["stars"] = rating
-
-    // console.log(req)
-    return axios
-      .put(`http://localhost:3002/profile/me/starred`, req, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-        } else {
-          setOfficialRating(rating)
-          setRequestedRating(-1)
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error rating film", err)
-        throw err
-      })
-  }
-  function unrateFilm() {
-    return axios
-      .delete(`http://localhost:3002/profile/me/starred`, {
-        data: {
-          tmdbId: movieDetails.id,
-        },
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-
-          // console.log(authState)
-        } else {
-          setOfficialRating(0)
-          setRequestedRating(-1)
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error unrating film", err)
         throw err
       })
   }
@@ -268,19 +231,9 @@ export default function FilmLanding() {
       setIsLoading(true)
 
       try {
-        /* If film has not been liked */
         if (!isLiked) {
           await likeFilm()
-          /* Automatically removes film from watchlist if it's watched */
-          if (isSaved) {
-            await unsaveFilm()
-          }
-          /* If film has already been liked */
         } else {
-          /* Important: Automatically unrate a film FIRST if it's unliked, THEN unrate it. */
-          if (officialRating > 0) {
-            await unrateFilm()
-          }
           await unlikeFilm()
         }
       } catch (err) {
@@ -299,24 +252,14 @@ export default function FilmLanding() {
     if (authState.status) {
       setIsLoading(true)
       try {
-        /* If film has not been saved */
         if (!isSaved) {
           await saveFilm()
-          /* Automatically unlikes and unrate a film if it's added to watchlist */
-          if (isLiked) {
-            await unlikeFilm()
-          }
-
-          if (officialRating > 0) {
-            await unrateFilm()
-          }
-          /* If film has already been liked */
         } else {
           await unsaveFilm()
         }
       } catch (err) {
-        alert("Error handling Like/Unlike, please try again.")
-        console.error("Error in handleLike(): ", err)
+        alert("Error handling Save/Unsave, please try again.")
+        console.error("Error in handleSave(): ", err)
       } finally {
         setIsLoading(false)
       }
@@ -333,26 +276,13 @@ export default function FilmLanding() {
         /* Only take action if requested rating differs from official rating */
         if (requestedRating !== officialRating) {
           /* Rate film if requested rating is in valid range */
-          if (requestedRating > 0 && requestedRating <= 3) {
-            /* IMPORTANT: If a film has not been liked when it is rated, automatically likes it FIRST, THEN rate the film. */
+          if (requestedRating >= 0 && requestedRating <= 3) {
+            /* IMPORTANT: If a film has not been liked when it is rated, send a like request with the requested Rating */
             if (!isLiked) {
-              await likeFilm()
-            }
-            /* Automatically removes film from watchlist if user rates it */
-            if (isSaved) {
-              await unsaveFilm()
-            }
-
-            // If rating film for first time
-            if (officialRating === 0) {
-              await rateFilm(requestedRating)
+              await likeFilm(requestedRating)
             } else {
-              // If modifying existing rating
-              await updateFilmRating(requestedRating)
+              await rateFilm(requestedRating)
             }
-          } else if (requestedRating === 0) {
-            // console.log("Trying to unrate film.")
-            await unrateFilm()
           } else if (requestedRating == -1) {
             // console.log("Requested rating: back to neutral (-1)")
           } else {
@@ -360,8 +290,8 @@ export default function FilmLanding() {
           }
         }
       } catch (err) {
-        alert("Error handling Like/Unlike, please try again.")
-        console.error("Error in handleLike(): ", err)
+        alert("Error handling Rate, please try again.")
+        console.error("Error in handleRate(): ", err)
       } finally {
         setIsLoading(false)
       }
@@ -389,9 +319,9 @@ export default function FilmLanding() {
             setDops,
             setMainCast
           )
-          checkLikeStatus(tmdbId, setIsLiked)
+          checkLikeStatus(tmdbId, setIsLiked, setOfficialRating)
           checkSaveStatus(tmdbId, setIsSaved)
-          checkRateStatus(tmdbId, setOfficialRating)
+          // checkRateStatus(tmdbId, setOfficialRating)
         } catch (err) {
           console.error("Error loading film data: ", err)
         } finally {

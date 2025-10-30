@@ -1,75 +1,138 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getReleaseYear } from "../../Utils/helperFunctions"
+import { group } from "d3"
 
 export default function DirectorUser_Gallery({
   listOfDirectorObjects,
   sortDirection,
+  sortBy,
   // queryString,
 }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const navigate = useNavigate()
   const [groupedDirectors, setGroupedDirectors] = useState([])
+  const [hoverId, setHoverId] = useState(null)
 
   useEffect(() => {
-    // console.log(listOfDirectorObjects)
     /* User reduce() to group list of films by year */
     if (listOfDirectorObjects) {
-      const directorGroups = listOfDirectorObjects.reduce(
-        (groups, director) => {
-          let targetKey //the key to be used for each Group Object
-          let groupName //the name to be displayed for each Group Object in HTML
+      // console.log(sortBy)
+      if (sortBy === "name") {
+        const directorGroups = listOfDirectorObjects.reduce(
+          (groups, director) => {
+            let targetKey //the key to be used for each Group Object
+            let groupName //the name to be displayed for each Group Object in HTML
 
-          if (!director.name) {
-            console.error("Director's Name not found.")
+            if (!director.name) {
+              console.error("Director's Name not found.")
+              return groups
+            }
+            targetKey = director.name.slice(0, 1)
+
+            if (!groups[targetKey]) {
+              groups[targetKey] = {}
+              groups[targetKey].directors = []
+            }
+            groups[targetKey].directors.push(director)
             return groups
-          }
-          targetKey = director.name.slice(0, 1)
-          // groupName = getNiceMonthYear(targetKey)
+          },
+          {}
+        )
+        console.log("before sorting: ", directorGroups)
 
-          // const year = getReleaseYear(film.release_date)
-          if (!groups[targetKey]) {
-            groups[targetKey] = {}
-            groups[targetKey].directors = []
-            // groups[targetKey].groupName = ""
-          }
-          groups[targetKey].directors.push(director)
-          // groups[targetKey].groupName = groupName
-          return groups
-        },
-        {}
-      )
+        /* Convert grouped list to array and sort based on sortDirection */
+        let sortedDirectorGroups
+        if (directorGroups) {
+          sortedDirectorGroups = Object.entries(directorGroups)
+            .map(([key, value]) => ({
+              key,
+              ...value,
+            }))
+            .sort((a, b) => {
+              return sortDirection === "desc" ? b - a : a - b
+            })
 
-      /* Convert grouped list to array and sort based on sortDirection */
-      let sortedDirectorGroups
-      if (directorGroups) {
-        //only dealing with year here
-        sortedDirectorGroups = Object.entries(directorGroups)
-          .map(([key, value]) => ({
-            key,
-            ...value,
-          }))
-          .sort((a, b) => {
-            return sortDirection === "desc" ? b - a : a - b
-          })
-      }
-      // console.log("Sorted: ", sortedDirectorGroups)
-
-      const finalArray = []
-      for (const group of sortedDirectorGroups) {
-        finalArray.push(group.key)
-        for (const director of group.directors) {
-          finalArray.push(director)
+          sortedDirectorGroups = Object.entries(directorGroups).sort(
+            ([a], [b]) => {
+              const scoreA = parseInt(a)
+              const scoreB = parseInt(b)
+              return sortDirection === "desc"
+                ? scoreB - scoreA
+                : scoreA - scoreB
+            }
+          )
         }
+        console.log("after sorting: ", sortedDirectorGroups)
+
+        const finalArray = []
+        for (const group of sortedDirectorGroups) {
+          finalArray.push(group[0])
+          for (const director of group[1].directors) {
+            finalArray.push(director)
+          }
+        }
+
+        setGroupedDirectors(finalArray)
+      } else if (sortBy == "score") {
+        const directorGroups = listOfDirectorObjects.reduce(
+          (groups, director) => {
+            let targetKey //the key to be used for each Group Object
+            let groupName //the name to be displayed for each Group Object in HTML
+
+            if (!director.WatchedDirectors.score) {
+              console.error("Director's Score not found.")
+              return groups
+            }
+            //director.score is a float number (max 4 digits, max 2 decimal points) written as a string. First, split() the string, which will return two parts, the integer and the decimal points. Then, use the integer part as the targetKey
+            const splits = director.WatchedDirectors.score.split(".")
+            targetKey = splits[0]
+
+            if (!groups[targetKey]) {
+              groups[targetKey] = {}
+              groups[targetKey].directors = []
+              // groups[targetKey].groupName = ""
+            }
+            groups[targetKey].directors.push(director)
+            // groups[targetKey].groupName = groupName
+            return groups
+          },
+          {}
+        )
+        console.log("before sorting: ", directorGroups)
+
+        /* Convert grouped list to array and sort based on sortDirection */
+        let sortedDirectorGroups
+        if (directorGroups) {
+          sortedDirectorGroups = Object.entries(directorGroups).sort(
+            ([a], [b]) => {
+              const scoreA = parseInt(a)
+              const scoreB = parseInt(b)
+              return sortDirection === "desc"
+                ? scoreB - scoreA
+                : scoreA - scoreB
+            }
+          )
+        }
+        console.log("after sorting: ", sortedDirectorGroups)
+
+        const finalArray = []
+        for (const group of sortedDirectorGroups) {
+          finalArray.push(group[0])
+          for (const director of group[1].directors) {
+            finalArray.push(director)
+          }
+        }
+
+        setGroupedDirectors(finalArray)
       }
-
-      console.log("Final: ", finalArray)
-      // console.log(typeof finalArray[0])
-
-      setGroupedDirectors(finalArray)
     }
-  }, [listOfDirectorObjects])
+  }, [listOfDirectorObjects, sortBy, sortDirection])
   // console.log(listOfDirectorObjects)
+
+  /* Avg_rating: total stars / total films watched. max value = 3
+  watchScore: use logarithm function that rewards a director when a user watches multiple films from them. max value = 1 (when user watches 10 or more films, watchScore = 1) 
+  finalScore: max(avg_rating) = 3; max(watchScore) = 1; multiply avg_rating by 2 (max 6); multiply watchScore by 4 (max 4). This will achieve a score on a scale of 10, where avg_rating has 60% weight, and num_watched_films has 40% weight.*/
 
   return (
     <div>
@@ -92,8 +155,15 @@ export default function DirectorUser_Gallery({
               return (
                 <div
                   key={key}
-                  className="flex flex-col gap-1 items-center justify-center border-0 w-[7rem] aspect-4/5">
-                  <div className="relative aspect-4/5 overflow-hidden w-[85%] min-w-[5rem] border-3 rounded-none group/thumbnail flex justify-center items-center">
+                  className="flex flex-col gap-1 items-center justify-center border-0 w-[7rem] aspect-4/5 group/thumbnail">
+                  <div
+                    className="relative aspect-4/5 overflow-hidden w-[85%] min-w-[5rem] border-3 rounded-none  flex justify-center items-center"
+                    onMouseEnter={() => {
+                      setHoverId(key)
+                    }}
+                    onMouseLeave={() => {
+                      setHoverId(null)
+                    }}>
                     <img
                       className="object-cover w-full transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03] grayscale transform  brightness-110"
                       src={
@@ -102,6 +172,17 @@ export default function DirectorUser_Gallery({
                           : `profilepicnotfound.jpg`
                       }
                     />
+                    {hoverId === key && (
+                      <div className="absolute text-xs w-full h-full bg-black/60 text-white p-1 flex flex-col justify-center items-start">
+                        <span>
+                          {`Watched: ${groupObject.WatchedDirectors.num_watched_films}`}
+                        </span>
+
+                        <span>
+                          {`Score: ${groupObject.WatchedDirectors.score}`}
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <div className="text-xs italic border-0 text-center">
                     {groupObject.name}

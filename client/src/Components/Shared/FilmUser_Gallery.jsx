@@ -30,7 +30,7 @@ export default function FilmUser_Gallery({
           case "watched":
             switch (sortBy) {
               case "added_date":
-                const timestamp = film.Likes?.addedAt
+                const timestamp = film.Likes?.createdAt
                 if (!timestamp) {
                   // console.log("Watched: No timestamp")
                   return groups
@@ -48,7 +48,7 @@ export default function FilmUser_Gallery({
             switch (sortBy) {
               case "added_date":
                 // console.log(film)
-                const timestamp = film.Saves?.addedAt
+                const timestamp = film.Saves?.createdAt
                 if (!timestamp) {
                   // console.log("Watchlisted: No timestamp")
                   return groups
@@ -62,11 +62,11 @@ export default function FilmUser_Gallery({
                 break
             }
             break
-          case "starred":
+          case "watched/rated":
             switch (sortBy) {
               case "added_date":
                 // console.log(film)
-                const timestamp = film.Stars?.addedAt
+                const timestamp = film.Likes?.updatedAt
                 if (!timestamp) {
                   // console.log("Starred: No timestamp")
                   return groups

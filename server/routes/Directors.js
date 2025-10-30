@@ -1,26 +1,67 @@
 const express = require("express")
 const router = express.Router()
-const { Users } = require("../models")
-const { Directors } = require("../models")
-
-const { Films } = require("../models")
-const { Stars } = require("../models")
+const { Users, Directors, WatchedDirectors } = require("../models")
 const { validateToken } = require("../middlewares/AuthMiddleware")
 
 /* GET: Fetch all directors whose films users have liked */
 router.get("/", validateToken, async (req, res) => {
   try {
     const jwtUserId = req.user.id //UserId in signed JWT
-    const sortDirection = req.query.sortDirection
-    const numStars = req.query.numStars
+    const sortBy = req.query.sortBy || "name"
+    const sortDirection = req.query.sortDirection || "desc"
+    const sortCommand = `${sortBy}_${sortDirection}`
+    // const numStars = req.query.numStars
 
     let order
-    switch (sortDirection) {
-      case "desc":
-        order = [["watchedDirectors", "name", "DESC"]]
+    switch (sortCommand) {
+      // Sorting by association model attribute
+      case "name_desc":
+        order = [[{ model: Directors, as: "watchedDirectors" }, "name", "ASC"]]
         break
-      case "asc":
-        order = [["watchedDirectors", "name", "ASC"]]
+      case "name_asc":
+        order = [[{ model: Directors, as: "watchedDirectors" }, "name", "DESC"]]
+        break
+
+      // Sorting by junction table attribute
+      case "highest_star_desc":
+        order = [
+          [
+            { model: Directors, as: "watchedDirectors" },
+            WatchedDirectors,
+            "highest_star",
+            "DESC",
+          ],
+        ]
+        break
+      case "highest_star_asc":
+        order = [
+          [
+            { model: Directors, as: "watchedDirectors" },
+            WatchedDirectors,
+            "highest_star",
+            "ASC",
+          ],
+        ]
+        break
+      case "score_desc":
+        order = [
+          [
+            { model: Directors, as: "watchedDirectors" },
+            WatchedDirectors,
+            "score",
+            "DESC",
+          ],
+        ]
+        break
+      case "score_asc":
+        order = [
+          [
+            { model: Directors, as: "watchedDirectors" },
+            WatchedDirectors,
+            "score",
+            "ASC",
+          ],
+        ]
         break
     }
 
@@ -31,7 +72,13 @@ router.get("/", validateToken, async (req, res) => {
           as: "watchedDirectors",
           attributes: ["id", "name", "profile_path"],
           through: {
-            attributes: ["num_watched_films"],
+            attributes: [
+              "num_watched_films",
+              "num_stars_total",
+              "highest_star",
+              "avg_rating",
+              "score",
+            ],
           },
         },
       ],

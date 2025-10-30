@@ -31,29 +31,42 @@ export default function NavBar() {
   }
 
   return (
-    <div>
-      <ul className="flex gap-7 p-2 border-1">
-        {/* <CustomLink to="/">Search</CustomLink> */}
+    <div className="flex items-center justify-between w-full p-3 pl-[2rem] pr-[2rem] h-[4rem]">
+      <div className="h-full flex items-center justify-center">
+        <span className="text-md uppercase font-semibold ">The Film Atlas</span>
+      </div>
 
-        {!authState.status ? (
-          <>
-            <CustomLink to="/">FILMS</CustomLink>
-            <CustomLink to="/directors">DIRECTORS</CustomLink>
-            <CustomLink to="/map">MAP</CustomLink>
-            <CustomLink to="/login">LOG IN</CustomLink>
-            <CustomLink to="/register">REGISTER</CustomLink>
-          </>
-        ) : (
-          <>
-            <CustomLink to="/">FILMS</CustomLink>
-            <CustomLink to="/directors">DIRECTORS</CustomLink>
-            <CustomLink to="/map">MAP</CustomLink>
-            {/* <CustomLink to="/watchlist">WATCHLIST</CustomLink> */}
+      <div className="text-sm h-full mt-1">
+        <ul className="flex gap-7 p-2 ">
+          {/* <CustomLink to="/">Search</CustomLink> */}
 
-            <button onClick={logOut}>LOG OUT</button>
-          </>
-        )}
-      </ul>
+          {!authState.status ? (
+            <>
+              <CustomLink to="/">FILMS</CustomLink>
+              <CustomLink to="/directors">DIRECTORS</CustomLink>
+              <CustomLink to="/map">MAP</CustomLink>
+              <CustomLink to="/login">LOG IN</CustomLink>
+              <CustomLink to="/register">REGISTER</CustomLink>
+            </>
+          ) : (
+            <>
+              <CustomLink to="/">FILMS</CustomLink>
+              <CustomLink to="/directors">DIRECTORS</CustomLink>
+              <CustomLink to="/map">MAP</CustomLink>
+              {/* <CustomLink to="/watchlist">WATCHLIST</CustomLink> */}
+
+              <button onClick={logOut}>LOG OUT</button>
+            </>
+          )}
+        </ul>
+      </div>
+
+      {authState.status && (
+        <div className="text-black text-sm h-full flex items-center justify-center">
+          <span>Welcome,&nbsp;</span>
+          <span className="font-bold">{`${authState.username}!`}</span>
+        </div>
+      )}
     </div>
   )
 }

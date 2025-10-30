@@ -30,13 +30,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "userId",
       otherKey: "filmId",
     })
-    // Each User can have many "Star" instances
-    Users.belongsToMany(models.Films, {
-      through: models.Stars,
-      as: "starredFilms",
-      foreignKey: "userId",
-      otherKey: "filmId",
-    })
     // Each User can have many Directors
     Users.belongsToMany(models.Directors, {
       through: models.WatchedDirectors,

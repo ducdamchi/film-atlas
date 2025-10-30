@@ -226,7 +226,7 @@ export function fetchListByParams(
 - tmdbId: unique TMDB id assigned to film
 - setLike: useState() method that updates the like status in the calling component
 */
-export function checkLikeStatus(tmdbId, setIsLiked) {
+export function checkLikeStatus(tmdbId, setIsLiked, setOfficialRating) {
   return axios
     .get(`http://localhost:3002/profile/me/watched/${tmdbId}`, {
       headers: {
@@ -237,11 +237,8 @@ export function checkLikeStatus(tmdbId, setIsLiked) {
       if (response.data.error) {
         console.log("Server: ", response.data.error)
       } else {
-        if (response.data.liked) {
-          setIsLiked(true)
-        } else {
-          setIsLiked(false)
-        }
+        setIsLiked(response.data.liked)
+        setOfficialRating(response.data.stars)
       }
       return response.data
     })
@@ -277,36 +274,6 @@ export function checkSaveStatus(tmdbId, setIsSaved) {
     })
     .catch((err) => {
       console.error("Client: Error checking save status", err)
-      throw err
-    })
-}
-
-/* Check the Saved status of a film for logged in users from App's DB
-@params:
-- tmdbId: unique TMDB id assigned to film
-- setLike: useState() method that updates the like status in the calling component
-*/
-export function checkRateStatus(tmdbId, setOfficialRating) {
-  return axios
-    .get(`http://localhost:3002/profile/me/starred/${tmdbId}`, {
-      headers: {
-        accessToken: localStorage.getItem("accessToken"),
-      },
-    })
-    .then((response) => {
-      if (response.data.error) {
-        console.log("Server: ", response.data.error)
-      } else {
-        if (response.data.starred) {
-          setOfficialRating(response.data.stars)
-        } else {
-          setOfficialRating(0)
-        }
-      }
-      return response.data
-    })
-    .catch((err) => {
-      console.error("Client: Error checking rate status", err)
       throw err
     })
 }

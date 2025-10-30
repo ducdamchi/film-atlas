@@ -68,17 +68,21 @@ export default function TripleStarRating({
         </button>
       </div>
       <div>
-        {officialRating !== 0 && (
-          <button
-            onClick={() => {
-              console.log("clicked")
-              setRequestedRating(0)
-            }}
-            className="text-xl hover:text-blue-800 transition-all duration-200 ease-out text-pink-600">
-            Un-star
-          </button>
-        )}
-        {officialRating === 0 && <span className="text-xl">Starred</span>}
+        {officialRating !== 0 &&
+          officialRating !== undefined &&
+          officialRating !== null && (
+            <button
+              onClick={() => {
+                // console.log(officialRating)
+                setRequestedRating(0)
+              }}
+              className="text-xl hover:text-blue-800 transition-all duration-200 ease-out text-pink-600">
+              Unrate
+            </button>
+          )}
+        {(officialRating === 0 ||
+          officialRating === undefined ||
+          officialRating === null) && <span className="text-xl">Rate</span>}
       </div>
     </div>
   )

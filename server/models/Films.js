@@ -57,13 +57,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "filmId",
       otherKey: "userId",
     })
-    // Each Film can be Starred by many users
-    Films.belongsToMany(models.Users, {
-      through: models.Stars,
-      as: "starredByUsers",
-      foreignKey: "filmId",
-      otherKey: "userId",
-    })
   }
 
   return Films

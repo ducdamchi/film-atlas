@@ -101,9 +101,9 @@ export default function QuickSearchModal({
   }, [searchModalOpen, searchInput])
 
   return (
-    <div className="absolute top-[30%] left-0 border-green-700 w-screen h-auto z-10 flex justify-center ">
+    <div className="absolute top-[30%] left-0 border-green-700 w-screen h-auto z-100 flex justify-center ">
       <div
-        className="relative w-[60%] h-auto min-w-[20rem] max-w-[45rem] bg-stone-900/80 text-white backdrop-blur-sm border-1 border-stone-500/80 rounded-xl"
+        className="relative w-[60%] h-auto min-w-[20rem] max-w-[45rem] bg-stone-900/80 text-white backdrop-blur-sm border-1 border-stone-500/80 rounded-md"
         ref={modalRef}>
         {/* Search bar */}
         <div className="relative flex justify-start h-auto  border-stone-500/80">
@@ -144,7 +144,7 @@ export default function QuickSearchModal({
                   <Link
                     key={key}
                     id={`result-${key}`}
-                    className="search-result film-item w-full h-[5rem] flex justify-center items-start gap-1 p-2 focus:bg-stone-950/70 hover:bg-stone-950/70 focus:outline-0"
+                    className="search-result film-item w-full h-[5rem] flex justify-center items-start gap-1 p-2 focus:bg-blue-600/80 hover:bg-stone-200/20 focus:outline-0 rounded-md"
                     to={`/films/${filmObject.id}`}
                     // state={{ currentViewMode: queryString }}
                   >
@@ -164,8 +164,14 @@ export default function QuickSearchModal({
                     {/* Text next to backdrop */}
                     <div className="text-[0.9rem] w-full p-3">
                       <span className="font-bold uppercase transition-all duration-200 ease-out peer-hover:text-blue-800">
-                        {`${filmObject.title}`}
-                      </span>{" "}
+                        {}
+                        {`${filmObject.title.slice(0, 20)}`}
+                      </span>
+                      {filmObject.title.length >= 20 && (
+                        <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
+                          ...
+                        </span>
+                      )}
                       <br />
                       {filmObject.release_date && (
                         <span className="">
@@ -173,6 +179,8 @@ export default function QuickSearchModal({
                         </span>
                       )}
                     </div>
+
+                    <div>Go to film </div>
                   </Link>
                 ))}
               </div>

@@ -25,6 +25,18 @@ import LoadingPage from "./Shared/LoadingPage"
 
 /* Icons */
 import { HiMiniBarsArrowDown, HiMiniBarsArrowUp } from "react-icons/hi2"
+import {
+  RiSortAlphabetAsc,
+  RiSortAlphabetDesc,
+  RiSortNumberAsc,
+  RiSortNumberDesc,
+} from "react-icons/ri"
+import {
+  FaSortNumericDown,
+  FaSortNumericDownAlt,
+  FaSortAlphaDown,
+  FaSortAlphaDownAlt,
+} from "react-icons/fa"
 
 export default function Directors() {
   const [searchInput, setSearchInput] = useState("")
@@ -34,8 +46,8 @@ export default function Directors() {
   const [searchModalOpen, setSearchModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [numStars, setNumStars] = useState(0)
-
-  const [sortDirection, setSortDirection] = useState("asc")
+  const [sortBy, setSortBy] = useState("name")
+  const [sortDirection, setSortDirection] = useState("desc")
   const [queryString, setQueryString] = useState("directors")
   const { authState } = useContext(AuthContext)
   const location = useLocation()
@@ -101,7 +113,9 @@ export default function Directors() {
             accessToken: localStorage.getItem("accessToken"),
           },
           params: {
+            sortBy: sortBy,
             sortDirection: sortDirection,
+            numStars: numStars,
           },
         })
         .then((response) => {
@@ -116,7 +130,7 @@ export default function Directors() {
         })
     }
     fetchUserDirectorList()
-  }, [sortDirection, queryString])
+  }, [sortDirection, sortBy, queryString, numStars])
 
   return (
     <>
@@ -131,13 +145,10 @@ export default function Directors() {
       {/* Wrapper for entire page */}
       <div className="flex flex-col items-center">
         <NavBar />
-        {/* Page title for Liked films*/}
-        {/* <div className="text-black mt-20 ">
-          <span> Welcome to The Film Atlas</span>
-          {authState.status && (
-            <span className="font-bold">{`, ${authState.username}`}</span>
-          )}
-        </div> */}
+
+        <div className="text-black text-3xl mt-10 font-bold uppercase">
+          DIRECTORS
+        </div>
 
         <SearchBar
           searchInput={searchInput}
@@ -157,74 +168,95 @@ export default function Directors() {
               }}
             />
           </div> */}
-          {/* <div className="flex items-center p-2 gap-5">
+          <div className="flex items-center p-2 gap-5">
             <div>Sort By</div>
-            <ToggleSwitch
+            <Toggle_Three
               width={`20rem`}
               height={`2.5rem`}
               state={sortBy}
               setState={setSortBy}
               stateDetails={{
-                1: { value: "added_date", label: "Recently Added" },
-                2: { value: "released_date", label: "Released Year" },
-              }}
-            />
-          </div> */}
-          <div className="flex items-center p-2 gap-5">
-            <div>Sort Order </div>
-            <Toggle_Two
-              width={`10rem`}
-              height={`2.5rem`}
-              state={sortDirection}
-              setState={setSortDirection}
-              stateDetails={{
-                1: {
-                  value: "asc",
-                  label: "A-Z",
-                },
-                2: {
-                  value: "desc",
-                  label: "Z-A",
-                },
+                1: { value: "name", label: "Name" },
+                2: { value: "score", label: "Score" },
+                3: { value: "highest_star", label: "Stars" },
               }}
             />
           </div>
-
-          <div className="flex items-center p-2 gap-5">
-            <div>Rating</div>
-            <Toggle_Four
-              state={numStars}
-              setState={setNumStars}
-              stateDetails={{
-                1: {
-                  value: 0,
-                  label: <span className="">All</span>,
-                },
-                2: {
-                  value: 3,
-                  label: (
-                    <span className="text-2xl text-pink-600">
-                      &#10048;&#10048;&#10048;
-                    </span>
-                  ),
-                },
-                3: {
-                  value: 2,
-                  label: (
-                    <span className="text-2xl text-pink-600">
-                      &#10048;&#10048;
-                    </span>
-                  ),
-                },
-                4: {
-                  value: 1,
-                  label: (
-                    <span className="text-2xl text-pink-600">&#10048;</span>
-                  ),
-                },
-              }}
-            />
-          </div>
+          {sortBy === "name" && (
+            <div className="flex items-center p-2 gap-5">
+              <div>Sort Order </div>
+              <Toggle_Two
+                width={`10rem`}
+                height={`2.5rem`}
+                state={sortDirection}
+                setState={setSortDirection}
+                stateDetails={{
+                  1: {
+                    value: "desc",
+                    label: <FaSortAlphaDown className="text-xl" />,
+                  },
+                  2: {
+                    value: "asc",
+                    label: <FaSortAlphaDownAlt className="text-xl" />,
+                  },
+                }}
+              />
+            </div>
+          )}
+          {sortBy === "score" && (
+            <div className="flex items-center p-2 gap-5">
+              <div>Sort Order </div>
+              <Toggle_Two
+                width={`10rem`}
+                height={`2.5rem`}
+                state={sortDirection}
+                setState={setSortDirection}
+                stateDetails={{
+                  1: {
+                    value: "desc",
+                    label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+                  },
+                  2: {
+                    value: "asc",
+                    label: <FaSortNumericDown className="text-xl mt-0" />,
+                  },
+                }}
+              />
+            </div>
+          )}
+          {sortBy === "highest_star" && (
+            <div className="flex items-center p-2 gap-5">
+              <div>Highest Star</div>
+              <Toggle_Three
+                state={numStars}
+                setState={setNumStars}
+                stateDetails={{
+                  1: {
+                    value: 3,
+                    label: (
+                      <span className="text-2xl text-pink-600">
+                        &#10048;&#10048;&#10048;
+                      </span>
+                    ),
+                  },
+                  2: {
+                    value: 2,
+                    label: (
+                      <span className="text-2xl text-pink-600">
+                        &#10048;&#10048;
+                      </span>
+                    ),
+                  },
+                  3: {
+                    value: 1,
+                    label: (
+                      <span className="text-2xl text-pink-600">&#10048;</span>
+                    ),
+                  },
+                }}
+              />
+            </div>
+          )}
         </div>
         {/* If user logged in and is not searching, show them list of liked films */}
         {!isSearching && !isLoading && authState.status && (
@@ -233,6 +265,7 @@ export default function Directors() {
             <DirectorUser_Gallery
               listOfDirectorObjects={userDirectorList}
               sortDirection={sortDirection}
+              sortBy={sortBy}
             />
           </div>
         )}

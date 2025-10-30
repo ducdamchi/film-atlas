@@ -14,6 +14,23 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    stars: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      validate: {
+        isIn: [[0, 1, 2, 3]],
+      },
+    },
   })
+
+  Likes.associate = (models) => {
+    Likes.belongsToMany(models.WatchedDirectors, {
+      through: models.WatchedDirectorLikes,
+      as: "watchedDirectorLikes",
+      foreignKey: "likeId",
+      otherKey: "watchedDirectorId",
+    })
+  }
+
   return Likes
 }

@@ -14,13 +14,15 @@ import SearchBar from "./Shared/SearchBar"
 import FilmUser_Gallery from "./Shared/FilmUser_Gallery"
 import FilmTMDB_Gallery from "./Shared/FilmTmdb_Gallery"
 import QuickSearchModal from "./Shared/QuickSearchModal"
-import QuadrupleToggleSwitch from "./Shared/Toggle_Four"
-import TripleToggleSwitch from "./Shared/Toggle_Three"
-import ToggleSwitch from "./Shared/Toggle_Two"
+import Toggle_Four from "./Shared/Toggle_Four"
+import Toggle_Three from "./Shared/Toggle_Three"
+import Toggle_Two from "./Shared/Toggle_Two"
 import LoadingPage from "./Shared/LoadingPage"
 
 /* Icons */
 import { HiMiniBarsArrowDown, HiMiniBarsArrowUp } from "react-icons/hi2"
+import { RiSortNumberAsc, RiSortNumberDesc } from "react-icons/ri"
+import { FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa"
 
 export default function Films() {
   const [searchInput, setSearchInput] = useState("")
@@ -92,6 +94,7 @@ export default function Films() {
 
   /* Fetch User's film list (liked, watchlisted or starred) from App's DB */
   useEffect(() => {
+    // console.log("NumStars: ", numStars)
     const fetchUserFilmList = async () => {
       fetchListByParams(
         queryString,
@@ -117,14 +120,10 @@ export default function Films() {
       {/* Wrapper for entire page */}
       <div className="flex flex-col items-center">
         <NavBar />
-        {/* Page title for Liked films*/}
 
-        {/* <div className="text-black mt-20 ">
-          <span> Welcome to The Film Atlas</span>
-          {authState.status && (
-            <span className="font-bold">{`, ${authState.username}`}</span>
-          )}
-        </div> */}
+        <div className="text-black text-3xl mt-10 font-bold uppercase">
+          Films
+        </div>
 
         <SearchBar
           searchInput={searchInput}
@@ -134,20 +133,20 @@ export default function Films() {
 
         <div className="flex flex-col items-start justify-center mt-20">
           <div className="flex items-center p-2 gap-5">
-            <div>View Mode</div>
-            <TripleToggleSwitch
+            <div>Category</div>
+            <Toggle_Three
               state={queryString}
               setState={setQueryString}
               stateDetails={{
                 1: { value: "watched", label: "Watched" },
                 2: { value: "watchlisted", label: "Watchlist" },
-                3: { value: "starred", label: "Starred" },
+                3: { value: "watched/rated", label: "Rated" },
               }}
             />
           </div>
           <div className="flex items-center p-2 gap-5">
             <div>Sort By</div>
-            <ToggleSwitch
+            <Toggle_Two
               width={`20rem`}
               height={`2.5rem`}
               state={sortBy}
@@ -160,7 +159,7 @@ export default function Films() {
           </div>
           <div className="flex items-center p-2 gap-5">
             <div>Sort Order </div>
-            <ToggleSwitch
+            <Toggle_Two
               width={`10rem`}
               height={`2.5rem`}
               state={sortDirection}
@@ -168,19 +167,19 @@ export default function Films() {
               stateDetails={{
                 1: {
                   value: "desc",
-                  label: <HiMiniBarsArrowDown className="text-2xl mt-2" />,
+                  label: <FaSortNumericDownAlt className="text-xl mt-0" />,
                 },
                 2: {
                   value: "asc",
-                  label: <HiMiniBarsArrowUp className="text-2xl mt-2" />,
+                  label: <FaSortNumericDown className="text-xl mt-0" />,
                 },
               }}
             />
           </div>
-          {queryString === "starred" && (
+          {queryString === "watched/rated" && (
             <div className="flex items-center p-2 gap-5">
               <div>Rating</div>
-              <QuadrupleToggleSwitch
+              <Toggle_Four
                 state={numStars}
                 setState={setNumStars}
                 stateDetails={{

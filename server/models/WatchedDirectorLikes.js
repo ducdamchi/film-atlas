@@ -1,26 +1,20 @@
 module.exports = (sequelize, DataTypes) => {
-  const Stars = sequelize.define("Stars", {
+  const WatchedDirectorLikes = sequelize.define("WatchedDirectorLikes", {
     id: {
       type: DataTypes.INTEGER,
       autoIncrement: true,
       allowNull: false,
       primaryKey: true,
     },
-    filmId: {
+    likeId: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    userId: {
+    watchedDirectorId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    },
-    stars: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        isIn: [[1, 2, 3]],
-      },
     },
   })
-  return Stars
+
+  return WatchedDirectorLikes
 }
