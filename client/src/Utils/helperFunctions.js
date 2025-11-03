@@ -1,4 +1,5 @@
 import axios from "axios"
+import { FaListCheck } from "react-icons/fa6"
 
 /* Converts ISO_A2 country codes into full country name */
 export function getCountryName(code) {
@@ -106,49 +107,45 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
     })
 }
 
-/* Query for films from TMDB (search with provided input)
+/* Fetch info of one film (with known id) from TMDB
 @params:
-- searchInput: A useState object containing the search input
-- setSearchResult: A useState function that updates the search result  */
-// export async function discoverDirectorFromTMDB(directorsName, setSearchResult) {
-//   const discoverUrl = "https://api.themoviedb.org/3/discover/movie"
-//   const searchPersonUrl = "https://api.themoviedb.org/3/search/person"
-//   const apiKey = "14b22a55c02218f84058041c5f553d3d"
+- tmdbId: unique TMDB id assigned to film
+- set...: useState() methods that updates the corresponding values in the calling component
+*/
+export function fetchFilmFromTMDB(
+  tmdbId,
+  setMovieDetails,
+  setDirectors,
+  setDops,
+  setMainCast
+) {
+  const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
+  const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
-//   try {
-//     const directorResult = await axios.get(searchPersonUrl, {
-//       params: {
-//         query: directorsName,
-//         api_key: apiKey,
-//         include_adult: false,
-//       },
-//     })
+  return axios
+    .get(
+      `${movieDetailsUrl}${tmdbId}?append_to_response=credits,videos,watch/providers&api_key=${apiKey}`
+    )
+    .then((response) => {
+      const directorsList = response.data.credits.crew.filter(
+        (crewMember) => crewMember.job === "Director"
+      )
+      // const dopsList = response.data.credits.crew.filter(
+      //   (crewMember) => crewMember.job === "Director of Photography"
+      // )
+      // const mainCastList = response.data.credits.cast.slice(0, 5)
 
-//     console.log("DirectorResult: ", directorResult)
-//     const director = directorResult.data.results.find(
-//       (person) => person.known_for_department === "Directing"
-//     )
-
-//     if (!director) {
-//       throw new Error("Director not found.")
-//     }
-//     const discoverResult = await axios.get(discoverUrl, {
-//       params: {
-//         api_key: apiKey,
-//         with_crew: director.id,
-//         include_adult: false,
-//         include_video: false,
-//         sort_by: "popularity.desc",
-//       },
-//     })
-//     console.log("DiscoverResult: ", discoverResult.data)
-//     setSearchResult(discoverResult.data.results)
-//     return discoverResult.data
-//   } catch (err) {
-//     console.log("Error searching for director: ", err)
-//     throw err
-//   }
-// }
+      setMovieDetails(response.data)
+      setDirectors(directorsList)
+      // setDops(dopsList)
+      // setMainCast(mainCastList)
+      return response.data
+    })
+    .catch((err) => {
+      console.log("Client: Error fetching film from TMDB", err)
+      throw err
+    })
+}
 
 export function queryDirectorFromTMDB(searchInput, setSearchResult) {
   const searchPersonUrl = "https://api.themoviedb.org/3/search/person"
@@ -194,17 +191,18 @@ export function fetchDirectorFromTMDB(
       )
 
       // Filter out films without backdrop or poster path
-      const filteredDirectedFilms = directedFilms.filter(
+      let filteredDirectedFilms = directedFilms.filter(
         (film) => !(film.backdrop_path === null || film.poster_path === null)
       )
 
       // If director is deceased, filter out films released after their deathdate
-      if (response.data.deathdate !== null) {
-        filteredDirectedFilms.filter(
-          (film) =>
-            parseInt(film.release_date?.replace("-", "")) <=
-            parseInt(response.data.deathday?.replace("-", ""))
-        )
+      if (response.data.deathday !== null) {
+        const deathDate = new Date(response.data.deathday)
+        filteredDirectedFilms = filteredDirectedFilms.filter((film) => {
+          if (!film.release_date) return false
+          const filmDate = new Date(film.release_date)
+          return filmDate <= deathDate
+        })
       }
 
       // Sort by most recent release date -> least recent
@@ -216,46 +214,6 @@ export function fetchDirectorFromTMDB(
 
       setDirectorDetails(response.data)
       setDirectedFilms(sortedDirectedFilms)
-      return response.data
-    })
-    .catch((err) => {
-      console.log("Client: Error fetching film from TMDB", err)
-      throw err
-    })
-}
-
-/* Fetch info of one film (with known id) from TMDB
-@params:
-- tmdbId: unique TMDB id assigned to film
-- set...: useState() methods that updates the corresponding values in the calling component
-*/
-export function fetchFilmFromTMDB(
-  tmdbId,
-  setMovieDetails,
-  setDirectors,
-  setDops,
-  setMainCast
-) {
-  const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
-  const apiKey = "14b22a55c02218f84058041c5f553d3d"
-
-  return axios
-    .get(
-      `${movieDetailsUrl}${tmdbId}?append_to_response=credits&api_key=${apiKey}`
-    )
-    .then((response) => {
-      const directorsList = response.data.credits.crew.filter(
-        (crewMember) => crewMember.job === "Director"
-      )
-      const dopsList = response.data.credits.crew.filter(
-        (crewMember) => crewMember.job === "Director of Photography"
-      )
-      const mainCastList = response.data.credits.cast.slice(0, 5)
-
-      setMovieDetails(response.data)
-      setDirectors(directorsList)
-      setDops(dopsList)
-      setMainCast(mainCastList)
       return response.data
     })
     .catch((err) => {
@@ -291,6 +249,35 @@ export function fetchListByParams(
       throw err
     })
 }
+
+// export function getWatchProviders(tmdbId, setWatchProviders) {
+//    const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
+//    const apiKey = "14b22a55c02218f84058041c5f553d3d"
+
+//    return axios
+//      .get(
+//        `${movieDetailsUrl}${tmdbId}?append_to_response=credits,videos&api_key=${apiKey}`
+//      )
+//      .then((response) => {
+//        const directorsList = response.data.credits.crew.filter(
+//          (crewMember) => crewMember.job === "Director"
+//        )
+//        // const dopsList = response.data.credits.crew.filter(
+//        //   (crewMember) => crewMember.job === "Director of Photography"
+//        // )
+//        // const mainCastList = response.data.credits.cast.slice(0, 5)
+
+//        setMovieDetails(response.data)
+//        setDirectors(directorsList)
+//        // setDops(dopsList)
+//        // setMainCast(mainCastList)
+//        return response.data
+//      })
+//      .catch((err) => {
+//        console.log("Client: Error fetching film from TMDB", err)
+//        throw err
+//      })
+// }
 
 /* Check the Like status of a film for logged in users from App's DB
 @params:
