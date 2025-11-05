@@ -75,6 +75,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
               directors={directors}
               movieDetails={movieDetails}
               setIsLoading={setIsLoading}
+              isLoading={isLoading}
               css={{
                 textColor: "white",
                 hoverBg: "bg-zinc-200/30",

@@ -29,8 +29,7 @@ export default function Toggle_Two({
 
   return (
     <div
-      className="relative bg-gray-200 rounded-full"
-      style={{ width: width, height: height }}>
+      className={`relative bg-gray-200 rounded-full w-[${width}] h-[${height}]`}>
       <div className="relative flex h-full w-full">
         {/* Slider background */}
         <div

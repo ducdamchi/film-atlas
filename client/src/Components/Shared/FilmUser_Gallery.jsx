@@ -21,7 +21,7 @@ export default function FilmUser_Gallery({
   useEffect(() => {
     // console.log(listOfFilmObjects)
     /* User reduce() to group list of films by year */
-    if (listOfFilmObjects) {
+    if (listOfFilmObjects && !listOfFilmObjects.error) {
       const filmGroups = listOfFilmObjects.reduce((groups, film) => {
         let targetKey //the key to be used for each Group Object
         let groupName //the name to be displayed for each Group Object in HTML
@@ -123,7 +123,7 @@ export default function FilmUser_Gallery({
 
   return (
     <div>
-      {listOfFilmObjects.length === 0 && (
+      {(listOfFilmObjects.length === 0 || listOfFilmObjects.error) && (
         <div className="mt-10">No films found.</div>
       )}
 

@@ -95,16 +95,20 @@ export default function Films() {
   /* Fetch User's film list (liked, watchlisted or starred) from App's DB */
   useEffect(() => {
     // console.log("NumStars: ", numStars)
-    const fetchUserFilmList = async () => {
-      fetchListByParams(
-        queryString,
-        sortBy,
-        sortDirection,
-        numStars,
-        setUserFilmList
-      )
+    if (authState.status) {
+      const fetchUserFilmList = async () => {
+        fetchListByParams({
+          queryString: queryString,
+          sortBy: sortBy,
+          sortDirection: sortDirection,
+          numStars: numStars,
+          setUserFilmList: setUserFilmList,
+        })
+      }
+      fetchUserFilmList()
+    } else {
+      alert("Log in to interact with films!")
     }
-    fetchUserFilmList()
   }, [sortBy, sortDirection, queryString, numStars])
 
   return (
@@ -133,8 +137,10 @@ export default function Films() {
 
         <div className="flex flex-col items-start justify-center mt-20">
           <div className="flex items-center p-2 gap-5">
-            <div>Category</div>
+            <div>View Mode</div>
             <Toggle_Three
+              width={`20rem`}
+              height={`2.5rem`}
               state={queryString}
               setState={setQueryString}
               stateDetails={{
@@ -158,7 +164,7 @@ export default function Films() {
             />
           </div>
           <div className="flex items-center p-2 gap-5">
-            <div>Sort Order </div>
+            <div>Sort Order</div>
             <Toggle_Two
               width={`10rem`}
               height={`2.5rem`}
@@ -180,6 +186,8 @@ export default function Films() {
             <div className="flex items-center p-2 gap-5">
               <div>Rating</div>
               <Toggle_Four
+                width={`20rem`}
+                height={`2.5rem`}
                 state={numStars}
                 setState={setNumStars}
                 stateDetails={{

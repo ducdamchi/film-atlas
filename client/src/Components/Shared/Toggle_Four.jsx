@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react"
 
-export default function Toggle_Four({ state, setState, stateDetails }) {
+export default function Toggle_Four({
+  state,
+  setState,
+  stateDetails,
+  width,
+  height,
+}) {
   const [activeOption, setActiveOption] = useState(1)
 
   const getSliderTransform = () => {
@@ -28,7 +34,8 @@ export default function Toggle_Four({ state, setState, stateDetails }) {
   }, [state])
 
   return (
-    <div className="relative bg-gray-200 rounded-full w-[20rem]">
+    <div
+      className={`relative bg-gray-200 rounded-full w-[${width}] h-[${height}]`}>
       <div className="relative flex h-[2.5rem]">
         {/* Slider background */}
         <div

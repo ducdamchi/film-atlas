@@ -112,13 +112,7 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
 - tmdbId: unique TMDB id assigned to film
 - set...: useState() methods that updates the corresponding values in the calling component
 */
-export function fetchFilmFromTMDB(
-  tmdbId,
-  setMovieDetails,
-  setDirectors,
-  setDops,
-  setMainCast
-) {
+export function fetchFilmFromTMDB(tmdbId, setMovieDetails, setDirectors) {
   const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
@@ -130,15 +124,9 @@ export function fetchFilmFromTMDB(
       const directorsList = response.data.credits.crew.filter(
         (crewMember) => crewMember.job === "Director"
       )
-      // const dopsList = response.data.credits.crew.filter(
-      //   (crewMember) => crewMember.job === "Director of Photography"
-      // )
-      // const mainCastList = response.data.credits.cast.slice(0, 5)
 
       setMovieDetails(response.data)
       setDirectors(directorsList)
-      // setDops(dopsList)
-      // setMainCast(mainCastList)
       return response.data
     })
     .catch((err) => {
@@ -222,13 +210,50 @@ export function fetchDirectorFromTMDB(
     })
 }
 
-export function fetchListByParams(
-  queryString,
-  sortBy,
-  sortDirection,
-  numStars,
-  setUserFilmList
-) {
+export function queryTopRatedFilmByCountryTMDB(countryCode, setSearchResult) {
+  const searchUrl = "https://api.themoviedb.org/3/discover/movie"
+  const apiKey = "14b22a55c02218f84058041c5f553d3d"
+
+  return axios
+    .get(searchUrl, {
+      params: {
+        api_key: apiKey,
+        with_origin_country: countryCode,
+        region: countryCode,
+        include_adult: false,
+        include_video: false,
+        "vote_count.gte": 20,
+        "vote_average.gte": 6,
+        sort_by: "vote_average.desc",
+      },
+    })
+    .then((response) => {
+      const original_results = response.data.results
+      const filtered_results = original_results.filter(
+        (movie) => !(movie.backdrop_path === null || movie.poster_path === null)
+      )
+      // // .filter((movie) => movie.popularity > 1 || movie.vote_count > 10)
+      // const sorted_filtered_results = filtered_results.sort(
+      //   (a, b) => b.popularity - a.popularity
+      // )
+      setSearchResult(filtered_results)
+      // console.log("Filtered results:", sorted_filtered_results)
+      return response.data
+    })
+    .catch((err) => {
+      console.log("Error: ", err)
+      throw err
+    })
+}
+
+export function fetchListByParams({
+  queryString = null,
+  sortBy = null,
+  sortDirection = null,
+  numStars = null,
+  setUserFilmList = null,
+  countryCode = null,
+} = {}) {
   return axios
     .get(`http://localhost:3002/profile/me/${queryString}`, {
       headers: {
@@ -238,6 +263,7 @@ export function fetchListByParams(
         sortBy: sortBy,
         sortDirection: sortDirection,
         numStars: numStars,
+        countryCode: countryCode,
       },
     })
     .then((response) => {

@@ -30,6 +30,7 @@ export default function InteractionConsole({
   directors,
   movieDetails,
   setIsLoading,
+  isLoading,
   css,
 }) {
   const [isLiked, setIsLiked] = useState(false)
@@ -223,14 +224,14 @@ export default function InteractionConsole({
           await unlikeFilm()
         }
       } catch (err) {
-        alert("Error handling Like/Unlike, please try again.")
+        alert("Error liking/unliking film, please try again.")
         console.error("Error in handleLike(): ", err)
       } finally {
         setIsLoading(false)
       }
       /* If user not logged in, alert */
     } else {
-      alert("Sign In to Like Movies!")
+      alert("Log in to interact with films!")
     }
   }
   async function handleSave() {
@@ -244,7 +245,7 @@ export default function InteractionConsole({
           await unsaveFilm()
         }
       } catch (err) {
-        alert("Error handling Save/Unsave, please try again.")
+        alert("Error saving/unsaving film, please try again.")
         console.error("Error in handleSave(): ", err)
       } finally {
         setIsLoading(false)
@@ -252,7 +253,7 @@ export default function InteractionConsole({
 
       /* If user not logged in, alert */
     } else {
-      alert("Sign In to Save Movies!")
+      alert("Log in to interact with films!")
     }
   }
   async function handleRate() {
@@ -276,14 +277,14 @@ export default function InteractionConsole({
           }
         }
       } catch (err) {
-        alert("Error handling Rate, please try again.")
+        alert("Error rating/unrating film, please try again.")
         console.error("Error in handleRate(): ", err)
       } finally {
         setIsLoading(false)
       }
       /* If user not logged in, alert */
     } else {
-      alert("Sign In to Rate Movies!")
+      alert("Log in to interact with films!")
     }
   }
 
@@ -311,55 +312,59 @@ export default function InteractionConsole({
   }, [tmdbId])
 
   return (
-    <div
-      className={`flex items-center gap-${css.flexGap} h-[4rem] text-${css.textColor} z-30`}>
-      <button
-        alt="Add to watched"
-        title="Add to watched"
-        className={`hover:${css.hoverTextColor} transition-all duration-200 ease-out hover:${css.hoverBg} p-3 h-full flex items-center`}
-        onClick={handleLike}>
-        {isLiked ? (
-          <div className="flex items-center gap-1">
-            <BiSolidHeart
-              className={`text-${css.likeColor} text-${css.likeSize}`}
-            />
-            <span className={`text-${css.likeColor} text-${css.fontSize}`}>
-              Watched
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1">
-            <BiHeart className={`text-${css.likeSize}`} />
-            <span className={`text-${css.fontSize}`}>Watched</span>
-          </div>
-        )}
-      </button>
-      <button
-        alt="Add to watchlist"
-        title="Add to watchlist"
-        className={`hover:${css.hoverTextColor} transition-all duration-200 ease-out hover:${css.hoverBg} p-3 h-full flex items-center`}
-        onClick={handleSave}>
-        {isSaved ? (
-          <div className="flex items-center gap-1">
-            <BiListCheck
-              className={`text-${css.saveColor} text-${css.saveSize}`}
-            />
-            <span className={`text-${css.saveColor} text-${css.fontSize}`}>
-              Watchlist
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1">
-            <BiListPlus className={`text-${css.saveSize}`} />
-            <span className={`text-${css.fontSize}`}>Watchlist</span>
-          </div>
-        )}
-      </button>
-      <TripleStarRating
-        officialRating={officialRating}
-        setRequestedRating={setRequestedRating}
-        css={css}
-      />
-    </div>
+    <>
+      {!isLoading && (
+        <div
+          className={`flex items-center gap-${css.flexGap} h-[4rem] text-${css.textColor} z-30`}>
+          <button
+            alt="Add to watched"
+            title="Add to watched"
+            className={`hover:${css.hoverTextColor} transition-all duration-200 ease-out hover:${css.hoverBg} p-3 h-full flex items-center`}
+            onClick={handleLike}>
+            {isLiked ? (
+              <div className="flex items-center gap-1">
+                <BiSolidHeart
+                  className={`text-${css.likeColor} text-${css.likeSize}`}
+                />
+                <span className={`text-${css.likeColor} text-${css.fontSize}`}>
+                  Watched
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <BiHeart className={`text-${css.likeSize}`} />
+                <span className={`text-${css.fontSize}`}>Watched</span>
+              </div>
+            )}
+          </button>
+          <button
+            alt="Add to watchlist"
+            title="Add to watchlist"
+            className={`hover:${css.hoverTextColor} transition-all duration-200 ease-out hover:${css.hoverBg} p-3 h-full flex items-center`}
+            onClick={handleSave}>
+            {isSaved ? (
+              <div className="flex items-center gap-1">
+                <BiListCheck
+                  className={`text-${css.saveColor} text-${css.saveSize}`}
+                />
+                <span className={`text-${css.saveColor} text-${css.fontSize}`}>
+                  Watchlist
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1">
+                <BiListPlus className={`text-${css.saveSize}`} />
+                <span className={`text-${css.fontSize}`}>Watchlist</span>
+              </div>
+            )}
+          </button>
+          <TripleStarRating
+            officialRating={officialRating}
+            setRequestedRating={setRequestedRating}
+            css={css}
+          />
+        </div>
+      )}
+    </>
   )
 }

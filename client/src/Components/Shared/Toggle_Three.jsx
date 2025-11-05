@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react"
 
-export default function Toggle_Three({ state, setState, stateDetails }) {
+export default function Toggle_Three({
+  state,
+  setState,
+  stateDetails,
+  width,
+  height,
+}) {
   const [activeOption, setActiveOption] = useState(1)
 
   const getSliderTransform = () => {
@@ -25,8 +31,9 @@ export default function Toggle_Three({ state, setState, stateDetails }) {
   }, [state])
 
   return (
-    <div className="relative bg-gray-200 rounded-full w-[20rem] h-[full]">
-      <div className="relative flex h-[2.5rem]">
+    <div
+      className={`relative bg-gray-200 rounded-full w-[${width}] h-[${height}]`}>
+      <div className="relative flex w-full h-full">
         {/* Slider background */}
         <div
           className={`absolute h-full bg-white rounded-full shadow-md transition-all duration-400 ease-in-out w-1/3 ${getSliderTransform()}`}

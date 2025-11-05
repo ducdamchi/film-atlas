@@ -10,7 +10,7 @@ const {
   Saves,
 } = require("../models")
 const { validateToken } = require("../middlewares/AuthMiddleware")
-const { Op, fn, col } = require("sequelize")
+const { Op, fn, col, Sequelize } = require("sequelize")
 
 /* Avg_rating: total stars / total films watched. max value = 3
   watchScore: use logarithm function that rewards a director when a user watches multiple films from them. max value = 1 (when user watches 10 or more films, watchScore = 1) 
@@ -154,6 +154,96 @@ router.get("/rated", validateToken, async (req, res) => {
       return res.status(404).json({ error: "User Not Found" })
     } else {
       return res.status(200).json(userWithRatedFilms.likedFilms)
+    }
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: "Error Fetching Content" })
+  }
+})
+
+/* GET: Fetch all films user liked from a certain country */
+router.get("/by_country", validateToken, async (req, res) => {
+  try {
+    const jwtUserId = req.user.id //UserId in signed JWT
+    const sortBy = req.query.sortBy || "added_date"
+    const sortDirection = req.query.sortDirection || "desc"
+    const sortCommand = `${sortBy}_${sortDirection}`
+    const countryCode = req.query.countryCode
+    const numStars = parseInt(req.query.numStars)
+    let order, whereCondition
+
+    if (
+      countryCode === null ||
+      countryCode === "" ||
+      countryCode.length !== 2
+    ) {
+      return res.status(404).json({ error: "Country Code Not Found" })
+    }
+
+    switch (sortCommand) {
+      case "added_date_desc":
+        order = [
+          [{ model: Films, as: "likedFilms" }, Likes, "createdAt", "DESC"],
+        ]
+        break
+      case "added_date_asc":
+        order = [
+          [{ model: Films, as: "likedFilms" }, Likes, "createdAt", "ASC"],
+        ]
+        break
+      case "released_date_desc":
+        order = [[{ model: Films, as: "likedFilms" }, "release_date", "DESC"]]
+        break
+      case "released_date_asc":
+        order = [[{ model: Films, as: "likedFilms" }, "release_date", "ASC"]]
+        break
+    }
+
+    if (numStars === 0) {
+      whereCondition = Sequelize.literal(
+        `stars > 0 AND JSON_CONTAINS(origin_country, '"${countryCode}"')`
+      )
+    } else if (numStars > 0) {
+      whereCondition = Sequelize.literal(
+        `stars = ${numStars} AND JSON_CONTAINS(origin_country, '"${countryCode}"')`
+      )
+    } else {
+      whereCondition = Sequelize.literal(
+        `JSON_CONTAINS(origin_country, '"${countryCode}"')`
+      )
+    }
+
+    const userWithLikedFilms = await Users.findByPk(jwtUserId, {
+      include: [
+        {
+          model: Films,
+          as: "likedFilms",
+          attributes: [
+            "id",
+            "title",
+            "runtime",
+            "directors",
+            "directorNamesForSorting",
+            "poster_path",
+            "backdrop_path",
+            "origin_country",
+            "release_date",
+          ],
+          where: whereCondition,
+          through: {
+            attributes: ["createdAt"],
+          },
+        },
+      ],
+      order: order,
+    })
+
+    if (!userWithLikedFilms) {
+      return res
+        .status(200)
+        .json({ error: `User Not Found / Films from ${countryCode} Not Found` })
+    } else {
+      return res.status(200).json(userWithLikedFilms.likedFilms)
     }
   } catch (err) {
     console.error(err)
