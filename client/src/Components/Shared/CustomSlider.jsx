@@ -21,7 +21,7 @@ export default function CustomSlider({
 }) {
   return (
     <div className={`w-[${width}] flex items-center gap-2`}>
-      <small>{min}</small>
+      <div className="text-xs font-semibold">{min}</div>
       <div
         className="w-full flex justify-center"
         // onHover={() => console.log("hovering")}
@@ -43,14 +43,13 @@ export default function CustomSlider({
           onThumbDragEnd={() => setRange([tempRange[0], tempRange[1]])}
           onRangeDragEnd={() => setRange([tempRange[0], tempRange[1]])}
         />
-
+        {/* 
         <small
-          // ref={infoRef}
           className="absolute w-[5rem] flex items-center justify-center mt-6 z-20 transition-all duration-600 ease-out opacity-100">
           {infoRefText}
-        </small>
+        </small> */}
       </div>
-      <small>{max}</small>
+      <div className="text-xs font-semibold">{max}</div>
     </div>
   )
 }

@@ -477,125 +477,118 @@ export default function MapPage() {
             <div className="uppercase font-bold text-3xl flex items-center justify-center w-full mt-10">{`${getCountryName(popupInfo.iso_a2)}`}</div>
           )}
 
-        <div className="flex flex-col items-start justify-center mt-10">
-          <div className="flex items-center p-2 gap-5">
-            <div>View Mode</div>
-            <Toggle_Three
-              width={`20rem`}
-              height={`2.5rem`}
-              state={queryString}
-              setState={setQueryString}
-              stateDetails={{
-                1: { value: "discover", label: "Discover" },
-                2: { value: "watched/by_country", label: "Watched" },
-                3: { value: "watched/rated/by_country", label: "Rated" },
-              }}
-            />
-          </div>
+        <div className="flex flex-col items-center justify-center mt-10 w-[30rem] border-1">
+          <Toggle_Three
+            label="View Mode"
+            width={`20rem`}
+            height={`2.5rem`}
+            state={queryString}
+            setState={setQueryString}
+            stateDetails={{
+              1: { value: "discover", label: "Discover" },
+              2: { value: "watched/by_country", label: "Watched" },
+              3: { value: "watched/rated/by_country", label: "Rated" },
+            }}
+          />
+
           {!isDiscoverMode && (
-            <div>
-              <div className="flex items-center p-2 gap-5">
-                <div>Sort By</div>
-                <Toggle_Two
-                  width={`20rem`}
-                  height={`2.5rem`}
-                  state={sortBy}
-                  setState={setSortBy}
-                  stateDetails={{
-                    1: { value: "added_date", label: "Recently Added" },
-                    2: { value: "released_date", label: "Released Year" },
-                  }}
-                />
-              </div>
-              <div className="flex items-center p-2 gap-5">
-                <div>Sort Order </div>
-                <Toggle_Two
-                  width={`10rem`}
-                  height={`2.5rem`}
-                  state={sortDirection}
-                  setState={setSortDirection}
-                  stateDetails={{
-                    1: {
-                      value: "desc",
-                      label: <FaSortNumericDownAlt className="text-xl mt-0" />,
-                    },
-                    2: {
-                      value: "asc",
-                      label: <FaSortNumericDown className="text-xl mt-0" />,
-                    },
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          {!isDiscoverMode && queryString === "watched/rated/by_country" && (
-            <div className="flex items-center p-2 gap-5">
-              <div>Rating</div>
-              <Toggle_Four
+            <div className="w-full">
+              <Toggle_Two
+                label="Sort By"
                 width={`20rem`}
                 height={`2.5rem`}
-                state={numStars}
-                setState={setNumStars}
+                state={sortBy}
+                setState={setSortBy}
+                stateDetails={{
+                  1: { value: "added_date", label: "Recently Added" },
+                  2: { value: "released_date", label: "Released Year" },
+                }}
+              />
+              <Toggle_Two
+                label="Sort Order"
+                width={`10rem`}
+                height={`2.5rem`}
+                state={sortDirection}
+                setState={setSortDirection}
                 stateDetails={{
                   1: {
-                    value: 0,
-                    label: <span className="">All</span>,
+                    value: "desc",
+                    label: <FaSortNumericDownAlt className="text-xl mt-0" />,
                   },
                   2: {
-                    value: 3,
-                    label: (
-                      <span className="text-2xl text-pink-600">
-                        &#10048;&#10048;&#10048;
-                      </span>
-                    ),
-                  },
-                  3: {
-                    value: 2,
-                    label: (
-                      <span className="text-2xl text-pink-600">
-                        &#10048;&#10048;
-                      </span>
-                    ),
-                  },
-                  4: {
-                    value: 1,
-                    label: (
-                      <span className="text-2xl text-pink-600">&#10048;</span>
-                    ),
+                    value: "asc",
+                    label: <FaSortNumericDown className="text-xl mt-0" />,
                   },
                 }}
               />
             </div>
           )}
+          {!isDiscoverMode && queryString === "watched/rated/by_country" && (
+            <Toggle_Four
+              label="Rating"
+              width={`20rem`}
+              height={`2.5rem`}
+              state={numStars}
+              setState={setNumStars}
+              stateDetails={{
+                1: {
+                  value: 0,
+                  label: <span className="">All</span>,
+                },
+                2: {
+                  value: 3,
+                  label: (
+                    <span className="text-2xl text-pink-600">
+                      &#10048;&#10048;&#10048;
+                    </span>
+                  ),
+                },
+                3: {
+                  value: 2,
+                  label: (
+                    <span className="text-2xl text-pink-600">
+                      &#10048;&#10048;
+                    </span>
+                  ),
+                },
+                4: {
+                  value: 1,
+                  label: (
+                    <span className="text-2xl text-pink-600">&#10048;</span>
+                  ),
+                },
+              }}
+            />
+          )}
           {isDiscoverMode && (
-            <div className="w-full flex flex-col items-center gap-10">
-              <div className="flex items-center p-2 gap-5">
-                <div>Sort By</div>
-                <Toggle_Two
-                  width="20rem"
-                  height="2.5rem"
-                  state={discoverBy}
-                  setState={setDiscoverBy}
-                  stateDetails={{
-                    1: { value: "vote_average.desc", label: "Average Rating" },
-                    2: { value: "vote_count.desc", label: "Vote Count" },
-                  }}
-                />
-              </div>
-              <div className="text-xs italic">
-                Results are automatically ordered from highest to lowest
-              </div>
-              <div className="flex items-center p-2 gap-5">
-                <div>Filter By</div>
-                <div>
+            <div className="w-full flex flex-col items-center gap-0">
+              <Toggle_Two
+                label="Sort By"
+                width="20rem"
+                height="2.5rem"
+                state={discoverBy}
+                setState={setDiscoverBy}
+                stateDetails={{
+                  1: { value: "vote_average.desc", label: "Average Rating" },
+                  2: { value: "vote_count.desc", label: "Vote Count" },
+                }}
+              />
+
+              <div className="flex items-center p-2 gap-5 w-full border-1">
+                <div className="border-1 w-[7rem] flex justify-end uppercase text-sm">
+                  Filter
+                </div>
+                <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[20rem]">
                   <div
-                    className="w-full flex flex-col items-center justify-center gap-1"
+                    className="w-full flex flex-col items-center justify-center gap-2"
                     // ref={ratingValueRef}
                     onMouseEnter={() => setDisplayRating(true)}
                     onMouseLeave={() => setDisplayRating(false)}>
-                    <div>{`Average Rating >= ${tempRatingRange[1]}`}</div>
+                    <div className="text-xs uppercase font-semibold">
+                      Average Rating &#x2265; {`${tempRatingRange[1]}`}
+                    </div>
                     <CustomSlider
-                      width="20rem"
+                      width="15rem"
                       id="slider-simple"
                       min={0}
                       max={10}
@@ -606,18 +599,20 @@ export default function MapPage() {
                       setRange={setRatingRange}
                       // isInfoRefDisplayed={displayRating}
                       // infoRef={ratingValueRef}
-                      infoRefText={`mininum ${tempRatingRange[1]}`}
+                      // infoRefText={`mininum ${tempRatingRange[1]}`}
                       thumbsDisabled={[true, false]}
                       rangeSlideDisabled={true}
                     />
                   </div>
                   <div
-                    className="w-full flex flex-col items-center justify-center gap-1"
+                    className="w-full flex flex-col items-center justify-center gap-2"
                     onMouseEnter={() => setDisplayVoteCount(true)}
                     onMouseLeave={() => setDisplayVoteCount(false)}>
-                    <div>Vote Count</div>
+                    <div className="text-xs uppercase font-bold">
+                      Vote Count &#x2265; {`${tempVoteCountRange[1]}`}
+                    </div>
                     <CustomSlider
-                      width="20rem"
+                      width="15rem"
                       id="slider-simple"
                       min={0}
                       max={500}
@@ -634,6 +629,9 @@ export default function MapPage() {
                     />
                   </div>
                 </div>
+              </div>
+              <div className="text-xs italic mt-5">
+                Results are automatically displayed in descending order.
               </div>
             </div>
           )}

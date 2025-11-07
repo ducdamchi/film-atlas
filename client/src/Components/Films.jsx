@@ -136,90 +136,85 @@ export default function Films() {
         />
 
         <div className="flex flex-col items-start justify-center mt-20">
-          <div className="flex items-center p-2 gap-5">
-            <div>View Mode</div>
-            <Toggle_Three
+          <Toggle_Three
+            label="View Mode"
+            width={`20rem`}
+            height={`2.5rem`}
+            state={queryString}
+            setState={setQueryString}
+            stateDetails={{
+              1: { value: "watched", label: "Watched" },
+              2: { value: "watchlisted", label: "Watchlist" },
+              3: { value: "watched/rated", label: "Rated" },
+            }}
+          />
+
+          <Toggle_Two
+            label="Sort By"
+            width={`20rem`}
+            height={`2.5rem`}
+            state={sortBy}
+            setState={setSortBy}
+            stateDetails={{
+              1: { value: "added_date", label: "Recently Added" },
+              2: { value: "released_date", label: "Released Year" },
+            }}
+          />
+
+          <Toggle_Two
+            label="Sort Order"
+            width={`10rem`}
+            height={`2.5rem`}
+            state={sortDirection}
+            setState={setSortDirection}
+            stateDetails={{
+              1: {
+                value: "desc",
+                label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+              },
+              2: {
+                value: "asc",
+                label: <FaSortNumericDown className="text-xl mt-0" />,
+              },
+            }}
+          />
+
+          {queryString === "watched/rated" && (
+            <Toggle_Four
+              label="Rating"
               width={`20rem`}
               height={`2.5rem`}
-              state={queryString}
-              setState={setQueryString}
-              stateDetails={{
-                1: { value: "watched", label: "Watched" },
-                2: { value: "watchlisted", label: "Watchlist" },
-                3: { value: "watched/rated", label: "Rated" },
-              }}
-            />
-          </div>
-          <div className="flex items-center p-2 gap-5">
-            <div>Sort By</div>
-            <Toggle_Two
-              width={`20rem`}
-              height={`2.5rem`}
-              state={sortBy}
-              setState={setSortBy}
-              stateDetails={{
-                1: { value: "added_date", label: "Recently Added" },
-                2: { value: "released_date", label: "Released Year" },
-              }}
-            />
-          </div>
-          <div className="flex items-center p-2 gap-5">
-            <div>Sort Order</div>
-            <Toggle_Two
-              width={`10rem`}
-              height={`2.5rem`}
-              state={sortDirection}
-              setState={setSortDirection}
+              state={numStars}
+              setState={setNumStars}
               stateDetails={{
                 1: {
-                  value: "desc",
-                  label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+                  value: 0,
+                  label: <span className="">All</span>,
                 },
                 2: {
-                  value: "asc",
-                  label: <FaSortNumericDown className="text-xl mt-0" />,
+                  value: 3,
+                  label: (
+                    <span className="text-2xl text-pink-600">
+                      &#10048;&#10048;&#10048;
+                    </span>
+                  ),
+                },
+                3: {
+                  value: 2,
+                  label: (
+                    <span className="text-2xl text-pink-600">
+                      &#10048;&#10048;
+                    </span>
+                  ),
+                },
+                4: {
+                  value: 1,
+                  label: (
+                    <span className="text-2xl text-pink-600">&#10048;</span>
+                  ),
                 },
               }}
             />
-          </div>
-          {queryString === "watched/rated" && (
-            <div className="flex items-center p-2 gap-5">
-              <div>Rating</div>
-              <Toggle_Four
-                width={`20rem`}
-                height={`2.5rem`}
-                state={numStars}
-                setState={setNumStars}
-                stateDetails={{
-                  1: {
-                    value: 0,
-                    label: <span className="">All</span>,
-                  },
-                  2: {
-                    value: 3,
-                    label: (
-                      <span className="text-2xl text-pink-600">
-                        &#10048;&#10048;&#10048;
-                      </span>
-                    ),
-                  },
-                  3: {
-                    value: 2,
-                    label: (
-                      <span className="text-2xl text-pink-600">
-                        &#10048;&#10048;
-                      </span>
-                    ),
-                  },
-                  4: {
-                    value: 1,
-                    label: (
-                      <span className="text-2xl text-pink-600">&#10048;</span>
-                    ),
-                  },
-                }}
-              />
-            </div>
           )}
         </div>
 

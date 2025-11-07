@@ -6,6 +6,7 @@ export default function Toggle_Two({
   stateDetails,
   width,
   height,
+  label,
 }) {
   const [activeOption, setActiveOption] = useState(1)
 
@@ -28,35 +29,40 @@ export default function Toggle_Two({
   }, [state])
 
   return (
-    <div
-      className={`relative bg-gray-200 rounded-full w-[${width}] h-[${height}]`}>
-      <div className="relative flex h-full w-full">
-        {/* Slider background */}
-        <div
-          className={`absolute h-full bg-white rounded-full shadow-md transition-all duration-400 ease-in-out w-1/2 ${getSliderTransform()}`}
-        />
+    <div className="flex items-center p-2 gap-5 w-full border-1">
+      <div className="border-1 w-[7rem] flex justify-end uppercase text-sm">
+        {label}
+      </div>
+      <div
+        className={`relative bg-gray-200 rounded-full w-[${width}] h-[${height}]`}>
+        <div className="relative flex h-full w-full">
+          {/* Slider background */}
+          <div
+            className={`absolute h-full bg-white rounded-full shadow-md transition-all duration-400 ease-in-out w-1/2 ${getSliderTransform()}`}
+          />
 
-        {/* Options */}
-        <button
-          onClick={() => {
-            setActiveOption(1)
-            setState(stateDetails[1].value)
-          }}
-          className={`flex-1 text-center py-2 rounded-full transition-colors duration-300 z-10 flex items-center justify-center ${
-            activeOption === 1 ? "text-black font-semibold" : "text-gray-600"
-          }`}>
-          {stateDetails[1].label}
-        </button>
-        <button
-          onClick={() => {
-            setActiveOption(2)
-            setState(stateDetails[2].value)
-          }}
-          className={`flex-1 text-center py-2 rounded-full transition-colors duration-300 z-10 flex items-center justify-center ${
-            activeOption === 2 ? "text-black font-semibold" : "text-gray-600"
-          }`}>
-          {stateDetails[2].label}
-        </button>
+          {/* Options */}
+          <button
+            onClick={() => {
+              setActiveOption(1)
+              setState(stateDetails[1].value)
+            }}
+            className={`flex-1 text-center py-2 rounded-full transition-colors duration-300 z-10 flex items-center justify-center ${
+              activeOption === 1 ? "text-black font-semibold" : "text-gray-600"
+            }`}>
+            {stateDetails[1].label}
+          </button>
+          <button
+            onClick={() => {
+              setActiveOption(2)
+              setState(stateDetails[2].value)
+            }}
+            className={`flex-1 text-center py-2 rounded-full transition-colors duration-300 z-10 flex items-center justify-center ${
+              activeOption === 2 ? "text-black font-semibold" : "text-gray-600"
+            }`}>
+            {stateDetails[2].label}
+          </button>
+        </div>
       </div>
     </div>
   )

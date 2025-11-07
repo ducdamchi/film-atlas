@@ -172,61 +172,57 @@ export default function Directors() {
               }}
             />
           </div> */}
-          <div className="flex items-center p-2 gap-5">
-            <div>Sort By</div>
-            <Toggle_Three
-              width={`20rem`}
+
+          <Toggle_Three
+            label="Sort By"
+            width={`20rem`}
+            height={`2.5rem`}
+            state={sortBy}
+            setState={setSortBy}
+            stateDetails={{
+              1: { value: "name", label: "Name" },
+              2: { value: "score", label: "Score" },
+              3: { value: "highest_star", label: "Stars" },
+            }}
+          />
+
+          {sortBy === "name" && (
+            <Toggle_Two
+              label="Sort Order"
+              width={`10rem`}
               height={`2.5rem`}
-              state={sortBy}
-              setState={setSortBy}
+              state={sortDirection}
+              setState={setSortDirection}
               stateDetails={{
-                1: { value: "name", label: "Name" },
-                2: { value: "score", label: "Score" },
-                3: { value: "highest_star", label: "Stars" },
+                1: {
+                  value: "desc",
+                  label: <FaSortAlphaDown className="text-xl" />,
+                },
+                2: {
+                  value: "asc",
+                  label: <FaSortAlphaDownAlt className="text-xl" />,
+                },
               }}
             />
-          </div>
-          {sortBy === "name" && (
-            <div className="flex items-center p-2 gap-5">
-              <div>Sort Order </div>
-              <Toggle_Two
-                width={`10rem`}
-                height={`2.5rem`}
-                state={sortDirection}
-                setState={setSortDirection}
-                stateDetails={{
-                  1: {
-                    value: "desc",
-                    label: <FaSortAlphaDown className="text-xl" />,
-                  },
-                  2: {
-                    value: "asc",
-                    label: <FaSortAlphaDownAlt className="text-xl" />,
-                  },
-                }}
-              />
-            </div>
           )}
           {(sortBy === "score" || sortBy === "highest_star") && (
-            <div className="flex items-center p-2 gap-5">
-              <div>Sort Order </div>
-              <Toggle_Two
-                width={`10rem`}
-                height={`2.5rem`}
-                state={sortDirection}
-                setState={setSortDirection}
-                stateDetails={{
-                  1: {
-                    value: "desc",
-                    label: <FaSortNumericDownAlt className="text-xl mt-0" />,
-                  },
-                  2: {
-                    value: "asc",
-                    label: <FaSortNumericDown className="text-xl mt-0" />,
-                  },
-                }}
-              />
-            </div>
+            <Toggle_Two
+              label="Sort Order"
+              width={`10rem`}
+              height={`2.5rem`}
+              state={sortDirection}
+              setState={setSortDirection}
+              stateDetails={{
+                1: {
+                  value: "desc",
+                  label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+                },
+                2: {
+                  value: "asc",
+                  label: <FaSortNumericDown className="text-xl mt-0" />,
+                },
+              }}
+            />
           )}
           {/* {sortBy === "highest_star" && (
             <div className="flex items-center p-2 gap-5">
