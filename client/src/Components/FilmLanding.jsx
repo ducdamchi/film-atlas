@@ -46,13 +46,12 @@ export default function FilmLanding() {
         setSearchModalOpen(false)
         setIsLoading(true)
         try {
-          fetchFilmFromTMDB(
-            tmdbId,
-            setMovieDetails,
-            setDirectors
-            // setDops,
-            // setMainCast
+          const result = await fetchFilmFromTMDB(tmdbId)
+          const directorsList = result.credits.crew.filter(
+            (crewMember) => crewMember.job === "Director"
           )
+          setMovieDetails(result)
+          setDirectors(directorsList)
         } catch (err) {
           console.error("Error loading film data: ", err)
         } finally {
@@ -64,7 +63,7 @@ export default function FilmLanding() {
   }, [tmdbId])
 
   useEffect(() => {
-    console.log("movieDetails: ", movieDetails)
+    // console.log("movieDetails: ", movieDetails)
     if (movieDetails.credits) {
       const dopsList = movieDetails.credits.crew.filter(
         (crewMember) => crewMember.job === "Director of Photography"
@@ -84,7 +83,7 @@ export default function FilmLanding() {
         return dateB - dateA
       })
 
-      console.log(sortedTrailerLinks)
+      // console.log(sortedTrailerLinks)
       setDops(dopsList)
       setMainCast(mainCastList)
       if (sortedTrailerLinks.length >= 1) {
@@ -95,22 +94,13 @@ export default function FilmLanding() {
     }
   }, [movieDetails])
 
-  // useEffect(() => {
-  //   if (location.state) {
-  //     const { currentViewMode } = location.state || {}
-  //     console.log("Location.state:", location.state)
-  //     console.log("Current View Mode:", currentViewMode)
-  //     setReturnToViewMode(currentViewMode)
-  //   }
-  // }, [location.state])
-
   if (!movieDetails) {
     return <div>Error loading film. Please try again.</div>
   }
 
   return (
     <>
-      {/* {isLoading && <LoadingPage />} */}
+      {isLoading && <LoadingPage />}
 
       {/* Quick Search Modal */}
       {searchModalOpen && (
@@ -173,6 +163,7 @@ export default function FilmLanding() {
               likeColor: "red-800",
               saveColor: "green-800",
             }}
+            isLandingPage={true}
           />
 
           {movieDetails.overview && (

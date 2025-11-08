@@ -6,9 +6,8 @@ import { useLocation, useNavigate } from "react-router-dom"
 /* Custom functions */
 import { AuthContext } from "../Utils/authContext"
 import {
-  queryFilmFromTMDB,
-  fetchListByParams,
   queryDirectorFromTMDB,
+  fetchDirectorListByParams,
 } from "../Utils/helperFunctions"
 import useCommandK from "../Utils/useCommandK"
 
@@ -43,7 +42,6 @@ export default function Directors() {
   const [searchResult, setSearchResult] = useState([])
   const [userDirectorList, setUserDirectorList] = useState([])
   const [isSearching, setIsSearching] = useState(false)
-  // const [searchModalOpen, setSearchModalOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [numStars, setNumStars] = useState(0)
   const [sortBy, setSortBy] = useState("name")
@@ -77,62 +75,49 @@ export default function Directors() {
     }
   }, [location.state])
 
-  /* Query films from TMDB with Search Bar */
+  /* Query director from TMDB with Search Bar */
   useEffect(() => {
-    // console.log("Search Input:", searchInput)
-    const queryFilm = async () => {
+    const queryDirector = async () => {
       try {
         if (searchInput.trim().length === 0 || searchInput === null) {
           setIsSearching(false)
         } else {
           setIsSearching(true)
-          queryDirectorFromTMDB(searchInput, setSearchResult)
+          const result = await queryDirectorFromTMDB(searchInput)
+          const filtered_result = result.filter(
+            (person) => person.known_for_department === "Directing"
+          )
+          setSearchResult(filtered_result)
         }
       } catch (err) {
         console.log("Error Querying Film: ", err)
-        throw err
       }
     }
-    queryFilm()
+    queryDirector()
   }, [searchInput])
-
-  // useEffect(() => {
-  //   console.log("search Result: ", searchResult)
-  // }, [searchResult])
-
-  // useEffect(() => {
-  //   console.log("Directors List: ", userDirectorList)
-  // }, [userDirectorList])
 
   /* Fetch User's Directors list (liked, watchlisted or starred) from App's DB */
   useEffect(() => {
-    // if (authState.status) {
-    const fetchUserDirectorList = async () => {
-      setIsLoading(true)
-      axios
-        .get(`http://localhost:3002/profile/me/${queryString}`, {
-          headers: {
-            accessToken: localStorage.getItem("accessToken"),
-          },
-          params: {
+    if (authState.status) {
+      const fetchUserDirectorList = async () => {
+        try {
+          setIsLoading(true)
+          const result = await fetchDirectorListByParams({
+            queryString: queryString,
             sortBy: sortBy,
             sortDirection: sortDirection,
             numStars: numStars,
-          },
-        })
-        .then((response) => {
-          setUserDirectorList(response.data)
-        })
-        .catch((err) => {
-          console.log("Error: ", err)
-          throw err
-        })
-        .finally(() => {
+          })
+          setUserDirectorList(result)
+        } catch (err) {
+          console.err("Error Fetching Directors List: ", err)
+        } finally {
           setIsLoading(false)
-        })
+        }
+      }
+      fetchUserDirectorList()
     }
-    fetchUserDirectorList()
-    // } else {
+    // else {
     //   alert("Log in to interact with directors!")
     // }
   }, [sortDirection, sortBy, queryString, numStars])
@@ -197,11 +182,11 @@ export default function Directors() {
               stateDetails={{
                 1: {
                   value: "desc",
-                  label: <FaSortAlphaDown className="text-xl" />,
+                  label: <FaSortAlphaDown className="text-xl w-[5rem]" />,
                 },
                 2: {
                   value: "asc",
-                  label: <FaSortAlphaDownAlt className="text-xl" />,
+                  label: <FaSortAlphaDownAlt className="text-xl w-[5rem]" />,
                 },
               }}
             />
@@ -216,11 +201,15 @@ export default function Directors() {
               stateDetails={{
                 1: {
                   value: "desc",
-                  label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+                  label: (
+                    <FaSortNumericDownAlt className="text-xl mt-0 w-[5rem]" />
+                  ),
                 },
                 2: {
                   value: "asc",
-                  label: <FaSortNumericDown className="text-xl mt-0" />,
+                  label: (
+                    <FaSortNumericDown className="text-xl mt-0 w-[5rem]" />
+                  ),
                 },
               }}
             />

@@ -62,14 +62,10 @@ export default function MapPage() {
   /* Slider - Rating const */
   const [ratingRange, setRatingRange] = useState([0, 7])
   const [tempRatingRange, setTempRatingRange] = useState([0, 7])
-  const [displayRating, setDisplayRating] = useState(false)
-  const ratingValueRef = useRef(null)
 
   /* Slider - Vote Count const */
   const [voteCountRange, setVoteCountRange] = useState([0, 100])
   const [tempVoteCountRange, setTempVoteCountRange] = useState([0, 100])
-  const [displayVoteCount, setDisplayVoteCount] = useState(false)
-  const voteCountValueRef = useRef(null)
 
   /* Authentication */
   const { authState, searchModalOpen, setSearchModalOpen } =
@@ -80,43 +76,18 @@ export default function MapPage() {
   }
   useCommandK(toggleSearchModal)
 
-  useEffect(() => {
-    if (ratingValueRef.current) {
-      if (displayRating) {
-        ratingValueRef.current.style.opacity = 1
-      } else {
-        setTimeout(() => {
-          ratingValueRef.current.style.opacity = 0
-        }, 200)
-      }
-    }
-  }, [displayRating])
-
-  useEffect(() => {
-    if (voteCountValueRef.current) {
-      if (displayVoteCount) {
-        voteCountValueRef.current.style.opacity = 1
-      } else {
-        setTimeout(() => {
-          voteCountValueRef.current.style.opacity = 0
-        }, 200)
-      }
-    }
-  }, [displayVoteCount])
-
-  /* Fetch User's film list (liked or watchlisted) from App's DB */
+  /* Fetch User's film list (liked or watchlisted) from App's DB when page first loads */
   useEffect(() => {
     if (authState.status) {
       const fetchInitialLikeData = async () => {
         try {
           setIsLoading(true)
-          fetchListByParams({
+          const result = await fetchListByParams({
             queryString: "watched",
-            setUserFilmList: setMapFilmData,
           })
+          setMapFilmData(result)
         } catch (err) {
-          console.log(err)
-          throw err
+          console.log("Error Fetching User Like Data: ", err)
         } finally {
           setIsLoading(false)
         }
@@ -129,22 +100,30 @@ export default function MapPage() {
 
   /* Hook to handle querying & sorting User Watched Films */
   useEffect(() => {
-    // console.log(popupInfo)
-    // if (authState.status) {
-    if (popupInfo && popupInfo.iso_a2 !== undefined) {
-      const fetchLikedFilmsByCountry = async () => {
-        fetchListByParams({
-          queryString: "watched/by_country",
-          countryCode: popupInfo.iso_a2,
-          setUserFilmList: setUserFilmList,
-          sortBy: sortBy,
-          sortDirection: sortDirection,
-          numStars: numStars,
-        })
+    if (authState.status) {
+      if (popupInfo && popupInfo.iso_a2 !== undefined) {
+        const fetchLikedFilmsByCountry = async () => {
+          try {
+            setIsLoading(true)
+            const result = await fetchListByParams({
+              queryString: "watched/by_country",
+              countryCode: popupInfo.iso_a2,
+              setUserFilmList: setUserFilmList,
+              sortBy: sortBy,
+              sortDirection: sortDirection,
+              numStars: numStars,
+            })
+            setUserFilmList(result)
+          } catch (err) {
+            console.log("Error Fetching User Film List: ", err)
+          } finally {
+            setIsLoading(false)
+          }
+        }
+        fetchLikedFilmsByCountry()
       }
-      fetchLikedFilmsByCountry()
     }
-    // } else {
+    // else {
     //   alert("Log in to interact with map!")
     // }
   }, [popupInfo, sortBy, sortDirection, numStars])
@@ -169,13 +148,18 @@ export default function MapPage() {
             popupInfo.iso_a2 !== undefined &&
             ratingRange.length == 2
           ) {
-            queryTopRatedFilmByCountryTMDB({
+            const result = await queryTopRatedFilmByCountryTMDB({
               countryCode: popupInfo.iso_a2,
-              setSearchResult: setSuggestedFilmList,
               sortBy: discoverBy,
               ratingRange: ratingRange,
               voteCountRange: voteCountRange,
             })
+
+            const filtered_results = result.filter(
+              (movie) =>
+                !(movie.backdrop_path === null || movie.poster_path === null)
+            )
+            setSuggestedFilmList(filtered_results)
           } else {
             setSuggestedFilmList([])
           }
@@ -189,15 +173,6 @@ export default function MapPage() {
       getSuggestions()
     }
   }, [isDiscoverMode, popupInfo, discoverBy, ratingRange, voteCountRange])
-
-  useEffect(() => {
-    // console.log("DisoverMode:", isDiscoverMode)
-    // console.log("Suggested Film List: ", suggestedFilmList)
-    // console.log("Vote Avg:", voteAverage)
-    // console.log("Vote Count:", voteCount)
-    // console.log("Rating range:", ratingRange)
-    // console.log("Rating range length:", ratingRange.length)
-  }, [suggestedFilmList, isDiscoverMode, ratingRange])
 
   useEffect(() => {
     // console.log(mapFilmData)
@@ -364,6 +339,7 @@ export default function MapPage() {
   return (
     <div>
       {isLoading && <LoadingPage />}
+
       {/* Quick Search Modal */}
       {searchModalOpen && (
         <QuickSearchModal
@@ -514,11 +490,15 @@ export default function MapPage() {
                 stateDetails={{
                   1: {
                     value: "desc",
-                    label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+                    label: (
+                      <FaSortNumericDownAlt className="text-xl mt-0 w-[5rem]" />
+                    ),
                   },
                   2: {
                     value: "asc",
-                    label: <FaSortNumericDown className="text-xl mt-0" />,
+                    label: (
+                      <FaSortNumericDown className="text-xl mt-0 w-[5rem]" />
+                    ),
                   },
                 }}
               />
@@ -580,11 +560,7 @@ export default function MapPage() {
                   Filter
                 </div>
                 <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[20rem]">
-                  <div
-                    className="w-full flex flex-col items-center justify-center gap-2"
-                    // ref={ratingValueRef}
-                    onMouseEnter={() => setDisplayRating(true)}
-                    onMouseLeave={() => setDisplayRating(false)}>
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
                     <div className="text-xs uppercase font-semibold text-gray-600">
                       Average Rating &#x2265; {`${tempRatingRange[1]}`}
                     </div>
@@ -598,17 +574,11 @@ export default function MapPage() {
                       setTempRange={setTempRatingRange}
                       range={ratingRange}
                       setRange={setRatingRange}
-                      // isInfoRefDisplayed={displayRating}
-                      // infoRef={ratingValueRef}
-                      // infoRefText={`mininum ${tempRatingRange[1]}`}
                       thumbsDisabled={[true, false]}
                       rangeSlideDisabled={true}
                     />
                   </div>
-                  <div
-                    className="w-full flex flex-col items-center justify-center gap-2"
-                    onMouseEnter={() => setDisplayVoteCount(true)}
-                    onMouseLeave={() => setDisplayVoteCount(false)}>
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
                     <div className="text-xs uppercase font-bold text-gray-600">
                       Vote Count &#x2265; {`${tempVoteCountRange[1]}`}
                     </div>
@@ -622,9 +592,6 @@ export default function MapPage() {
                       setTempRange={setTempVoteCountRange}
                       range={voteCountRange}
                       setRange={setVoteCountRange}
-                      // isInfoRefDisplayed={displayVoteCount}
-                      // infoRef={voteCountValueRef}
-                      infoRefText={`mininum ${tempVoteCountRange[1]}`}
                       thumbsDisabled={[true, false]}
                       rangeSlideDisabled={true}
                     />

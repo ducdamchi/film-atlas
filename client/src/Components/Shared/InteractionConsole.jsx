@@ -5,11 +5,13 @@ import axios from "axios"
 
 /* Custom functions */
 import {
-  getCountryName,
-  getReleaseYear,
-  fetchFilmFromTMDB,
   checkLikeStatus,
   checkSaveStatus,
+  likeFilm,
+  unlikeFilm,
+  saveFilm,
+  unsaveFilm,
+  rateFilm,
 } from "../../Utils/helperFunctions"
 import { AuthContext } from "../../Utils/authContext"
 
@@ -33,6 +35,7 @@ export default function InteractionConsole({
   setIsLoading,
   isLoading,
   css,
+  isLandingPage,
 }) {
   const [isLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
@@ -79,156 +82,39 @@ export default function InteractionConsole({
 
     return req
   }
-  /* Make API call to App's DB when user 'like' a film */
-  function likeFilm(requestedRating) {
-    const req = createReqBody("like")
-    req["stars"] = requestedRating ? requestedRating : 0
-
-    return axios
-      .post(`http://localhost:3002/profile/me/watched`, req, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-        } else {
-          setIsLiked(response.data.liked)
-          setOfficialRating(response.data.stars)
-          setRequestedRating(-1)
-          setIsSaved(false) //positively "unsave" film on client side. upon reload this value will get updated with actual Save status.
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error liking film", err)
-        throw err
-      })
-  }
-  /* Make API call to App's DB when user 'unlike' a film */
-  function unlikeFilm() {
-    return axios
-      .delete(`http://localhost:3002/profile/me/watched`, {
-        data: {
-          tmdbId: movieDetails.id,
-        },
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-
-          // console.log(authState)
-        } else {
-          setIsLiked(response.data.liked)
-          setOfficialRating(response.data.stars)
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error unliking film", err)
-        throw err
-      })
-  }
-  /* Make API call to App's DB when user 'like' a film */
-  function saveFilm() {
-    const req = createReqBody("save")
-    return axios
-      .post(`http://localhost:3002/profile/me/watchlisted`, req, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-        } else {
-          setIsSaved(response.data.saved)
-          //positively "unlike" film on client side. upon reload this value will get updated with actual Like status (incl ratings).
-          setIsLiked(false)
-          setOfficialRating(null)
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error saving film", err)
-        throw err
-      })
-  }
-  /* Make API call to App's DB when user 'unlike' a film */
-  function unsaveFilm() {
-    return axios
-      .delete(`http://localhost:3002/profile/me/watchlisted`, {
-        data: {
-          tmdbId: movieDetails.id,
-        },
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-        } else {
-          setIsSaved(response.data.saved)
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error unliking film", err)
-        throw err
-      })
-  }
-  /* Make API call to App's DB to rate a film that has already been liked */
-  function rateFilm(rating) {
-    const req = createReqBody("rate")
-    req["stars"] = rating
-    return axios
-      .put(`http://localhost:3002/profile/me/watched`, req, {
-        headers: {
-          accessToken: localStorage.getItem("accessToken"),
-        },
-      })
-      .then((response) => {
-        if (response.data.error) {
-          console.log("Server: ", response.data.error)
-          throw new Error(response.data.error)
-        } else {
-          setOfficialRating(response.data.stars)
-          setRequestedRating(-1) //neutral state
-          return response.data
-        }
-      })
-      .catch((err) => {
-        console.error("Client: Error rating film", err)
-        throw err
-      })
-  }
-
-  /* Handle user Like/Unlike interaction */
   async function handleLike() {
     /* If user is logged in, they can like/unlike. */
     if (authState.status) {
-      setIsLoading(true)
-
+      // setIsLoading(true)
       try {
         if (!isLiked) {
-          await likeFilm()
+          const req = createReqBody("like")
+          req["stars"] = requestedRating !== -1 ? requestedRating : 0
+          console.log("Request:", req)
+          const result = await likeFilm(req)
+          if (result.error) {
+            console.error("Server: ", result.error)
+          } else {
+            setIsLiked(result.liked)
+            setOfficialRating(result.stars)
+            setRequestedRating(-1)
+            setIsSaved(false) //optimistically "unsave" film on client side. upon reload this value will get updated with actual Save status.
+          }
         } else {
-          await unlikeFilm()
+          const result = await unlikeFilm(movieDetails.id)
+
+          if (result.error) {
+            console.error("Server: ", response.data.error)
+          } else {
+            setIsLiked(result.liked)
+            setOfficialRating(result.stars)
+          }
         }
       } catch (err) {
         alert("Error liking/unliking film, please try again.")
         console.error("Error in handleLike(): ", err)
       } finally {
-        setIsLoading(false)
+        // setIsLoading(false)
       }
       /* If user not logged in, alert */
     } else {
@@ -238,18 +124,32 @@ export default function InteractionConsole({
   async function handleSave() {
     /* If user is logged in, they can save/unsave */
     if (authState.status) {
-      setIsLoading(true)
+      // setIsLoading(true)
       try {
         if (!isSaved) {
-          await saveFilm()
+          const req = createReqBody("save")
+          const result = await saveFilm(req)
+          if (result.error) {
+            console.error("Server: ", result.error)
+          } else {
+            setIsSaved(result.saved)
+            //optimistically "unlike" film on client side. upon reload this value will get updated with actual Like status (incl ratings).
+            setIsLiked(false)
+            setOfficialRating(null)
+          }
         } else {
-          await unsaveFilm()
+          const result = await unsaveFilm(movieDetails.id)
+          if (result.error) {
+            console.log("Server: ", result.error)
+          } else {
+            setIsSaved(result.saved)
+          }
         }
       } catch (err) {
         alert("Error saving/unsaving film, please try again.")
         console.error("Error in handleSave(): ", err)
       } finally {
-        setIsLoading(false)
+        // setIsLoading(false)
       }
 
       /* If user not logged in, alert */
@@ -267,9 +167,28 @@ export default function InteractionConsole({
           if (requestedRating >= 0 && requestedRating <= 3) {
             /* IMPORTANT: If a film has not been liked when it is rated, send a like request with the requested Rating */
             if (!isLiked) {
-              await likeFilm(requestedRating)
+              const req = createReqBody("like")
+              req["stars"] = requestedRating !== -1 ? requestedRating : 0
+              console.log("Request:", req)
+              const result = await likeFilm(req)
+              if (result.error) {
+                console.error("Server: ", result.error)
+              } else {
+                setIsLiked(result.liked)
+                setOfficialRating(result.stars)
+                setRequestedRating(-1)
+                setIsSaved(false) //optimistically "unsave" film on client side. upon reload this value will get updated with actual Save status.
+              }
             } else {
-              await rateFilm(requestedRating)
+              const req = createReqBody("rate")
+              req["stars"] = requestedRating
+              const result = await rateFilm(req)
+              if (result.error) {
+                console.error("Server: ", result.error)
+              } else {
+                setOfficialRating(result.stars)
+                setRequestedRating(-1) //neutral state
+              }
             }
           } else if (requestedRating == -1) {
             // console.log("Requested rating: back to neutral (-1)")
@@ -297,11 +216,27 @@ export default function InteractionConsole({
   useEffect(() => {
     const fetchPageData = async () => {
       if (tmdbId) {
-        // setSearchModalOpen(false)
         setIsLoading(true)
         try {
-          checkLikeStatus(tmdbId, setIsLiked, setOfficialRating)
-          checkSaveStatus(tmdbId, setIsSaved)
+          const likeResult = await checkLikeStatus(tmdbId)
+          const saveResult = await checkSaveStatus(tmdbId)
+
+          if (likeResult.error) {
+            console.error("Server: ", likeResult.error)
+          } else {
+            setIsLiked(likeResult.liked)
+            setOfficialRating(likeResult.stars)
+          }
+
+          if (saveResult.error) {
+            console.error("Server: ", saveResult.error)
+          } else {
+            if (saveResult.saved) {
+              setIsSaved(true)
+            } else {
+              setIsSaved(false)
+            }
+          }
         } catch (err) {
           console.error("Error loading film data: ", err)
         } finally {
@@ -317,10 +252,12 @@ export default function InteractionConsole({
       {!isLoading && (
         <div
           className={`flex flex-col text-${css.textColor} z-30 items-center justify-center gap-0`}>
-          <div className="text-white w-[85%] text-justify pr-4 pl-4 pb-2">
-            <span className="">{movieDetails.overview?.slice(0, 200)}</span>
-            {movieDetails.overview?.length >= 200 && <span>{`...`}</span>}
-          </div>
+          {!isLandingPage && (
+            <div className="text-white w-[85%] text-justify pr-4 pl-4 pb-2">
+              <span className="">{movieDetails.overview?.slice(0, 200)}</span>
+              {movieDetails.overview?.length >= 200 && <span>{`...`}</span>}
+            </div>
+          )}
 
           {/* <div className="text-white w-[85%] flex items-center justify-center gap-2 pr-4 pl-4 pb-4">
             <AiFillClockCircle />

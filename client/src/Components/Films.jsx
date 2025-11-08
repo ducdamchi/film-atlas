@@ -30,10 +30,10 @@ export default function Films() {
   const [sortBy, setSortBy] = useState("added_date")
   const [sortDirection, setSortDirection] = useState("desc")
   const [numStars, setNumStars] = useState(0)
-
   const [queryString, setQueryString] = useState("watched")
   const { authState, searchModalOpen, setSearchModalOpen } =
     useContext(AuthContext)
+  const [isLoading, setIsLoading] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -69,11 +69,21 @@ export default function Films() {
           setIsSearching(false)
         } else {
           setIsSearching(true)
-          queryFilmFromTMDB(searchInput, setSearchResult)
+          // setIsLoading(true)
+          const original_results = await queryFilmFromTMDB(searchInput)
+          const filtered_results = original_results.filter(
+            (movie) =>
+              !(movie.backdrop_path === null || movie.poster_path === null)
+          )
+          const sorted_filtered_results = filtered_results.sort(
+            (a, b) => b.popularity - a.popularity
+          )
+          setSearchResult(sorted_filtered_results)
         }
       } catch (err) {
         console.log("Error Querying Film: ", err)
-        throw err
+      } finally {
+        // setIsLoading(false)
       }
     }
     queryFilm()
@@ -81,25 +91,33 @@ export default function Films() {
 
   /* Fetch User's film list (liked, watchlisted or starred) from App's DB */
   useEffect(() => {
-    // console.log("NumStars: ", numStars)
-    // if (authState.status) {
-    const fetchUserFilmList = async () => {
-      fetchListByParams({
-        queryString: queryString,
-        sortBy: sortBy,
-        sortDirection: sortDirection,
-        numStars: numStars,
-        setUserFilmList: setUserFilmList,
-      })
+    if (authState.status) {
+      const fetchUserFilmList = async () => {
+        try {
+          setIsLoading(true)
+          const results = await fetchListByParams({
+            queryString: queryString,
+            sortBy: sortBy,
+            sortDirection: sortDirection,
+            numStars: numStars,
+          })
+          setUserFilmList(results)
+        } catch (err) {
+          console.err("Error Fetching User Film List: ", err)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      fetchUserFilmList()
     }
-    fetchUserFilmList()
-    // } else {
+    // else {
     //   alert("Log in to interact with films!")
     // }
   }, [sortBy, sortDirection, queryString, numStars])
 
   return (
     <>
+      {/* {isLoading && <LoadingPage />} */}
       {/* Quick Search Modal */}
       {searchModalOpen && (
         <QuickSearchModal
@@ -157,11 +175,13 @@ export default function Films() {
             stateDetails={{
               1: {
                 value: "desc",
-                label: <FaSortNumericDownAlt className="text-xl mt-0" />,
+                label: (
+                  <FaSortNumericDownAlt className="text-xl mt-0 w-[5rem]" />
+                ),
               },
               2: {
                 value: "asc",
-                label: <FaSortNumericDown className="text-xl mt-0" />,
+                label: <FaSortNumericDown className="text-xl mt-0 w-[5rem]" />,
               },
             }}
           />

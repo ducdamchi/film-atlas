@@ -1,19 +1,14 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+
 import { getReleaseYear, queryFilmFromTMDB } from "../../Utils/helperFunctions"
-
-// import QuickSearchBar from "./QuickSearchBar"
-// import FilmListDisplay from "./FilmListDisplay"
 import useClickOutside from "../../Utils/useClickOutside"
-
-// import { AuthContext } from "../Utils/authContext"
 
 import { BiSearchAlt2 } from "react-icons/bi"
 
 export default function QuickSearchModal({
   searchModalOpen,
   setSearchModalOpen,
-  // queryString,
 }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const [searchInput, setSearchInput] = useState("")

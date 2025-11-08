@@ -14,7 +14,7 @@ export default function TripleStarRating({
     <div
       className={`flex items-center gap-1 hover:${css.hoverBg} transition-all duration-200 ease-out p-3 h-full flex group`}>
       <div
-        className={`flex items-center hover:${css.hoverTextColor} transition-all duration-200 ease-out`}>
+        className={`flex items-center text-${css.starSize} hover:${css.hoverTextColor} transition-all duration-200 ease-out`}>
         <button
           onMouseEnter={() => {
             setStarHover(1)
@@ -27,12 +27,10 @@ export default function TripleStarRating({
           }}>
           {starHover >= 1 || officialRating >= 1 ? (
             // <BiSolidStar className="text-3xl text-amber-400" />
-            <span className={`text-${css.starSize} text-pink-600`}>
-              &#10048;
-            </span>
+            <span className={`text-pink-600`}>&#10048;</span>
           ) : (
             // <BiStar className="text-3xl" />
-            <span className={`text-${css.starSize}`}>&#10048;</span>
+            <span className={``}>&#10048;</span>
           )}
         </button>
         <button
@@ -47,12 +45,10 @@ export default function TripleStarRating({
           }}>
           {starHover >= 2 || officialRating >= 2 ? (
             // <BiSolidStar className="text-3xl text-amber-400" />
-            <span className={`text-${css.starSize} text-pink-600`}>
-              &#10048;
-            </span>
+            <span className={` text-pink-600`}>&#10048;</span>
           ) : (
             // <BiStar className="text-3xl" />
-            <span className={`text-${css.starSize}`}>&#10048;</span>
+            <span className={``}>&#10048;</span>
           )}
         </button>
         <button
@@ -67,12 +63,10 @@ export default function TripleStarRating({
           }}>
           {starHover === 3 || officialRating >= 3 ? (
             // <BiSolidStar className="text-3xl text-amber-400" />
-            <span className={`text-${css.starSize} text-pink-600`}>
-              &#10048;
-            </span>
+            <span className={` text-pink-600`}>&#10048;</span>
           ) : (
             // <BiStar className="text-3xl" />
-            <span className={`text-${css.starSize}`}>&#10048;</span>
+            <span className={``}>&#10048;</span>
           )}
         </button>
       </div>

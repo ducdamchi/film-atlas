@@ -90,7 +90,7 @@ export function getNameParts(fullName) {
 @params:
 - searchInput: A useState object containing the search input
 - setSearchResult: A useState function that updates the search result  */
-export function queryFilmFromTMDB(searchInput, setSearchResult) {
+export function queryFilmFromTMDB(searchInput) {
   const searchUrl = "https://api.themoviedb.org/3/search/movie"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
@@ -104,17 +104,7 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
       },
     })
     .then((response) => {
-      const original_results = response.data.results
-      const filtered_results = original_results.filter(
-        (movie) => !(movie.backdrop_path === null || movie.poster_path === null)
-      )
-      // .filter((movie) => movie.popularity > 1 || movie.vote_count > 10)
-      const sorted_filtered_results = filtered_results.sort(
-        (a, b) => b.popularity - a.popularity
-      )
-      setSearchResult(sorted_filtered_results)
-      // console.log("Filtered results:", sorted_filtered_results)
-      return response.data
+      return response.data.results
     })
     .catch((err) => {
       console.log("Error: ", err)
@@ -127,7 +117,7 @@ export function queryFilmFromTMDB(searchInput, setSearchResult) {
 - tmdbId: unique TMDB id assigned to film
 - set...: useState() methods that updates the corresponding values in the calling component
 */
-export function fetchFilmFromTMDB(tmdbId, setMovieDetails, setDirectors) {
+export function fetchFilmFromTMDB(tmdbId) {
   const movieDetailsUrl = "https://api.themoviedb.org/3/movie/"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
@@ -136,12 +126,6 @@ export function fetchFilmFromTMDB(tmdbId, setMovieDetails, setDirectors) {
       `${movieDetailsUrl}${tmdbId}?append_to_response=credits,videos,watch/providers&api_key=${apiKey}`
     )
     .then((response) => {
-      const directorsList = response.data.credits.crew.filter(
-        (crewMember) => crewMember.job === "Director"
-      )
-
-      setMovieDetails(response.data)
-      setDirectors(directorsList)
       return response.data
     })
     .catch((err) => {
@@ -150,7 +134,7 @@ export function fetchFilmFromTMDB(tmdbId, setMovieDetails, setDirectors) {
     })
 }
 
-export function queryDirectorFromTMDB(searchInput, setSearchResult) {
+export function queryDirectorFromTMDB(searchInput) {
   const searchPersonUrl = "https://api.themoviedb.org/3/search/person"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
@@ -163,11 +147,7 @@ export function queryDirectorFromTMDB(searchInput, setSearchResult) {
       },
     })
     .then((response) => {
-      const directorResult = response.data.results.filter(
-        (person) => person.known_for_department === "Directing"
-      )
-      // console.log("All Directors Found: ", directorResult)
-      setSearchResult(directorResult)
+      return response.data.results
     })
     .catch((err) => {
       console.log("Client: Error querying director from TMDB", err)
@@ -175,11 +155,7 @@ export function queryDirectorFromTMDB(searchInput, setSearchResult) {
     })
 }
 
-export function fetchDirectorFromTMDB(
-  tmdbId,
-  setDirectorDetails,
-  setDirectedFilms
-) {
+export function fetchDirectorFromTMDB(tmdbId) {
   const personDetailsUrl = "https://api.themoviedb.org/3/person/"
   const apiKey = "14b22a55c02218f84058041c5f553d3d"
 
@@ -188,35 +164,6 @@ export function fetchDirectorFromTMDB(
       `${personDetailsUrl}${tmdbId}?append_to_response=movie_credits&api_key=${apiKey}`
     )
     .then((response) => {
-      // Filter out films where the director's job is not 'director'
-      const directedFilms = response.data.movie_credits.crew.filter(
-        (film) => film.job === "Director"
-      )
-
-      // Filter out films without backdrop or poster path
-      let filteredDirectedFilms = directedFilms.filter(
-        (film) => !(film.backdrop_path === null || film.poster_path === null)
-      )
-
-      // If director is deceased, filter out films released after their deathdate
-      if (response.data.deathday !== null) {
-        const deathDate = new Date(response.data.deathday)
-        filteredDirectedFilms = filteredDirectedFilms.filter((film) => {
-          if (!film.release_date) return false
-          const filmDate = new Date(film.release_date)
-          return filmDate <= deathDate
-        })
-      }
-
-      // Sort by most recent release date -> least recent
-      const sortedDirectedFilms = filteredDirectedFilms.sort((a, b) => {
-        const dateA = parseInt(a.release_date?.replace("-", ""))
-        const dateB = parseInt(b.release_date?.replace("-", ""))
-        return dateB - dateA
-      })
-
-      setDirectorDetails(response.data)
-      setDirectedFilms(sortedDirectedFilms)
       return response.data
     })
     .catch((err) => {
@@ -227,7 +174,6 @@ export function fetchDirectorFromTMDB(
 
 export function queryTopRatedFilmByCountryTMDB({
   countryCode = null,
-  setSearchResult = null,
   sortBy = null,
   ratingRange = null,
   voteCountRange = null,
@@ -243,20 +189,14 @@ export function queryTopRatedFilmByCountryTMDB({
         region: countryCode,
         include_adult: false,
         include_video: false,
-        "with_runtime.gte": 80, //pick films > 85 minutes
+        "with_runtime.gte": 80, //pick films > 80 minutes
         "vote_count.gte": voteCountRange[1],
         "vote_average.gte": ratingRange[1],
-        // "vote_average.lte": ratingRange[1],
         sort_by: sortBy,
       },
     })
     .then((response) => {
-      const original_results = response.data.results
-      const filtered_results = original_results.filter(
-        (movie) => !(movie.backdrop_path === null || movie.poster_path === null)
-      )
-      setSearchResult(filtered_results)
-      return response.data
+      return response.data.results
     })
     .catch((err) => {
       console.log("Error: ", err)
@@ -269,7 +209,6 @@ export function fetchListByParams({
   sortBy = null,
   sortDirection = null,
   numStars = null,
-  setUserFilmList = null,
   countryCode = null,
 } = {}) {
   return axios
@@ -285,7 +224,6 @@ export function fetchListByParams({
       },
     })
     .then((response) => {
-      setUserFilmList(response.data)
       return response.data
     })
     .catch((err) => {
@@ -294,12 +232,39 @@ export function fetchListByParams({
     })
 }
 
+export function fetchDirectorListByParams({
+  queryString = null,
+  sortBy = null,
+  sortDirection = null,
+  numStars = null,
+} = {}) {
+  return axios
+    .get(`http://localhost:3002/profile/me/${queryString}`, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+      params: {
+        sortBy: sortBy,
+        sortDirection: sortDirection,
+        numStars: numStars,
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.log("Error: ", err)
+      throw err
+    })
+    .finally(() => {})
+}
+
 /* Check the Like status of a film for logged in users from App's DB
 @params:
 - tmdbId: unique TMDB id assigned to film
 - setLike: useState() method that updates the like status in the calling component
 */
-export function checkLikeStatus(tmdbId, setIsLiked, setOfficialRating) {
+export function checkLikeStatus(tmdbId) {
   return axios
     .get(`http://localhost:3002/profile/me/watched/${tmdbId}`, {
       headers: {
@@ -307,12 +272,6 @@ export function checkLikeStatus(tmdbId, setIsLiked, setOfficialRating) {
       },
     })
     .then((response) => {
-      if (response.data.error) {
-        console.log("Server: ", response.data.error)
-      } else {
-        setIsLiked(response.data.liked)
-        setOfficialRating(response.data.stars)
-      }
       return response.data
     })
     .catch((err) => {
@@ -326,7 +285,7 @@ export function checkLikeStatus(tmdbId, setIsLiked, setOfficialRating) {
 - tmdbId: unique TMDB id assigned to film
 - setLike: useState() method that updates the like status in the calling component
 */
-export function checkSaveStatus(tmdbId, setIsSaved) {
+export function checkSaveStatus(tmdbId) {
   return axios
     .get(`http://localhost:3002/profile/me/watchlisted/${tmdbId}`, {
       headers: {
@@ -334,19 +293,100 @@ export function checkSaveStatus(tmdbId, setIsSaved) {
       },
     })
     .then((response) => {
-      if (response.data.error) {
-        console.log("Server: ", response.data.error)
-      } else {
-        if (response.data.saved) {
-          setIsSaved(true)
-        } else {
-          setIsSaved(false)
-        }
-      }
       return response.data
     })
     .catch((err) => {
       console.error("Client: Error checking save status", err)
+      throw err
+    })
+}
+
+/* Make API call to App's DB when user 'like' a film */
+export function likeFilm(req) {
+  return axios
+    .post(`http://localhost:3002/profile/me/watched`, req, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error liking film", err)
+      throw err
+    })
+}
+
+/* Make API call to App's DB when user 'unlike' a film */
+export function unlikeFilm(tmdbId) {
+  return axios
+    .delete(`http://localhost:3002/profile/me/watched`, {
+      data: {
+        tmdbId: tmdbId,
+      },
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error unliking film", err)
+      throw err
+    })
+}
+
+/* Make API call to App's DB when user 'like' a film */
+export function saveFilm(req) {
+  return axios
+    .post(`http://localhost:3002/profile/me/watchlisted`, req, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error saving film", err)
+      throw err
+    })
+}
+/* Make API call to App's DB when user 'unlike' a film */
+export function unsaveFilm(tmdbId) {
+  return axios
+    .delete(`http://localhost:3002/profile/me/watchlisted`, {
+      data: {
+        tmdbId: tmdbId,
+      },
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error unliking film", err)
+      throw err
+    })
+}
+
+/* Make API call to App's DB to rate a film that has already been liked */
+export function rateFilm(req) {
+  return axios
+    .put(`http://localhost:3002/profile/me/watched`, req, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error rating film", err)
       throw err
     })
 }
