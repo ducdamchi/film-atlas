@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { fetchFilmFromTMDB } from "../../../Utils/apiCalls"
 import FilmTMDB_Card from "./FilmTMDB_Card"
 
-export default function FilmTMDB_Gallery({ listOfFilmObjects }) {
+export default function FilmTMDB_Gallery({ listOfFilmObjects, setPage }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const navigate = useNavigate()
   const [hoverId, setHoverId] = useState(null)
@@ -39,7 +39,11 @@ export default function FilmTMDB_Gallery({ listOfFilmObjects }) {
             {listOfFilmObjects.map((filmObject, key) => (
               /* Each film item */
 
-              <FilmTMDB_Card key={key} filmObject={filmObject} />
+              <FilmTMDB_Card
+                key={key}
+                filmObject={filmObject}
+                setPage={setPage}
+              />
             ))}
           </div>
         </div>

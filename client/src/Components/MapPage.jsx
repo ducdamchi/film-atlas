@@ -106,313 +106,11 @@ export default function MapPage() {
   const [page, setPage] = usePersistedState("map-page", {
     numPages: 1,
     loadMore: false,
+    hasMore: true,
   })
 
-  const [hasMore, setHasMore] = useState(true)
-
-  function toggleSearchModal() {
-    setSearchModalOpen((status) => !status)
-  }
-  useCommandK(toggleSearchModal)
-
-  // async function fetchNewPage() {
-  //   if (isDiscoverMode && page.numPages !== 1 && page.loadMore === true) {
-  //     // console.log("Inside page function, page: ", page)
-
-  //     try {
-  //       setIsLoading(true)
-  //       if (
-  //         popupInfo &&
-  //         popupInfo.iso_a2 !== undefined &&
-  //         ratingRange.length == 2
-  //       ) {
-  //         const result = await queryTopRatedFilmByCountryTMDB({
-  //           page: page.numPages + 1,
-  //           countryCode: popupInfo.iso_a2,
-  //           sortBy: discoverBy,
-  //           ratingRange: ratingRange,
-  //           voteCountRange: voteCountRange,
-  //         })
-
-  //         setPage((prevPage) => ({
-  //           ...prevPage,
-  //           numPages: prevPage.numPages + 1,
-  //         }))
-
-  //         const filtered_results = result.filter(
-  //           (movie) =>
-  //             !(movie.backdrop_path === null || movie.poster_path === null)
-  //         )
-
-  //         if (filtered_results.length > 0) {
-  //           setSuggestedFilmList((prevResults) => [
-  //             ...prevResults,
-  //             ...filtered_results,
-  //           ])
-  //         } else {
-  //           setHasMore(false)
-  //           console.log("No more pages to load.")
-  //         }
-  //         // If requested country is different from previously requested country
-  //       } else {
-  //         setSuggestedFilmList([])
-  //       }
-  //     } catch (err) {
-  //       console.log(err)
-  //       throw err
-  //     } finally {
-  //       setIsLoading(false)
-  //     }
-  //   }
-  // }
-
-  useEffect(() => {
-    const fetchNewPage = async () => {
-      if (!isLoading && page.loadMore === true) {
-        console.log("Inside page function, page: ", page)
-
-        try {
-          setIsLoading(true)
-          if (
-            popupInfo &&
-            popupInfo.iso_a2 !== undefined &&
-            ratingRange.length == 2
-          ) {
-            const result = await queryTopRatedFilmByCountryTMDB({
-              page: page.numPages + 1,
-              countryCode: popupInfo.iso_a2,
-              sortBy: discoverBy,
-              ratingRange: ratingRange,
-              voteCountRange: voteCountRange,
-            })
-
-            setPage((prevPage) => ({
-              ...prevPage,
-              numPages: prevPage.numPages + 1,
-            }))
-
-            const filtered_results = result.filter(
-              (movie) =>
-                !(movie.backdrop_path === null || movie.poster_path === null)
-            )
-
-            if (filtered_results.length > 0) {
-              setSuggestedFilmList((prevResults) => [
-                ...prevResults,
-                ...filtered_results,
-              ])
-            } else {
-              setHasMore(false)
-              console.log("No more pages to load.")
-            }
-            // If requested country is different from previously requested country
-          } else {
-            setSuggestedFilmList([])
-          }
-        } catch (err) {
-          console.log(err)
-          throw err
-        } finally {
-          setIsLoading(false)
-        }
-      }
-    }
-    fetchNewPage()
-  }, [page])
-
-  useEffect(() => {
-    if (!isLoading) {
-      // Tell page function to not load any extra pages upon user return from landing page.
-      // setPage((prevPage) => ({ ...prevPage, loadMore: false }))
-
-      if (scrollPosition) {
-        setTimeout(() => {
-          window.scrollTo(0, parseInt(scrollPosition, 10))
-        }, 0)
-      } else {
-        setTimeout(() => {
-          window.scrollTo(0, 0)
-        }, 0)
-      }
-
-      const handleScroll = () => {
-        setScrollPosition(window.scrollY)
-      }
-
-      const scrollTimer = setTimeout(() => {
-        window.addEventListener("scroll", handleScroll)
-      }, 500)
-
-      return () => {
-        clearTimeout(scrollTimer)
-        window.removeEventListener("scroll", handleScroll)
-      }
-    }
-  }, [isLoading])
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) =>
-      entries.forEach(
-        (entry) => {
-          if (entry.isIntersecting) {
-            if (!isLoading && suggestedFilmList.length > 0) {
-              // console.log("Entry Intersected")
-              setPage((prevPage) => ({ ...prevPage, loadMore: true }))
-            }
-          } else {
-            setPage((prevPage) => ({ ...prevPage, loadMore: false }))
-          }
-        },
-        {
-          threshold: 1,
-        }
-      )
-    )
-
-    if (loadMoreTrigger.current) {
-      observer.observe(loadMoreTrigger.current)
-    }
-
-    return () => {
-      if (loadMoreTrigger.current) {
-        observer.unobserve(loadMoreTrigger.current)
-      }
-      setPage((prevPage) => ({ ...prevPage, loadMore: false }))
-    }
-  }, [isLoading])
-
-  /* Fetch User's film list (liked or watchlisted) from App's DB when page first loads */
-  useEffect(() => {
-    if (authState.status) {
-      const fetchInitialLikeData = async () => {
-        try {
-          setIsLoading(true)
-          const result = await fetchListByParams({
-            queryString: "watched",
-          })
-          setMapFilmData(result)
-        } catch (err) {
-          console.log("Error Fetching User Like Data: ", err)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      fetchInitialLikeData()
-    } else {
-      // alert("Log in to interact with map!")
-    }
-  }, [])
-
-  /* Hook to handle querying & sorting User Watched Films */
-  useEffect(() => {
-    if (authState.status) {
-      if (popupInfo && popupInfo.iso_a2 !== undefined) {
-        const fetchLikedFilmsByCountry = async () => {
-          try {
-            setIsLoading(true)
-            const result = await fetchListByParams({
-              queryString: "watched/by_country",
-              countryCode: popupInfo.iso_a2,
-              setUserFilmList: setUserFilmList,
-              sortBy: sortBy,
-              sortDirection: sortDirection,
-              numStars: numStars,
-            })
-            setUserFilmList(result)
-          } catch (err) {
-            console.log("Error Fetching User Film List: ", err)
-          } finally {
-            setIsLoading(false)
-          }
-        }
-        fetchLikedFilmsByCountry()
-      }
-    }
-    // else {
-    //   alert("Log in to interact with map!")
-    // }
-  }, [popupInfo, sortBy, sortDirection, numStars])
-
-  /* Hook to switch on/off Discover Mode */
-  useEffect(() => {
-    if (queryString === "discover") {
-      setIsDiscoverMode(true)
-    } else {
-      setIsDiscoverMode(false)
-    }
-  }, [queryString])
-
-  /* Hook to handle Discover Mode when any of the dependencies below change*/
-  useEffect(() => {
-    if (isDiscoverMode) {
-      const getSuggestions = async () => {
-        try {
-          // console.log("Inside default function")
-          // console.log(page, discoverBy)
-          setPage({ numPages: 1, loadMore: false })
-          setIsLoading(true)
-          setHasMore(true) //restart hasMore var
-          if (
-            popupInfo &&
-            popupInfo.iso_a2 !== undefined &&
-            ratingRange.length == 2
-          ) {
-            // console.log("Popup iso_a2: ", popupInfo.iso_a2)
-            // console.log("requested Country: ", requestedCountry)
-            // If parameters change but user are looking at the same region
-
-            // This is the standard query whenever any of the parameters change. Default page number is 1.
-            const result = await queryTopRatedFilmByCountryTMDB({
-              page: 1,
-              countryCode: popupInfo.iso_a2,
-              sortBy: discoverBy,
-              ratingRange: ratingRange,
-              voteCountRange: voteCountRange,
-            })
-
-            const filtered_results = result.filter(
-              (movie) =>
-                !(movie.backdrop_path === null || movie.poster_path === null)
-            )
-
-            setSuggestedFilmList(filtered_results)
-
-            // If requested country is different from previously requested country
-          } else {
-            setSuggestedFilmList([])
-          }
-        } catch (err) {
-          console.log(err)
-          throw err
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      getSuggestions()
-    }
-  }, [isDiscoverMode, popupInfo, discoverBy, ratingRange, voteCountRange])
-
-  useEffect(() => {
-    // console.log(mapFilmData)
-    const data = {}
-    mapFilmData.forEach((film) => {
-      film.origin_country.forEach((country) => {
-        // If country already added as key, increment film counter
-        if (country in data) {
-          // console.log("Country already added as key: ", country)
-          data[country].num_watched_films++
-          // If country shows up first time, set film counter = 0
-        } else {
-          data[country] = {
-            name: getCountryName(country),
-            num_watched_films: 1,
-          }
-        }
-      })
-    })
-    // console.log(data)
-    setFilmsPerCountryData(data)
-  }, [mapFilmData])
+  // const [hasMore, setHasMore] = useState(true)
+  const isPageRefresh = useRef(true)
 
   const setFeatureStates = useCallback(() => {
     if (!mapRef.current) return
@@ -535,6 +233,8 @@ export default function MapPage() {
       }
     }
 
+    console.log("PopupInfo being set")
+
     setPopupInfo({
       longitude: event.lngLat.lng,
       latitude: event.lngLat.lat,
@@ -544,6 +244,277 @@ export default function MapPage() {
       iso_a2: isoA2,
     })
   }, [])
+
+  function toggleSearchModal() {
+    setSearchModalOpen((status) => !status)
+  }
+  useCommandK(toggleSearchModal)
+
+  /*******************************************************************/
+  /* HOOKS TO HANDLE DISCOVER MODE & SCROLL RESTORATION */
+  /* Set Scroll Position Hook */
+  useEffect(() => {
+    console.log("Loading state: ", isLoading)
+    if (!isLoading) {
+      if (scrollPosition) {
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(scrollPosition, 10))
+          console.log("Should have scrolled to: ", scrollPosition)
+        }, 0)
+      } else {
+        setTimeout(() => {
+          window.scrollTo(0, 0)
+        }, 0)
+      }
+
+      const handleScroll = () => {
+        setScrollPosition(window.scrollY)
+      }
+
+      const scrollTimer = setTimeout(() => {
+        window.addEventListener("scroll", handleScroll)
+      }, 500)
+
+      return () => {
+        clearTimeout(scrollTimer)
+        window.removeEventListener("scroll", handleScroll)
+      }
+    }
+  }, [isLoading])
+
+  /* Intersection Observer Hook */
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) =>
+      entries.forEach(
+        (entry) => {
+          if (entry.isIntersecting) {
+            if (!isLoading && suggestedFilmList.length > 0) {
+              // console.log("Intersection Observer doing something: ", page)
+              setPage((prevPage) => ({ ...prevPage, loadMore: true }))
+            }
+          } else {
+            setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+          }
+        },
+        {
+          threshold: 1,
+        }
+      )
+    )
+
+    if (loadMoreTrigger.current) {
+      observer.observe(loadMoreTrigger.current)
+    }
+
+    return () => {
+      if (loadMoreTrigger.current) {
+        observer.unobserve(loadMoreTrigger.current)
+      }
+      setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+    }
+  }, [isLoading])
+
+  /* Hook to switch on/off Discover Mode */
+  useEffect(() => {
+    if (queryString === "discover") {
+      setIsDiscoverMode(true)
+    } else {
+      setIsDiscoverMode(false)
+    }
+  }, [queryString])
+
+  /* Fetch New Page Hook */
+  useEffect(() => {
+    const fetchNewPage = async () => {
+      /* This IF tells the hook to only fetch New Page when loadMore is set to true. setPage is controlled in three places: (1) the Fetch Initial Page hook, which always reinitializes page, (2) the Intersection Observer Hook, which sets loadMore to true if intersection happens, and false otherwise, and (3) the FilmTMDB_Card children component, which sets loadMore to false whenever a film is clicked on. */
+      if (!isLoading && page.loadMore === true) {
+        // console.log("Fetch New Page doing something: ", page)
+        try {
+          setIsLoading(true)
+          if (
+            popupInfo &&
+            popupInfo.iso_a2 !== undefined &&
+            ratingRange.length == 2
+          ) {
+            const result = await queryTopRatedFilmByCountryTMDB({
+              page: page.numPages + 1,
+              countryCode: popupInfo.iso_a2,
+              sortBy: discoverBy,
+              ratingRange: ratingRange,
+              voteCountRange: voteCountRange,
+            })
+
+            const filtered_results = result.filter(
+              (movie) =>
+                !(movie.backdrop_path === null || movie.poster_path === null)
+            )
+
+            if (filtered_results.length > 0) {
+              setSuggestedFilmList((prevResults) => [
+                ...prevResults,
+                ...filtered_results,
+              ])
+              setPage((prevPage) => ({
+                ...prevPage,
+                numPages: prevPage.numPages + 1,
+              }))
+            } else {
+              setPage((prevPage) => ({
+                ...prevPage,
+                loadMore: false,
+                hasMore: false,
+              }))
+              console.log("No more pages to load.")
+            }
+            // If requested country is different from previously requested country
+          } else {
+            setSuggestedFilmList([])
+          }
+        } catch (err) {
+          console.log(err)
+          throw err
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    }
+    fetchNewPage()
+  }, [page])
+
+  /* Fetch Initial Page Hook */
+  useEffect(() => {
+    /* This IF detects a page refresh and skips a unnecessary rerender. Thus, the API call for suggetions only fire when user selects a new country or adjust any of the dependecies array below. */
+    if (isPageRefresh.current) {
+      // console.log("Page refreshed, skipping handle Discover: ", page)
+      isPageRefresh.current = false
+      return
+    }
+
+    if (isDiscoverMode) {
+      // console.log("handle Discover hook doing something: ", page)
+      const getSuggestions = async () => {
+        try {
+          //Reinitialize setPage, as this API request only gets called when user select a new country or adjust any of the dependecies array below
+          setPage({ numPages: 1, loadMore: false, hasMore: true })
+          setIsLoading(true)
+          if (
+            popupInfo &&
+            popupInfo.iso_a2 !== undefined &&
+            ratingRange.length == 2
+          ) {
+            // This is the standard query whenever any of the parameters change. Default page number is 1.
+            const result = await queryTopRatedFilmByCountryTMDB({
+              page: 1,
+              countryCode: popupInfo.iso_a2,
+              sortBy: discoverBy,
+              ratingRange: ratingRange,
+              voteCountRange: voteCountRange,
+            })
+
+            const filtered_results = result.filter(
+              (movie) =>
+                !(movie.backdrop_path === null || movie.poster_path === null)
+            )
+
+            setSuggestedFilmList(filtered_results)
+
+            // If requested country is different from previously requested country
+          } else {
+            setSuggestedFilmList([])
+          }
+        } catch (err) {
+          console.log(err)
+          throw err
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      getSuggestions()
+    }
+  }, [isDiscoverMode, popupInfo, discoverBy, ratingRange, voteCountRange])
+  /*******************************************************************/
+
+  /* Fetch User's film list (liked or watchlisted) from App's DB when page first loads */
+  useEffect(() => {
+    if (authState.status) {
+      const fetchInitialLikeData = async () => {
+        try {
+          setIsLoading(true)
+          const result = await fetchListByParams({
+            queryString: "watched",
+          })
+          setMapFilmData(result)
+        } catch (err) {
+          console.log("Error Fetching User Like Data: ", err)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      fetchInitialLikeData()
+    } else {
+      // alert("Log in to interact with map!")
+    }
+  }, [])
+
+  /* Hook to extract data from App's DB to display on map */
+  useEffect(() => {
+    // if (isPageRefresh.current) {
+    //   console.log("Page refreshed, skipping data extraction")
+
+    //   isPageRefresh.current = false
+    //   return
+    // }
+    // console.log(mapFilmData)
+
+    const data = {}
+    mapFilmData.forEach((film) => {
+      film.origin_country.forEach((country) => {
+        // If country already added as key, increment film counter
+        if (country in data) {
+          // console.log("Country already added as key: ", country)
+          data[country].num_watched_films++
+          // If country shows up first time, set film counter = 0
+        } else {
+          data[country] = {
+            name: getCountryName(country),
+            num_watched_films: 1,
+          }
+        }
+      })
+    })
+    // console.log(data)
+    setFilmsPerCountryData(data)
+  }, [mapFilmData])
+
+  /* Hook to handle querying & sorting User Watched Films */
+  useEffect(() => {
+    if (authState.status) {
+      if (popupInfo && popupInfo.iso_a2 !== undefined) {
+        const fetchLikedFilmsByCountry = async () => {
+          try {
+            setIsLoading(true)
+            const result = await fetchListByParams({
+              queryString: "watched/by_country",
+              countryCode: popupInfo.iso_a2,
+              setUserFilmList: setUserFilmList,
+              sortBy: sortBy,
+              sortDirection: sortDirection,
+              numStars: numStars,
+            })
+            setUserFilmList(result)
+          } catch (err) {
+            console.log("Error Fetching User Film List: ", err)
+          } finally {
+            setIsLoading(false)
+          }
+        }
+        fetchLikedFilmsByCountry()
+      }
+    }
+    // else {
+    //   alert("Log in to interact with map!")
+    // }
+  }, [popupInfo, sortBy, sortDirection, numStars])
 
   /* Clean up event listeners when map unmounts */
   useEffect(() => {
@@ -831,16 +802,19 @@ export default function MapPage() {
           />
         )}
         {isDiscoverMode && suggestedFilmList && (
-          <FilmTMDB_Gallery listOfFilmObjects={suggestedFilmList} />
+          <FilmTMDB_Gallery
+            listOfFilmObjects={suggestedFilmList}
+            setPage={setPage}
+          />
         )}
 
-        {isDiscoverMode && hasMore && (
+        {isDiscoverMode && page.hasMore && (
           <div
             ref={loadMoreTrigger}
             className="w-full h-[10rem] flex items-center justify-center mb-0 mt-[20rem]"></div>
         )}
 
-        {isDiscoverMode && !hasMore && (
+        {isDiscoverMode && !page.hasMore && (
           <div className="w-full flex items-center justify-center m-10">
             You've reached the end!
           </div>
@@ -849,52 +823,3 @@ export default function MapPage() {
     </div>
   )
 }
-
-/* This hook gets triggered when there's a request to load more pages (when "page" variable is > 1, and when it changes). It queries the specified page, and appends it to the existing Suggestions list. Note: this hook only gets called when all other parameters like countryCode, discoverBy, ratingRange, voteCountRange, are unchanged. If any of these parameters change, the default hook above will be called, which automatically resets the Suggestions List and fill it with content from page 1 of the TMDB query. // only trigger when page is incremented past 1. if page is 1, it means that the default fetch function is handling fetching the first page from TMDB*/
-// useEffect(() => {
-//   if (isDiscoverMode && page.numPages !== 1 && page.loadMore === true) {
-
-//     const getSuggestions = async () => {
-//       try {
-//         setIsLoading(true)
-//         if (
-//           popupInfo &&
-//           popupInfo.iso_a2 !== undefined &&
-//           ratingRange.length == 2
-//         ) {
-//           const result = await queryTopRatedFilmByCountryTMDB({
-//             page: page.numPages,
-//             countryCode: popupInfo.iso_a2,
-//             sortBy: discoverBy,
-//             ratingRange: ratingRange,
-//             voteCountRange: voteCountRange,
-//           })
-
-//           const filtered_results = result.filter(
-//             (movie) =>
-//               !(movie.backdrop_path === null || movie.poster_path === null)
-//           )
-
-//           if (filtered_results.length > 0) {
-//             setSuggestedFilmList((prevResults) => [
-//               ...prevResults,
-//               ...filtered_results,
-//             ])
-//           } else {
-//             setHasMore(false)
-//             console.log("No more pages to load.")
-//           }
-//           // If requested country is different from previously requested country
-//         } else {
-//           setSuggestedFilmList([])
-//         }
-//       } catch (err) {
-//         console.log(err)
-//         throw err
-//       } finally {
-//         setIsLoading(false)
-//       }
-//     }
-//     getSuggestions()
-//   }
-// }, [page, isDiscoverMode])

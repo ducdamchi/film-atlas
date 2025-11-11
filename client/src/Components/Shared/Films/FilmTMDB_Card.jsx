@@ -8,7 +8,7 @@ import InteractionConsole from "../Buttons/InteractionConsole"
 import { MdStars } from "react-icons/md"
 import { MdPeople } from "react-icons/md"
 
-export default function FilmTMDB_Card({ filmObject, queryString }) {
+export default function FilmTMDB_Card({ filmObject, setPage }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const navigate = useNavigate()
   const [hoverId, setHoverId] = useState(null)
@@ -17,6 +17,7 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
   const [directors, setDirectors] = useState([]) //director
 
   useEffect(() => {
+    // console.log("Hover Id Hook triggered: ", hoverId)
     const fetchPageData = async () => {
       if (hoverId) {
         try {
@@ -37,45 +38,57 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
     fetchPageData()
   }, [hoverId])
 
-  useEffect(() => {
-    const filmCard = document.getElementById(`film-card-${filmObject.id}`)
-    const img = new Image()
-    img.crossOrigin = "anonymous"
+  // useEffect(() => {
+  //   const filmCard = document.getElementById(`film-card-${filmObject.id}`)
 
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(`https://image.tmdb.org/t/p/w500${filmObject.backdrop_path}`)}`
-    img.src = proxyUrl
+  //   const proxyUrl = `https://cors-anywhere.com/${encodeURIComponent(`https://image.tmdb.org/t/p/w500${filmObject.backdrop_path}`)}`
 
-    img.onload = () => {
-      const colorThief = new ColorThief()
-      let domColor
-      let brightness
-      try {
-        domColor = colorThief.getColor(img)
-        /* Check brightness of dominant color to ensure readability 
-        Formula: https://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx */
-        brightness = Math.round(
-          Math.sqrt(
-            domColor[0] * domColor[0] * 0.241 +
-              domColor[1] * domColor[1] * 0.691 +
-              domColor[2] * domColor[2] * 0.068
-          )
-        )
-        /* If bg dark enough, font can be white */
-        if (brightness > 194) {
-          filmCard.style.backgroundColor = `rgba(${domColor[0]}, ${domColor[1]}, ${domColor[2]}, 0.4)`
-          /* If bg a little light, reduce each rgb value by 33% */
-        } else if (130 < brightness <= 194) {
-          filmCard.style.backgroundColor = `rgba(${domColor[0] * 1.2}, ${domColor[1] * 1.2}, ${domColor[2] * 1.2}, 0.4)`
-          /* If bg too light, reduce each rgb value by 66% */
-        } else {
-          filmCard.style.backgroundColor = `rgba(${domColor[0] * 1.8}, ${domColor[1] * 1.8}, ${domColor[2] * 1.8}, 0.4)`
-        }
-      } catch (err) {
-        console.log(err)
-      }
-    }
-    // console.log(filmCard)
-  }, [])
+  //   fetch(proxyUrl)
+  //     .then((response) => {
+  //       console.log(response)
+  //       // response.json()
+  //     })
+  //     .then((data) => {
+  //       const base64Image = btoa(data.contents)
+  //       const img = new Image()
+  //       img.crossOrigin = "anonymous"
+  //       img.src = `data:image/jpeg;base64,${base64Image}`
+  //       img.onload = () => {
+  //         const colorThief = new ColorThief()
+  //         let domColor
+  //         let brightness
+  //         try {
+  //           domColor = colorThief.getColor(img)
+  //           /* Check brightness of dominant color to ensure readability
+  //       Formula: https://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx */
+  //           brightness = Math.round(
+  //             Math.sqrt(
+  //               domColor[0] * domColor[0] * 0.241 +
+  //                 domColor[1] * domColor[1] * 0.691 +
+  //                 domColor[2] * domColor[2] * 0.068
+  //             )
+  //           )
+  //           /* If bg dark enough, font can be white */
+  //           if (brightness > 194) {
+  //             filmCard.style.backgroundColor = `rgba(${domColor[0]}, ${domColor[1]}, ${domColor[2]}, 0.4)`
+  //             /* If bg a little light, reduce each rgb value by 33% */
+  //           } else if (130 < brightness <= 194) {
+  //             filmCard.style.backgroundColor = `rgba(${domColor[0] * 1.2}, ${domColor[1] * 1.2}, ${domColor[2] * 1.2}, 0.4)`
+  //             /* If bg too light, reduce each rgb value by 66% */
+  //           } else {
+  //             filmCard.style.backgroundColor = `rgba(${domColor[0] * 1.8}, ${domColor[1] * 1.8}, ${domColor[2] * 1.8}, 0.4)`
+  //           }
+  //         } catch (err) {
+  //           console.log(err)
+  //         }
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log("Error fetching image with AllOrigins: ", err)
+  //     })
+
+  //   // console.log(filmCard)
+  // }, [])
 
   return (
     <div
@@ -100,17 +113,11 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
           }
           alt=""
           onClick={() => {
-            navigate(
-              `/films/${filmObject.id}`
-              //   {
-              //   state: {
-              //     currentViewMode: queryString,
-              //   },
-              // }
-            )
+            navigate(`/films/${filmObject.id}`)
+            setPage((prevPage) => ({ ...prevPage, loadMore: false }))
           }}
         />
-        {hoverId === filmObject.id && !isLoading && (
+        {hoverId === filmObject.id && (
           <div className="border-red-500 absolute bottom-0 left-0 w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 flex items-center justify-center">
             <InteractionConsole
               tmdbId={hoverId}
@@ -136,6 +143,7 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
               className="border-red-500 absolute w-full h-full z-10"
               onClick={() => {
                 navigate(`/films/${filmObject.id}`)
+                setPage((prevPage) => ({ ...prevPage, loadMore: false }))
               }}></div>
           </div>
         )}
@@ -149,14 +157,8 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
           <div>
             <span
               onClick={() => {
-                navigate(
-                  `/films/${filmObject.id}`
-                  //   {
-                  //   state: {
-                  //     currentViewMode: queryString,
-                  //   },
-                  // }
-                )
+                navigate(`/films/${filmObject.id}`)
+                setPage((prevPage) => ({ ...prevPage, loadMore: false }))
               }}
               className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg ">
               {`${filmObject.title.slice(0, 25)}`}
