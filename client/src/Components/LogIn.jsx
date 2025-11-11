@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import * as Yup from "yup"
 import axios from "axios"
 
-import NavBar from "./Shared/NavBar"
+import NavBar from "./Shared/Navigation-Search/NavBar"
 
 import { AuthContext } from "../Utils/authContext"
 

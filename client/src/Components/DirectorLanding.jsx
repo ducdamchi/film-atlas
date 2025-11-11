@@ -1,21 +1,17 @@
 /* Libraries */
 import React, { useEffect, useState } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 /* Custom functions */
-import {
-  fetchDirectorFromTMDB,
-  getNiceMonthDateYear,
-  getAge,
-} from "../Utils/helperFunctions"
-import { AuthContext } from "../Utils/authContext"
-import useCommandK from "../Utils/useCommandK"
+import { getNiceMonthDateYear, getAge } from "../Utils/helperFunctions"
+import { fetchDirectorFromTMDB } from "../Utils/apiCalls"
+import useCommandK from "../Hooks/useCommandK"
 
 /* Components */
-import NavBar from "./Shared/NavBar"
-import LoadingPage from "./Shared/LoadingPage"
-import QuickSearchModal from "./Shared/QuickSearchModal"
-import FilmTMDB_Gallery from "./Shared/FilmTmdb_Gallery"
+import NavBar from "./Shared/Navigation-Search/NavBar"
+import LoadingPage from "./Shared/Navigation-Search/LoadingPage"
+import QuickSearchModal from "./Shared/Navigation-Search/QuickSearchModal"
+import FilmTMDB_Gallery from "./Shared/Films/FilmTMDB_Gallery"
 
 export default function DirectorLanding() {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"

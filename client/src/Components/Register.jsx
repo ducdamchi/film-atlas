@@ -3,7 +3,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik"
 import { Link, useNavigate } from "react-router-dom"
 import * as Yup from "yup"
 import axios from "axios"
-import NavBar from "./Shared/NavBar"
+import NavBar from "./Shared/Navigation-Search/NavBar"
 
 export default function Register() {
   const navigate = useNavigate()

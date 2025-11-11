@@ -12,8 +12,8 @@ import {
   saveFilm,
   unsaveFilm,
   rateFilm,
-} from "../../Utils/helperFunctions"
-import { AuthContext } from "../../Utils/authContext"
+} from "../../../Utils/apiCalls"
+import { AuthContext } from "../../../Utils/authContext"
 
 import TripleStarRating from "./TripleStarRating"
 
@@ -44,6 +44,7 @@ export default function InteractionConsole({
   // const [isLoading, setIsLoading] = useState(false)
 
   const { authState, loading } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   /* Create the request body for API call to App's DB when user 'like' a film */
   function createReqBody(requestString) {
@@ -255,17 +256,16 @@ export default function InteractionConsole({
       {!isLoading && (
         <div
           className={`flex flex-col text-${css.textColor} z-30 items-center justify-center gap-0`}>
-          {/* {!isLandingPage && (
-          )} */}
-          <div className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2">
-            <span className="">{movieDetails.overview?.slice(0, 250)}</span>
-            {movieDetails.overview?.length >= 250 && <span>{`...`}</span>}
-          </div>
-          {/* 
-          <div className="text-white w-[85%] flex items-center justify-center gap-2 pr-4 pl-4 pb-4">
-            <AiFillClockCircle />
-            <span className="">{`${movieDetails.runtime} minutes`}</span>
-          </div> */}
+          {!isLandingPage && (
+            <div
+              className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2"
+              onClick={() => {
+                navigate(`/films/${movieDetails.id}`)
+              }}>
+              <span className="">{movieDetails.overview?.slice(0, 250)}</span>
+              {movieDetails.overview?.length >= 250 && <span>{`...`}</span>}
+            </div>
+          )}
 
           <div
             className={`flex items-center gap-${css.flexGap} h-[4rem] justify-center w-[85%]`}>
@@ -323,4 +323,12 @@ export default function InteractionConsole({
       )}
     </>
   )
+}
+
+{
+  /* 
+          <div className="text-white w-[85%] flex items-center justify-center gap-2 pr-4 pl-4 pb-4">
+            <AiFillClockCircle />
+            <span className="">{`${movieDetails.runtime} minutes`}</span>
+          </div> */
 }

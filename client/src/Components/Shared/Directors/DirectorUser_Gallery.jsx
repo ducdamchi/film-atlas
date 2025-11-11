@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { getReleaseYear } from "../../Utils/helperFunctions"
-import { group } from "d3"
 
 import {
   RiCreativeCommonsZeroFill,
@@ -12,7 +10,6 @@ export default function DirectorUser_Gallery({
   listOfDirectorObjects,
   sortDirection,
   sortBy,
-  // queryString,
 }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const navigate = useNavigate()
@@ -190,74 +187,4 @@ export default function DirectorUser_Gallery({
       )}
     </div>
   )
-}
-
-// <div
-//   key={`${groupKey}`}
-//   className="grid grid-cols-3 gap-6 border-1">
-//   <div className="font-bold text-5xl border-1 flex items-center justify-center">
-//     {groupObject.key}
-//   </div>
-
-//   {groupObject.directors.map((directorObject, directorKey) => (
-//     /* Each film item */
-//     <div
-//       key={directorKey}
-//       className="relative aspect-square overflow-hidden w-[7rem] min-w-[5rem] border-3 rounded-none">
-//       <img
-//         className="object-cover w-full transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03] grayscale transform -translate-y-1/10 z-10 brightness-110"
-//         src={
-//           directorObject.profile_path !== null
-//             ? `${imgBaseUrl}${directorObject.profile_path}`
-//             : `profilepicnotfound.jpg`
-//         }
-//       />
-//     </div>
-//   ))}
-// </div>
-
-/* Right side - director's photo*/
-// {
-//   queryString && directorObject.directors && (
-//     <div className=" border-amber-400 flex items-center gap-1 justify-center">
-//       {directorObject.directors.map((dir, key) => {
-//         return (
-//           <img
-//             className="max-w-[3.5rem] aspect-square object-cover rounded-full grayscale"
-//             key={key}
-//             src={
-//               dir.profile_path !== null
-//                 ? `${imgBaseUrl}${dir.profile_path}`
-//                 : "profilepicnotfound.jpg"
-//             }
-//           />
-//         )
-//       })}
-//     </div>
-//   )
-// }
-
-/* Release year & Director's name */
-{
-  /* <div className="flex items-center uppercase text-sm gap-1">
-  {directorObject.release_date && (
-    <span className="">{`${getReleaseYear(directorObject.release_date)}`}</span>
-  )}
-  {queryString && directorObject.directors && (
-    <span className="">
-      <span className="flex gap-1">
-        <span>|</span>
-        {directorObject.directors.map((dir, key) => {
-          return (
-            <span key={key}>
-              <span>{`${dir.name}`}</span>
-              
-              {key !== directorObject.directors.length - 1 && <span>,</span>}
-            </span>
-          )
-        })}
-      </span>
-    </span>
-  )}
-</div> */
 }

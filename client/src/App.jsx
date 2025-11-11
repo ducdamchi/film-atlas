@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { HashRouter, Route, Routes } from "react-router-dom"
 import "./App.css"
 
-import LoadingPage from "./Components/Shared/LoadingPage"
+import LoadingPage from "./Components/Shared/Navigation-Search/LoadingPage"
 import Films from "./Components/Films"
 import Directors from "./Components/Directors"
 import FilmLanding from "./Components/FilmLanding"
@@ -72,13 +72,14 @@ function App() {
         }}>
         <HashRouter>
           <Routes>
-            <Route path="/" element={<Films />} />
+            <Route path="/" element={<MapPage />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/films" element={<Films />} />
             <Route path="/directors" element={<Directors />} />
             <Route path="/films/:tmdbId" element={<FilmLanding />} />
             <Route path="/directors/:tmdbId" element={<DirectorLanding />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<LogIn />} />
-            <Route path="/map" element={<MapPage />} />
           </Routes>
         </HashRouter>
       </AuthContext.Provider>

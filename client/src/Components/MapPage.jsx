@@ -6,33 +6,31 @@ import React, {
   useContext,
 } from "react"
 import { Map, Source, Layer, Popup } from "react-map-gl/maplibre"
-import axios from "axios"
-import { csv } from "d3-fetch"
+
 import * as maptilersdk from "@maptiler/sdk"
 import "@maptiler/sdk/dist/maptiler-sdk.css"
-import RangeSlider from "react-range-slider-input"
 import "react-range-slider-input/dist/style.css"
 import "../App.css"
 
 import { AuthContext } from "../Utils/authContext"
+import { getCountryName } from "../Utils/helperFunctions"
 import {
-  getCountryName,
   fetchListByParams,
   queryTopRatedFilmByCountryTMDB,
-} from "../Utils/helperFunctions"
-import useCommandK from "../Utils/useCommandK"
+} from "../Utils/apiCalls"
+import useCommandK from "../Hooks/useCommandK"
+import { usePersistedState } from "../Hooks/usePersistedState"
 
-import NavBar from "./Shared/NavBar"
-import QuickSearchModal from "./Shared/QuickSearchModal"
-import FilmUser_Gallery from "./Shared/FilmUser_Gallery"
-import FilmTMDB_Gallery from "./Shared/FilmTmdb_Gallery"
-import Toggle_Two from "./Shared/Toggle_Two"
-import Toggle_Three from "./Shared/Toggle_Three"
-import Toggle_Four from "./Shared/Toggle_Four"
-import CustomSlider from "./Shared/CustomSlider"
-import LoadingPage from "./Shared/LoadingPage"
+import NavBar from "./Shared/Navigation-Search/NavBar"
+import QuickSearchModal from "./Shared/Navigation-Search/QuickSearchModal"
+import FilmUser_Gallery from "./Shared/Films/FilmUser_Gallery"
+import FilmTMDB_Gallery from "./Shared/Films/FilmTMDB_Gallery"
+import Toggle_Two from "./Shared/Buttons/Toggle_Two"
+import Toggle_Three from "./Shared/Buttons/Toggle_Three"
+import Toggle_Four from "./Shared/Buttons/Toggle_Four"
+import CustomSlider from "./Shared/Buttons/CustomSlider"
+import LoadingPage from "./Shared/Navigation-Search/LoadingPage"
 
-// import "maplibre-gl/dist/maplibre-gl.css"`
 import { FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa"
 
 export default function MapPage() {
@@ -41,7 +39,7 @@ export default function MapPage() {
   const MAPTILER_API_KEY = "0bsarBRVUOINHDtiYsY0"
   const [firstSymbolId, setFirstSymbolId] = useState(null)
   const [isMapLoaded, setIsMapLoaded] = useState(false)
-  const [popupInfo, setPopupInfo] = useState(null)
+  const [popupInfo, setPopupInfo] = usePersistedState("map-popupInfo", null)
   const [filmsPerCountryData, setFilmsPerCountryData] = useState({})
 
   // const [hoverInfo, setHoverInfo] = useState(null)
@@ -49,36 +47,239 @@ export default function MapPage() {
   /* API request const */
   const [mapFilmData, setMapFilmData] = useState([])
   const [userFilmList, setUserFilmList] = useState([])
-  const [suggestedFilmList, setSuggestedFilmList] = useState([])
-  const [sortBy, setSortBy] = useState("added_date")
-  const [sortDirection, setSortDirection] = useState("desc")
-  const [queryString, setQueryString] = useState("discover")
-  const [numStars, setNumStars] = useState(0)
-  const [isDiscoverMode, setIsDiscoverMode] = useState(false)
-  // const [searchModalOpen, setSearchModalOpen] = useState(false)
+  const [suggestedFilmList, setSuggestedFilmList] = usePersistedState(
+    "map-suggestedFilmList",
+    []
+  )
+  const [isDiscoverMode, setIsDiscoverMode] = usePersistedState(
+    "map-isDiscoverMode",
+    false
+  )
   const [isLoading, setIsLoading] = useState(false)
-  const [discoverBy, setDiscoverBy] = useState("vote_average.desc")
+
+  /* Persistent states */
+  const [sortBy, setSortBy] = usePersistedState("map-sortBy", "added_date")
+  const [sortDirection, setSortDirection] = usePersistedState(
+    "map-sortDirection",
+    "desc"
+  )
+  const [queryString, setQueryString] = usePersistedState(
+    "map-queryString",
+    "discover"
+  )
+  const [numStars, setNumStars] = usePersistedState("map-numStars", 0)
+  const [discoverBy, setDiscoverBy] = usePersistedState(
+    "map-discoverBy",
+    "vote_average.desc"
+  )
+  const [scrollPosition, setScrollPosition] = usePersistedState(
+    "map-scrollPosition",
+    0
+  )
 
   /* Slider - Rating const */
-  const [ratingRange, setRatingRange] = useState([0, 7])
-  const [tempRatingRange, setTempRatingRange] = useState([0, 7])
+  const [ratingRange, setRatingRange] = usePersistedState(
+    "map-ratingRange",
+    [0, 7]
+  )
+  const [tempRatingRange, setTempRatingRange] = usePersistedState(
+    "map-tempRating",
+    [0, 7]
+  )
 
   /* Slider - Vote Count const */
-  const [voteCountRange, setVoteCountRange] = useState([0, 100])
-  const [tempVoteCountRange, setTempVoteCountRange] = useState([0, 100])
+  const [voteCountRange, setVoteCountRange] = usePersistedState(
+    "map-voteCountRange",
+    [0, 100]
+  )
+  const [tempVoteCountRange, setTempVoteCountRange] = usePersistedState(
+    "map-tempVoteCount",
+    [0, 100]
+  )
 
   /* Authentication */
   const { authState, searchModalOpen, setSearchModalOpen } =
     useContext(AuthContext)
 
   const loadMoreTrigger = useRef(null)
-  const [page, setPage] = useState(1)
+  // const [page, setPage] = usePersistedState("map-page", 1)
+  const [page, setPage] = usePersistedState("map-page", {
+    numPages: 1,
+    loadMore: false,
+  })
+
   const [hasMore, setHasMore] = useState(true)
 
   function toggleSearchModal() {
     setSearchModalOpen((status) => !status)
   }
   useCommandK(toggleSearchModal)
+
+  // async function fetchNewPage() {
+  //   if (isDiscoverMode && page.numPages !== 1 && page.loadMore === true) {
+  //     // console.log("Inside page function, page: ", page)
+
+  //     try {
+  //       setIsLoading(true)
+  //       if (
+  //         popupInfo &&
+  //         popupInfo.iso_a2 !== undefined &&
+  //         ratingRange.length == 2
+  //       ) {
+  //         const result = await queryTopRatedFilmByCountryTMDB({
+  //           page: page.numPages + 1,
+  //           countryCode: popupInfo.iso_a2,
+  //           sortBy: discoverBy,
+  //           ratingRange: ratingRange,
+  //           voteCountRange: voteCountRange,
+  //         })
+
+  //         setPage((prevPage) => ({
+  //           ...prevPage,
+  //           numPages: prevPage.numPages + 1,
+  //         }))
+
+  //         const filtered_results = result.filter(
+  //           (movie) =>
+  //             !(movie.backdrop_path === null || movie.poster_path === null)
+  //         )
+
+  //         if (filtered_results.length > 0) {
+  //           setSuggestedFilmList((prevResults) => [
+  //             ...prevResults,
+  //             ...filtered_results,
+  //           ])
+  //         } else {
+  //           setHasMore(false)
+  //           console.log("No more pages to load.")
+  //         }
+  //         // If requested country is different from previously requested country
+  //       } else {
+  //         setSuggestedFilmList([])
+  //       }
+  //     } catch (err) {
+  //       console.log(err)
+  //       throw err
+  //     } finally {
+  //       setIsLoading(false)
+  //     }
+  //   }
+  // }
+
+  useEffect(() => {
+    const fetchNewPage = async () => {
+      if (!isLoading && page.loadMore === true) {
+        console.log("Inside page function, page: ", page)
+
+        try {
+          setIsLoading(true)
+          if (
+            popupInfo &&
+            popupInfo.iso_a2 !== undefined &&
+            ratingRange.length == 2
+          ) {
+            const result = await queryTopRatedFilmByCountryTMDB({
+              page: page.numPages + 1,
+              countryCode: popupInfo.iso_a2,
+              sortBy: discoverBy,
+              ratingRange: ratingRange,
+              voteCountRange: voteCountRange,
+            })
+
+            setPage((prevPage) => ({
+              ...prevPage,
+              numPages: prevPage.numPages + 1,
+            }))
+
+            const filtered_results = result.filter(
+              (movie) =>
+                !(movie.backdrop_path === null || movie.poster_path === null)
+            )
+
+            if (filtered_results.length > 0) {
+              setSuggestedFilmList((prevResults) => [
+                ...prevResults,
+                ...filtered_results,
+              ])
+            } else {
+              setHasMore(false)
+              console.log("No more pages to load.")
+            }
+            // If requested country is different from previously requested country
+          } else {
+            setSuggestedFilmList([])
+          }
+        } catch (err) {
+          console.log(err)
+          throw err
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    }
+    fetchNewPage()
+  }, [page])
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Tell page function to not load any extra pages upon user return from landing page.
+      // setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+
+      if (scrollPosition) {
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(scrollPosition, 10))
+        }, 0)
+      } else {
+        setTimeout(() => {
+          window.scrollTo(0, 0)
+        }, 0)
+      }
+
+      const handleScroll = () => {
+        setScrollPosition(window.scrollY)
+      }
+
+      const scrollTimer = setTimeout(() => {
+        window.addEventListener("scroll", handleScroll)
+      }, 500)
+
+      return () => {
+        clearTimeout(scrollTimer)
+        window.removeEventListener("scroll", handleScroll)
+      }
+    }
+  }, [isLoading])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) =>
+      entries.forEach(
+        (entry) => {
+          if (entry.isIntersecting) {
+            if (!isLoading && suggestedFilmList.length > 0) {
+              // console.log("Entry Intersected")
+              setPage((prevPage) => ({ ...prevPage, loadMore: true }))
+            }
+          } else {
+            setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+          }
+        },
+        {
+          threshold: 1,
+        }
+      )
+    )
+
+    if (loadMoreTrigger.current) {
+      observer.observe(loadMoreTrigger.current)
+    }
+
+    return () => {
+      if (loadMoreTrigger.current) {
+        observer.unobserve(loadMoreTrigger.current)
+      }
+      setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+    }
+  }, [isLoading])
 
   /* Fetch User's film list (liked or watchlisted) from App's DB when page first loads */
   useEffect(() => {
@@ -101,33 +302,6 @@ export default function MapPage() {
       // alert("Log in to interact with map!")
     }
   }, [])
-
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) =>
-      entries.forEach(
-        (entry) => {
-          if (entry.isIntersecting && !isLoading) {
-            // console.log("Entry Intersected: ", entry)
-            // getSuggestions(page)
-            setPage((prevPage) => prevPage + 1)
-          }
-        },
-        {
-          threshold: 1,
-        }
-      )
-    )
-
-    if (loadMoreTrigger.current) {
-      observer.observe(loadMoreTrigger.current)
-    }
-
-    return () => {
-      if (loadMoreTrigger.current) {
-        observer.unobserve(loadMoreTrigger.current)
-      }
-    }
-  }, [isLoading])
 
   /* Hook to handle querying & sorting User Watched Films */
   useEffect(() => {
@@ -170,11 +344,13 @@ export default function MapPage() {
 
   /* Hook to handle Discover Mode when any of the dependencies below change*/
   useEffect(() => {
-    if (isDiscoverMode && !isLoading) {
+    if (isDiscoverMode) {
       const getSuggestions = async () => {
         try {
+          // console.log("Inside default function")
+          // console.log(page, discoverBy)
+          setPage({ numPages: 1, loadMore: false })
           setIsLoading(true)
-          setPage(1) //restart the page count
           setHasMore(true) //restart hasMore var
           if (
             popupInfo &&
@@ -215,57 +391,6 @@ export default function MapPage() {
       getSuggestions()
     }
   }, [isDiscoverMode, popupInfo, discoverBy, ratingRange, voteCountRange])
-
-  /* This hook gets triggered when there's a request to load more pages (when "page" variable is > 1, and when it changes). It queries the specified page, and appends it to the existing Suggestions list. Note: this hook only gets called when all other parameters like countryCode, discoverBy, ratingRange, voteCountRange, are unchanged. If any of these parameters change, the default hook above will be called, which automatically resets the Suggestions List and fill it with content from page 1 of the TMDB query. */
-  useEffect(() => {
-    // only trigger when page is incremented past 1. if page is 1, it means that the default fetch function is handling fetching the first page from TMDB
-    // console.log("Page: ", page)
-
-    if (isDiscoverMode && !isLoading && page !== 1) {
-      const getSuggestions = async () => {
-        try {
-          setIsLoading(true)
-          if (
-            popupInfo &&
-            popupInfo.iso_a2 !== undefined &&
-            ratingRange.length == 2
-          ) {
-            const result = await queryTopRatedFilmByCountryTMDB({
-              page: page,
-              countryCode: popupInfo.iso_a2,
-              sortBy: discoverBy,
-              ratingRange: ratingRange,
-              voteCountRange: voteCountRange,
-            })
-
-            const filtered_results = result.filter(
-              (movie) =>
-                !(movie.backdrop_path === null || movie.poster_path === null)
-            )
-
-            if (filtered_results.length > 0) {
-              setSuggestedFilmList((prevResults) => [
-                ...prevResults,
-                ...filtered_results,
-              ])
-            } else {
-              setHasMore(false)
-              console.log("No more pages to load.")
-            }
-            // If requested country is different from previously requested country
-          } else {
-            setSuggestedFilmList([])
-          }
-        } catch (err) {
-          console.log(err)
-          throw err
-        } finally {
-          setIsLoading(false)
-        }
-      }
-      getSuggestions()
-    }
-  }, [page])
 
   useEffect(() => {
     // console.log(mapFilmData)
@@ -345,10 +470,6 @@ export default function MapPage() {
       }
     })
   }, [filmsPerCountryData])
-
-  // useEffect(() => {
-  //   console.log(suggestedFilmList)
-  // }, [suggestedFilmList])
 
   const onData = useCallback(
     (event) => {
@@ -713,13 +834,13 @@ export default function MapPage() {
           <FilmTMDB_Gallery listOfFilmObjects={suggestedFilmList} />
         )}
 
-        {hasMore && (
+        {isDiscoverMode && hasMore && (
           <div
             ref={loadMoreTrigger}
-            className="w-full h-[10rem] flex items-center justify-center m-10"></div>
+            className="w-full h-[10rem] flex items-center justify-center mb-0 mt-[20rem]"></div>
         )}
 
-        {!hasMore && (
+        {isDiscoverMode && !hasMore && (
           <div className="w-full flex items-center justify-center m-10">
             You've reached the end!
           </div>
@@ -728,3 +849,52 @@ export default function MapPage() {
     </div>
   )
 }
+
+/* This hook gets triggered when there's a request to load more pages (when "page" variable is > 1, and when it changes). It queries the specified page, and appends it to the existing Suggestions list. Note: this hook only gets called when all other parameters like countryCode, discoverBy, ratingRange, voteCountRange, are unchanged. If any of these parameters change, the default hook above will be called, which automatically resets the Suggestions List and fill it with content from page 1 of the TMDB query. // only trigger when page is incremented past 1. if page is 1, it means that the default fetch function is handling fetching the first page from TMDB*/
+// useEffect(() => {
+//   if (isDiscoverMode && page.numPages !== 1 && page.loadMore === true) {
+
+//     const getSuggestions = async () => {
+//       try {
+//         setIsLoading(true)
+//         if (
+//           popupInfo &&
+//           popupInfo.iso_a2 !== undefined &&
+//           ratingRange.length == 2
+//         ) {
+//           const result = await queryTopRatedFilmByCountryTMDB({
+//             page: page.numPages,
+//             countryCode: popupInfo.iso_a2,
+//             sortBy: discoverBy,
+//             ratingRange: ratingRange,
+//             voteCountRange: voteCountRange,
+//           })
+
+//           const filtered_results = result.filter(
+//             (movie) =>
+//               !(movie.backdrop_path === null || movie.poster_path === null)
+//           )
+
+//           if (filtered_results.length > 0) {
+//             setSuggestedFilmList((prevResults) => [
+//               ...prevResults,
+//               ...filtered_results,
+//             ])
+//           } else {
+//             setHasMore(false)
+//             console.log("No more pages to load.")
+//           }
+//           // If requested country is different from previously requested country
+//         } else {
+//           setSuggestedFilmList([])
+//         }
+//       } catch (err) {
+//         console.log(err)
+//         throw err
+//       } finally {
+//         setIsLoading(false)
+//       }
+//     }
+//     getSuggestions()
+//   }
+// }, [page, isDiscoverMode])

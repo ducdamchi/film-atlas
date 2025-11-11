@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { getReleaseYear, fetchFilmFromTMDB } from "../../Utils/helperFunctions"
-
+import { fetchFilmFromTMDB } from "../../../Utils/apiCalls"
 import FilmTMDB_Card from "./FilmTMDB_Card"
 
 export default function FilmTMDB_Gallery({ listOfFilmObjects }) {

@@ -1,7 +1,8 @@
-import { useEffect, useState, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
-import { getReleaseYear, getNiceMonthYear } from "../../Utils/helperFunctions"
-import { group } from "d3"
+import { useEffect, useState } from "react"
+import {
+  getReleaseYear,
+  getNiceMonthYear,
+} from "../../../Utils/helperFunctions"
 
 import FilmUser_Card from "./FilmUser_Card"
 

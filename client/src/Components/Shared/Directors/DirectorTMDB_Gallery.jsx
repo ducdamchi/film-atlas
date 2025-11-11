@@ -1,11 +1,7 @@
-import { useEffect, useEffectEvent, useLayoutEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { getReleaseYear } from "../../Utils/helperFunctions"
 
-export default function DirectorTMDB_Gallery({
-  listOfDirectorObjects,
-  queryString,
-}) {
+export default function DirectorTMDB_Gallery({ listOfDirectorObjects }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const navigate = useNavigate()
 
@@ -73,50 +69,4 @@ export default function DirectorTMDB_Gallery({
       )}
     </div>
   )
-}
-
-/* Right side - director's photo*/
-// {
-//   queryString && directorObject.directors && (
-//     <div className=" border-amber-400 flex items-center gap-1 justify-center">
-//       {directorObject.directors.map((dir, key) => {
-//         return (
-//           <img
-//             className="max-w-[3.5rem] aspect-square object-cover rounded-full grayscale"
-//             key={key}
-//             src={
-//               dir.profile_path !== null
-//                 ? `${imgBaseUrl}${dir.profile_path}`
-//                 : "profilepicnotfound.jpg"
-//             }
-//           />
-//         )
-//       })}
-//     </div>
-//   )
-// }
-
-/* Release year & Director's name */
-{
-  /* <div className="flex items-center uppercase text-sm gap-1">
-  {directorObject.release_date && (
-    <span className="">{`${getReleaseYear(directorObject.release_date)}`}</span>
-  )}
-  {queryString && directorObject.directors && (
-    <span className="">
-      <span className="flex gap-1">
-        <span>|</span>
-        {directorObject.directors.map((dir, key) => {
-          return (
-            <span key={key}>
-              <span>{`${dir.name}`}</span>
-              
-              {key !== directorObject.directors.length - 1 && <span>,</span>}
-            </span>
-          )
-        })}
-      </span>
-    </span>
-  )}
-</div> */
 }

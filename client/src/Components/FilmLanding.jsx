@@ -1,21 +1,18 @@
 /* Libraries */
-import React, { useEffect, useState, useContext, useRef } from "react"
-import { useLocation, useParams, useNavigate, Link } from "react-router-dom"
+import React, { useEffect, useState, useContext } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 
 /* Custom functions */
-import {
-  getCountryName,
-  getReleaseYear,
-  fetchFilmFromTMDB,
-} from "../Utils/helperFunctions"
-import useCommandK from "../Utils/useCommandK"
+import { getCountryName, getReleaseYear } from "../Utils/helperFunctions"
+import { fetchFilmFromTMDB } from "../Utils/apiCalls"
+import useCommandK from "../Hooks/useCommandK"
 import { AuthContext } from "../Utils/authContext"
 
 /* Components */
-import NavBar from "./Shared/NavBar"
-import LoadingPage from "./Shared/LoadingPage"
-import QuickSearchModal from "./Shared/QuickSearchModal"
-import InteractionConsole from "./Shared/InteractionConsole"
+import NavBar from "./Shared/Navigation-Search/NavBar"
+import LoadingPage from "./Shared/Navigation-Search/LoadingPage"
+import QuickSearchModal from "./Shared/Navigation-Search/QuickSearchModal"
+import InteractionConsole from "./Shared/Buttons/InteractionConsole"
 
 export default function FilmLanding() {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
@@ -29,7 +26,6 @@ export default function FilmLanding() {
   const { authState, searchModalOpen, setSearchModalOpen } =
     useContext(AuthContext)
   const { tmdbId } = useParams()
-  // const location = useLocation()
   const navigate = useNavigate()
 
   function toggleSearchModal() {

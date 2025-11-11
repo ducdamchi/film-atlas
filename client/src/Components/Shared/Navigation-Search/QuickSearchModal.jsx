@@ -1,10 +1,15 @@
 import React, { useEffect, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
-import { getReleaseYear, queryFilmFromTMDB } from "../../Utils/helperFunctions"
-import useClickOutside from "../../Utils/useClickOutside"
+import { getReleaseYear } from "../../../Utils/helperFunctions"
+import { queryFilmFromTMDB } from "../../../Utils/apiCalls"
+import useClickOutside from "../../../Hooks/useClickOutside"
 
-import { BiSearchAlt2 } from "react-icons/bi"
+import {
+  BiSearchAlt2,
+  BiSolidRightArrowSquare,
+  BiSolidRightArrowAlt,
+} from "react-icons/bi"
 
 export default function QuickSearchModal({
   searchModalOpen,
@@ -85,16 +90,24 @@ export default function QuickSearchModal({
 
   /* Hook to detect if Quick Search Bar is being used, and handle page logic according */
   useEffect(() => {
-    /* If search modal is open and is non-empty, user is searching */
-    if (
-      searchModalOpen &&
-      !(searchInput.trim().length === 0 || searchInput === null)
-    ) {
-      setIsSearching(true)
-      queryFilmFromTMDB(searchInput, setSearchResult)
-    } else {
-      setIsSearching(false)
+    const queryFilm = async () => {
+      if (
+        /* If search modal is open and is non-empty, user is searching */
+        searchModalOpen &&
+        !(searchInput.trim().length === 0 || searchInput === null)
+      ) {
+        try {
+          setIsSearching(true)
+          const result = await queryFilmFromTMDB(searchInput)
+          setSearchResult(result)
+        } catch (err) {
+          console.err("Error Querying Film with Quick Search Modal: ", err)
+        }
+      } else {
+        setIsSearching(false)
+      }
     }
+    queryFilm()
   }, [searchModalOpen, searchInput])
 
   return (
@@ -137,7 +150,7 @@ export default function QuickSearchModal({
         {isSearching && (
           <div className="w-full text-white p-2" ref={resultsRef}>
             {searchResult.length === 0 && (
-              <div className="">No results found.</div>
+              <div className="m-2 ml-4">No results found.</div>
             )}
             {searchResult.length > 0 && (
               <div className="flex flex-col justify-center gap-0">
@@ -146,7 +159,7 @@ export default function QuickSearchModal({
                   <Link
                     key={key}
                     id={`result-${key}`}
-                    className="search-result film-item w-full h-[5rem] flex justify-center items-start gap-1 p-2 focus:bg-blue-600/80 hover:bg-stone-200/20 focus:outline-0 rounded-md"
+                    className="search-result film-item w-full h-[5rem] flex justify-start items-center gap-1 p-2 focus:bg-blue-600/80 hover:bg-stone-200/20 focus:outline-0 rounded-md"
                     to={`/films/${filmObject.id}`}
                     // state={{ currentViewMode: queryString }}
                   >
@@ -182,7 +195,10 @@ export default function QuickSearchModal({
                       )}
                     </div>
 
-                    <div>Go to film </div>
+                    <div className=" w-[12rem] flex items-center justify-center gap-1">
+                      <span className="text-base">Go to Film</span>
+                      <BiSolidRightArrowSquare className="text-2xl" />
+                    </div>
                   </Link>
                 ))}
               </div>

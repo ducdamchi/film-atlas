@@ -5,19 +5,19 @@ import { useLocation, useNavigate } from "react-router-dom"
 
 /* Custom functions */
 import { AuthContext } from "../Utils/authContext"
-import { queryFilmFromTMDB, fetchListByParams } from "../Utils/helperFunctions"
-import useCommandK from "../Utils/useCommandK"
+import { queryFilmFromTMDB, fetchListByParams } from "../Utils/apiCalls"
+import useCommandK from "../Hooks/useCommandK"
 
 /* Components */
-import NavBar from "./Shared/NavBar"
-import SearchBar from "./Shared/SearchBar"
-import FilmUser_Gallery from "./Shared/FilmUser_Gallery"
-import FilmTMDB_Gallery from "./Shared/FilmTmdb_Gallery"
-import QuickSearchModal from "./Shared/QuickSearchModal"
-import Toggle_Four from "./Shared/Toggle_Four"
-import Toggle_Three from "./Shared/Toggle_Three"
-import Toggle_Two from "./Shared/Toggle_Two"
-import LoadingPage from "./Shared/LoadingPage"
+import NavBar from "./Shared/Navigation-Search/NavBar"
+import SearchBar from "./Shared/Navigation-Search/SearchBar"
+import FilmUser_Gallery from "./Shared/Films/FilmUser_Gallery"
+import FilmTMDB_Gallery from "./Shared/Films/FilmTMDB_Gallery"
+import QuickSearchModal from "./Shared/Navigation-Search/QuickSearchModal"
+import Toggle_Four from "./Shared/Buttons/Toggle_Four"
+import Toggle_Three from "./Shared/Buttons/Toggle_Three"
+import Toggle_Two from "./Shared/Buttons/Toggle_Two"
+import LoadingPage from "./Shared/Navigation-Search/LoadingPage"
 
 /* Icons */
 import { FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa"

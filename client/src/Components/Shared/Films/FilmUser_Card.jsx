@@ -4,24 +4,19 @@ import { useNavigate } from "react-router-dom"
 import {
   getCountryName,
   getReleaseYear,
-  fetchFilmFromTMDB,
   getNameParts,
-} from "../../Utils/helperFunctions"
+} from "../../../Utils/helperFunctions"
+import { fetchFilmFromTMDB } from "../../../Utils/apiCalls"
 
-import InteractionConsole from "./InteractionConsole"
-import { MdStars } from "react-icons/md"
-import { MdPeople } from "react-icons/md"
+import InteractionConsole from "../Buttons/InteractionConsole"
 
-export default function FilmTMDB_Card({ filmObject, queryString }) {
+export default function FilmUser_Card({ filmObject, queryString }) {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
   const navigate = useNavigate()
-  const [isDirectorHover, setIsDirectorHover] = useState(false)
   const [hoverId, setHoverId] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [movieDetails, setMovieDetails] = useState({})
-  const [directors, setDirectors] = useState([]) //director
-  // const img = document.getElementById(`thumbnail-${filmObject.id}`)
-  // const filmCard = document.getElementById(`film-card-${filmObject.id}`)
+  const [directors, setDirectors] = useState([])
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -81,13 +76,12 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
         console.log(err)
       }
     }
-    // console.log(filmCard)
   }, [])
 
   return (
     <div
       id={`film-card-${filmObject.id}`}
-      className="film-item w-[30rem] min-w-[20rem] aspect-16/10 flex flex-col justify-center items-start gap-0 bg-zinc-200">
+      className="film-item w-[30rem] min-w-[20rem] aspect-16/10 flex flex-col justify-center items-start gap-0 bg-gray-200">
       {/* Poster */}
       <div
         className="group/thumbnail overflow-hidden relative"
@@ -107,24 +101,17 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
           }
           alt=""
           onClick={() => {
-            navigate(
-              `/films/${filmObject.id}`
-              //   {
-              //   state: {
-              //     currentViewMode: queryString,
-              //   },
-              // }
-            )
+            navigate(`/films/${filmObject.id}`)
           }}
         />
-        {hoverId === filmObject.id && !isLoading && (
+        {hoverId === filmObject.id && (
           <div className="border-red-500 absolute bottom-0 left-0 w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 flex items-center justify-center">
             <InteractionConsole
               tmdbId={hoverId}
               directors={directors}
               movieDetails={movieDetails}
-              isLoading={isLoading}
               setIsLoading={setIsLoading}
+              isLoading={isLoading}
               css={{
                 textColor: "white",
                 hoverBg: "bg-zinc-200/30",
@@ -149,26 +136,19 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
       </div>
 
       {/* Text below poster */}
-      <div className="text-black w-full p-4 flex justify-between">
-        {/* Left side - Title, year*/}
+      <div className="text-gray-900 w-full p-3 flex justify-between ">
+        {/* Left side - Title, year, directors name*/}
         <div className="border-amber-400 flex flex-col items-start justify-center gap-0 ml-1">
           {/* Film Title */}
-          <div>
+          <div className="max-w-[18rem] text-wrap">
             <span
               onClick={() => {
-                navigate(
-                  `/films/${filmObject.id}`
-                  //   {
-                  //   state: {
-                  //     currentViewMode: queryString,
-                  //   },
-                  // }
-                )
+                navigate(`/films/${filmObject.id}`)
               }}
-              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg ">
-              {`${filmObject.title.slice(0, 25)}`}
+              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
+              {`${filmObject.title.slice(0, 50)}`}
             </span>
-            {filmObject.title.length >= 25 && (
+            {filmObject.title.length >= 50 && (
               <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
                 ...
               </span>
@@ -181,41 +161,56 @@ export default function FilmTMDB_Card({ filmObject, queryString }) {
                 {`${getReleaseYear(filmObject.release_date)}`}
               </span>
             )}
+            {queryString && filmObject.origin_country && (
+              <span className="">
+                <span className="flex gap-1">
+                  <span>|</span>
+                  {filmObject.origin_country.map((country, key) => {
+                    return (
+                      <span key={key}>
+                        <span>{`${getCountryName(country)}`}</span>
+                        {/* Add a comma if it's not the last country on the list */}
+                        {key !== filmObject.origin_country.length - 1 && (
+                          <span>,</span>
+                        )}
+                      </span>
+                    )
+                  })}
+                </span>
+              </span>
+            )}
           </div>
         </div>
-        {/* Right side - TMDB rating and vote count */}
-        <div className="flex items-center gap-5 justify-center mr-1">
-          <div className="flex items-center justify-center gap-1">
-            <MdStars className="text-xl" />
-            <div>{Number(filmObject.vote_average).toFixed(1)}</div>
-          </div>
-          <div className="flex items-center justify-center gap-1">
-            <MdPeople className="text-2xl" />
-            <div>{filmObject.vote_count}</div>
-          </div>
+        {/* Right side - director's photo*/}
+        <div className="flex flex-col items-center justify-center gap-1 max-w-[20rem] mr-1">
+          {queryString && filmObject.directors && (
+            <div className="border-amber-400 flex items-center gap-1 justify-center">
+              {filmObject.directors.map((dir, key) => {
+                return (
+                  <div
+                    key={key}
+                    className="flex flex-col items-center justify-center gap-1">
+                    <div className="relative max-w-[8rem] h-[3rem] aspect-1/1 overflow-hidden rounded-full">
+                      <img
+                        className="object-cover grayscale transform -translate-y-2/11 hover:scale-[1.05] transition-all duration-300 ease-out"
+                        src={
+                          dir.profile_path !== null
+                            ? `${imgBaseUrl}${dir.profile_path}`
+                            : "profilepicnotfound.jpg"
+                        }
+                        onClick={() => navigate(`/directors/${dir.tmdbId}`)}
+                      />
+                    </div>
+                    <div className="text-xs uppercase">
+                      {`${getNameParts(dir.name)?.firstNameInitial}. ${getNameParts(dir.name)?.lastName}`}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-// {
-//   queryString && filmObject.directors && (
-//     <span className="">
-//       <span className="flex gap-1 uppercase text-xs italic font-semibold">
-//         {/* <span>|</span> */}
-//         {filmObject.directors.map((dir, key) => {
-//           return (
-//             <span key={key}>
-//               <span>{`${dir.name}`}</span>
-//               {/* Add a comma if it's not the last country on the list */}
-//               {key !== filmObject.directors.length - 1 && (
-//                 <span>,</span>
-//               )}
-//             </span>
-//           )
-//         })}
-//       </span>
-//     </span>
-//   )
-// }

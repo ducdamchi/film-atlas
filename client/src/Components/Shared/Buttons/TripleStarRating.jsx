@@ -1,7 +1,4 @@
-import axios from "axios"
 import React, { useState } from "react"
-import { BiStar, BiSolidStar, BiX } from "react-icons/bi"
-import { RiDeleteBack2Fill } from "react-icons/ri"
 
 export default function TripleStarRating({
   officialRating,

@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react"
 import { Link, useMatch, useResolvedPath } from "react-router-dom"
-import { AuthContext } from "../../Utils/authContext"
+import { AuthContext } from "../../../Utils/authContext"
 import { BiSearchAlt2 } from "react-icons/bi"
 
 export default function NavBar() {
@@ -43,12 +43,10 @@ export default function NavBar() {
 
         <div className="text-sm h-full mt-1 flex items-center gap-5">
           <ul className="flex gap-7 p-2 ">
-            {/* <CustomLink to="/">Search</CustomLink> */}
-
             {!authState.status ? (
               <>
                 <CustomLink to="/map">MAP</CustomLink>
-                <CustomLink to="/" exact={true}>
+                <CustomLink to="/films" exact={true}>
                   FILMS
                 </CustomLink>
                 <CustomLink to="/directors">DIRECTORS</CustomLink>
@@ -56,7 +54,7 @@ export default function NavBar() {
             ) : (
               <>
                 <CustomLink to="/map">MAP</CustomLink>
-                <CustomLink to="/">FILMS</CustomLink>
+                <CustomLink to="/films">FILMS</CustomLink>
                 <CustomLink to="/directors">DIRECTORS</CustomLink>
               </>
             )}

@@ -1,5 +1,4 @@
 /* Libraries */
-import axios from "axios"
 import React, { useEffect, useState, useContext, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -8,28 +7,19 @@ import { AuthContext } from "../Utils/authContext"
 import {
   queryDirectorFromTMDB,
   fetchDirectorListByParams,
-} from "../Utils/helperFunctions"
-import useCommandK from "../Utils/useCommandK"
+} from "../Utils/apiCalls"
+import useCommandK from "../Hooks/useCommandK"
 
 /* Components */
-import NavBar from "./Shared/NavBar"
-import SearchBar from "./Shared/SearchBar"
-import DirectorTMDB_Gallery from "./Shared/DirectorTmdb_Gallery"
-import DirectorUser_Gallery from "./Shared/DirectorUser_Gallery"
-import QuickSearchModal from "./Shared/QuickSearchModal"
-import Toggle_Four from "./Shared/Toggle_Four"
-import Toggle_Three from "./Shared/Toggle_Three"
-import Toggle_Two from "./Shared/Toggle_Two"
-import LoadingPage from "./Shared/LoadingPage"
+import NavBar from "./Shared/Navigation-Search/NavBar"
+import SearchBar from "./Shared/Navigation-Search/SearchBar"
+import DirectorTMDB_Gallery from "./Shared/Directors/DirectorTMDB_Gallery"
+import DirectorUser_Gallery from "./Shared/Directors/DirectorUser_Gallery"
+import QuickSearchModal from "./Shared/Navigation-Search/QuickSearchModal"
+import Toggle_Three from "./Shared/Buttons/Toggle_Three"
+import Toggle_Two from "./Shared/Buttons/Toggle_Two"
 
 /* Icons */
-import { HiMiniBarsArrowDown, HiMiniBarsArrowUp } from "react-icons/hi2"
-import {
-  RiSortAlphabetAsc,
-  RiSortAlphabetDesc,
-  RiSortNumberAsc,
-  RiSortNumberDesc,
-} from "react-icons/ri"
 import {
   FaSortNumericDown,
   FaSortNumericDownAlt,

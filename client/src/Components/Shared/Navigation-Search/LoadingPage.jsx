@@ -10,12 +10,12 @@ export default function LoadingPage() {
           <span className="font-semibold uppercase text-zinc-800">
             Loading...
           </span>
-          <ColorRing
-            colors={["#000000", "#404040", "#bfbfbf", "#404040", "#000000"]}
-          />
+          <ColorRing colors={["#000000"]} />
         </div>
       </div>
     </>,
     document.getElementById("loadingPage")
   )
 }
+
+// colors={["#000000", "#404040", "#bfbfbf", "#404040", "#000000"]}
