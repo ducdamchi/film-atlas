@@ -147,15 +147,15 @@ export default function FilmLanding() {
             setIsLoading={setIsLoading}
             css={{
               textColor: "black",
-              hoverBg: "bg-zinc-200/30",
-              hoverTextColor: "text-blue-800",
-              fontSize: "xl",
-              likeSize: "3xl",
-              saveSize: "5xl",
-              starSize: "4xl",
-              flexGap: "5",
-              likeColor: "red-800",
-              saveColor: "green-800",
+              hoverBg: "oklch(92% 0.004 286.32 / 0.3)",
+              hoverTextColor: "oklch(42.4% 0.199 265.638)",
+              fontSize: "1rem",
+              likeSize: "1.4rem",
+              saveSize: "1.8rem",
+              starSize: "1.6rem",
+              flexGap: "1rem",
+              likeColor: "oklch(44.4% 0.177 26.899)",
+              saveColor: "oklch(44.8% 0.119 151.328)",
             }}
             isLandingPage={true}
           />

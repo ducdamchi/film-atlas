@@ -114,15 +114,15 @@ export default function FilmUser_Card({ filmObject, queryString }) {
               isLoading={isLoading}
               css={{
                 textColor: "white",
-                hoverBg: "bg-zinc-200/30",
-                hoverTextColor: "text-blue-200",
-                fontSize: "base",
-                likeSize: "2xl",
-                saveSize: "4xl",
-                starSize: "3xl",
-                flexGap: "2",
-                likeColor: "red-800",
-                saveColor: "green-800",
+                hoverBg: "oklch(92% 0.004 286.32 / 0.3)",
+                hoverTextColor: "oklch(88.2% 0.059 254.128)",
+                fontSize: "1rem",
+                likeSize: "1.4rem",
+                saveSize: "1.8rem",
+                starSize: "1.6rem",
+                flexGap: "1rem",
+                likeColor: "oklch(63.7% 0.237 25.331)",
+                saveColor: "oklch(72.3% 0.219 149.579)",
               }}
               isLandingPage={false}
             />
@@ -146,9 +146,9 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                 navigate(`/films/${filmObject.id}`)
               }}
               className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
-              {`${filmObject.title.slice(0, 50)}`}
+              {`${filmObject.title.slice(0, 25)}`}
             </span>
-            {filmObject.title.length >= 50 && (
+            {filmObject.title.length >= 25 && (
               <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
                 ...
               </span>
@@ -184,7 +184,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
         {/* Right side - director's photo*/}
         <div className="flex flex-col items-center justify-center gap-1 max-w-[20rem] mr-1">
           {queryString && filmObject.directors && (
-            <div className="border-amber-400 flex items-center gap-1 justify-center">
+            <div className="border-amber-400 flex items-start gap-1 justify-center">
               {filmObject.directors.map((dir, key) => {
                 return (
                   <div
@@ -201,7 +201,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                         onClick={() => navigate(`/directors/${dir.tmdbId}`)}
                       />
                     </div>
-                    <div className="text-xs uppercase">
+                    <div className="text-xs uppercase text-center">
                       {`${getNameParts(dir.name)?.firstNameInitial}. ${getNameParts(dir.name)?.lastName}`}
                     </div>
                   </div>

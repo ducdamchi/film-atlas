@@ -5,7 +5,15 @@ import React, {
   useCallback,
   useContext,
 } from "react"
-import { Map, Source, Layer, Popup } from "react-map-gl/maplibre"
+import {
+  Map,
+  Source,
+  Layer,
+  Popup,
+  NavigationControl,
+  ScaleControl,
+  FullscreenControl,
+} from "react-map-gl/maplibre"
 
 import * as maptilersdk from "@maptiler/sdk"
 import "@maptiler/sdk/dist/maptiler-sdk.css"
@@ -254,13 +262,13 @@ export default function MapPage() {
   /* HOOKS TO HANDLE DISCOVER MODE & SCROLL RESTORATION */
   /* Set Scroll Position Hook */
   useEffect(() => {
-    console.log("Loading state: ", isLoading)
+    // console.log("Loading state: ", isLoading)
     if (!isLoading) {
       if (scrollPosition) {
+        // use setTimeout as a temporary solution to make sure page content fully loads before scroll restoration starts. When watched/rated films become a lot, the 300ms second might not be enough and a new solution will be required.
         setTimeout(() => {
           window.scrollTo(0, parseInt(scrollPosition, 10))
-          console.log("Should have scrolled to: ", scrollPosition)
-        }, 0)
+        }, 300)
       } else {
         setTimeout(() => {
           window.scrollTo(0, 0)
@@ -397,6 +405,7 @@ export default function MapPage() {
           //Reinitialize setPage, as this API request only gets called when user select a new country or adjust any of the dependecies array below
           setPage({ numPages: 1, loadMore: false, hasMore: true })
           setIsLoading(true)
+          // setScrollPosition(0)
           if (
             popupInfo &&
             popupInfo.iso_a2 !== undefined &&
@@ -437,6 +446,7 @@ export default function MapPage() {
   /* Fetch User's film list (liked or watchlisted) from App's DB when page first loads */
   useEffect(() => {
     if (authState.status) {
+      // console.log("Fetch Initial User Likes doing something")
       const fetchInitialLikeData = async () => {
         try {
           setIsLoading(true)
@@ -458,14 +468,6 @@ export default function MapPage() {
 
   /* Hook to extract data from App's DB to display on map */
   useEffect(() => {
-    // if (isPageRefresh.current) {
-    //   console.log("Page refreshed, skipping data extraction")
-
-    //   isPageRefresh.current = false
-    //   return
-    // }
-    // console.log(mapFilmData)
-
     const data = {}
     mapFilmData.forEach((film) => {
       film.origin_country.forEach((country) => {
@@ -482,13 +484,14 @@ export default function MapPage() {
         }
       })
     })
-    // console.log(data)
     setFilmsPerCountryData(data)
   }, [mapFilmData])
 
   /* Hook to handle querying & sorting User Watched Films */
   useEffect(() => {
     if (authState.status) {
+      // console.log("Handle sort doing something")
+
       if (popupInfo && popupInfo.iso_a2 !== undefined) {
         const fetchLikedFilmsByCountry = async () => {
           try {
@@ -526,7 +529,7 @@ export default function MapPage() {
   }, [onData])
 
   return (
-    <div>
+    <div className="flex flex-col justify-center">
       {isLoading && <LoadingPage />}
 
       {/* Quick Search Modal */}
@@ -537,7 +540,7 @@ export default function MapPage() {
         />
       )}
       <NavBar />
-      <div className="w-screen h-[40rem] flex flex-col items-center relative">
+      <div className="w-screen h-[40rem] flex flex-col items-center relative border-30 border-l-35 border-r-35">
         <Map
           className=""
           ref={mapRef}
@@ -549,6 +552,14 @@ export default function MapPage() {
           mapStyle={
             "https://api.maptiler.com/maps/0199f849-b24f-7c0c-a482-2c1149331519/style.json?key=0bsarBRVUOINHDtiYsY0"
           }>
+          {/* Map Controls */}
+          <NavigationControl
+            position="top-right"
+            showCompass={false}
+            showZoom={true}
+            visualizePitch={true}
+          />
+
           <Source
             id="countriesData"
             type="vector"
@@ -738,8 +749,8 @@ export default function MapPage() {
                 state={discoverBy}
                 setState={setDiscoverBy}
                 stateDetails={{
-                  1: { value: "vote_average.desc", label: "Average Rating" },
-                  2: { value: "vote_count.desc", label: "Vote Count" },
+                  2: { value: "vote_average.desc", label: "Average Rating" },
+                  1: { value: "vote_count.desc", label: "Vote Count" },
                 }}
               />
 
@@ -748,24 +759,6 @@ export default function MapPage() {
                   Filter
                 </div>
                 <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[20rem]">
-                  <div className="w-full flex flex-col items-center justify-center gap-2">
-                    <div className="text-xs uppercase font-semibold text-gray-600">
-                      Average Rating &#x2265; {`${tempRatingRange[1]}`}
-                    </div>
-                    <CustomSlider
-                      width="15rem"
-                      id="slider-simple"
-                      min={0}
-                      max={10}
-                      step={0.1}
-                      tempRange={tempRatingRange}
-                      setTempRange={setTempRatingRange}
-                      range={ratingRange}
-                      setRange={setRatingRange}
-                      thumbsDisabled={[true, false]}
-                      rangeSlideDisabled={true}
-                    />
-                  </div>
                   <div className="w-full flex flex-col items-center justify-center gap-2">
                     <div className="text-xs uppercase font-bold text-gray-600">
                       Vote Count &#x2265; {`${tempVoteCountRange[1]}`}
@@ -780,6 +773,24 @@ export default function MapPage() {
                       setTempRange={setTempVoteCountRange}
                       range={voteCountRange}
                       setRange={setVoteCountRange}
+                      thumbsDisabled={[true, false]}
+                      rangeSlideDisabled={true}
+                    />
+                  </div>
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="text-xs uppercase font-semibold text-gray-600">
+                      Average Rating &#x2265; {`${tempRatingRange[1]}`}
+                    </div>
+                    <CustomSlider
+                      width="15rem"
+                      id="slider-simple"
+                      min={0}
+                      max={10}
+                      step={0.1}
+                      tempRange={tempRatingRange}
+                      setTempRange={setTempRatingRange}
+                      range={ratingRange}
+                      setRange={setRatingRange}
                       thumbsDisabled={[true, false]}
                       rangeSlideDisabled={true}
                     />
@@ -811,7 +822,7 @@ export default function MapPage() {
         {isDiscoverMode && page.hasMore && (
           <div
             ref={loadMoreTrigger}
-            className="w-full h-[10rem] flex items-center justify-center mb-0 mt-[20rem]"></div>
+            className="w-full h-[10rem] flex items-center justify-center mb-0 mt-[10rem]"></div>
         )}
 
         {isDiscoverMode && !page.hasMore && (

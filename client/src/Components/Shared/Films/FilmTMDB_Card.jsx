@@ -127,15 +127,15 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
               setIsLoading={setIsLoading}
               css={{
                 textColor: "white",
-                hoverBg: "bg-zinc-200/30",
-                hoverTextColor: "text-blue-200",
-                fontSize: "base",
-                likeSize: "2xl",
-                saveSize: "4xl",
-                starSize: "3xl",
-                flexGap: "2",
-                likeColor: "red-800",
-                saveColor: "green-800",
+                hoverBg: "oklch(92% 0.004 286.32 / 0.3)",
+                hoverTextColor: "oklch(88.2% 0.059 254.128)",
+                fontSize: "1rem",
+                likeSize: "1.4rem",
+                saveSize: "1.8rem",
+                starSize: "1.6rem",
+                flexGap: "1rem",
+                likeColor: "oklch(44.4% 0.177 26.899)",
+                saveColor: "oklch(44.8% 0.119 151.328)",
               }}
               isLandingPage={false}
             />

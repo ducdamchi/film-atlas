@@ -9,9 +9,14 @@ export default function TripleStarRating({
 
   return (
     <div
-      className={`flex items-center gap-1 hover:${css.hoverBg} transition-all duration-200 ease-out p-3 h-full flex group`}>
+      className={`flex items-center gap-1 hover:bg-[var(--hover-bg-color)] transition-all duration-200 ease-out p-3 h-full flex group`}
+      style={{ "--hover-bg-color": css.hoverBg }}>
       <div
-        className={`flex items-center text-${css.starSize} hover:${css.hoverTextColor} transition-all duration-200 ease-out`}>
+        className={`flex items-center hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out`}
+        style={{
+          "--hover-text-color": css.hoverTextColor,
+          fontSize: css.starSize,
+        }}>
         <button
           onMouseEnter={() => {
             setStarHover(1)
@@ -75,7 +80,11 @@ export default function TripleStarRating({
               onClick={() => {
                 setRequestedRating(0)
               }}
-              className={`text-${css.fontSize} hover:${css.hoverTextColor} transition-all duration-200 ease-out text-pink-600`}>
+              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out text-pink-600`}
+              style={{
+                "--hover-text-color": css.hoverTextColor,
+                fontSize: css.fontSize,
+              }}>
               Unrate
             </button>
           )}
@@ -83,7 +92,11 @@ export default function TripleStarRating({
           officialRating === undefined ||
           officialRating === null) && (
           <span
-            className={`text-${css.fontSize} group-hover:${css.hoverTextColor}`}>
+            className={` group-hover:text-[var(--hover-text-color)]`}
+            style={{
+              "--hover-text-color": css.hoverTextColor,
+              fontSize: css.fontSize,
+            }}>
             Rate
           </span>
         )}

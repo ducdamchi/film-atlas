@@ -255,7 +255,8 @@ export default function InteractionConsole({
     <>
       {!isLoading && (
         <div
-          className={`flex flex-col text-${css.textColor} z-30 items-center justify-center gap-0`}>
+          className={`flex flex-col z-30 items-center justify-center gap-0`}
+          style={{ color: css.textColor }}>
           {!isLandingPage && (
             <div
               className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2"
@@ -268,48 +269,76 @@ export default function InteractionConsole({
           )}
 
           <div
-            className={`flex items-center gap-${css.flexGap} h-[4rem] justify-center w-[85%]`}>
+            className={`flex items-center h-[4rem] justify-center w-[85%]`}
+            style={{ flexGap: css.flexGap }}>
             <button
               alt="Add to watched"
               title="Add to watched"
-              className={`hover:${css.hoverTextColor} transition-all duration-200 ease-out hover:${css.hoverBg} p-3 h-full flex items-center`}
+              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out hover:bg-[var(--hover-bg-color)] p-3 h-full flex items-center`}
+              style={{
+                "--hover-text-color": css.hoverTextColor,
+                "--hover-bg-color": css.hoverBg,
+              }}
               onClick={handleLike}>
               {isLiked ? (
                 <div className="flex items-center gap-1">
                   <BiSolidHeart
-                    className={`text-${css.likeColor} text-${css.likeSize}`}
+                    style={{ color: css.likeColor, fontSize: css.likeSize }}
+                    // className={`text-${css.likeColor} text-${css.likeSize}`}
                   />
                   <span
-                    className={`text-${css.likeColor} text-${css.fontSize}`}>
+                    style={{ color: css.likeColor, fontSize: css.fontSize }}
+                    // className={`text-${css.likeColor} text-${css.fontSize}`}
+                  >
                     Watched
                   </span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
-                  <BiHeart className={`text-${css.likeSize}`} />
-                  <span className={`text-${css.fontSize}`}>Watched</span>
+                  <BiHeart
+                    // className={`text-${css.likeSize}`}
+                    style={{ fontSize: css.likeSize }}
+                  />
+                  <span
+                    // className={`text-${css.fontSize}`}
+                    style={{ fontSize: css.fontSize }}>
+                    Watched
+                  </span>
                 </div>
               )}
             </button>
             <button
               alt="Add to watchlist"
               title="Add to watchlist"
-              className={`hover:${css.hoverTextColor} transition-all duration-200 ease-out hover:${css.hoverBg} p-3 h-full flex items-center`}
+              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out hover:bg-[var(--hover-bg-color)] p-3 h-full flex items-center`}
+              style={{
+                "--hover-text-color": css.hoverTextColor,
+                "--hover-bg-color": css.hoverBg,
+              }}
               onClick={handleSave}>
               {isSaved ? (
                 <div className="flex items-center gap-1">
                   <BiListCheck
-                    className={`text-${css.saveColor} text-${css.saveSize}`}
+                    // className={`text-${css.saveColor} text-${css.saveSize}`}
+                    style={{ color: css.saveColor, fontSize: css.saveSize }}
                   />
                   <span
-                    className={`text-${css.saveColor} text-${css.fontSize}`}>
+                    // className={`text-${css.saveColor} text-${css.fontSize}`}
+                    style={{ color: css.saveColor, fontSize: css.fontSize }}>
                     Watchlist
                   </span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1">
-                  <BiListPlus className={`text-${css.saveSize}`} />
-                  <span className={`text-${css.fontSize}`}>Watchlist</span>
+                  <BiListPlus
+                    className={`text-${css.saveSize}`}
+                    style={{ fontSize: css.saveSize }}
+                  />
+                  <span
+                    // className={`text-${css.fontSize}`}
+                    style={{ fontSize: css.fontSize }}>
+                    Watchlist
+                  </span>
                 </div>
               )}
             </button>
