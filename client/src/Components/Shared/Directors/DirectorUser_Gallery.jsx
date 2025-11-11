@@ -73,8 +73,9 @@ export default function DirectorUser_Gallery({
                 )
               } else if (targetKey === 0) {
                 groupName = (
-                  <div className="text-5xl text-pink-600">
-                    <RiCreativeCommonsZeroLine />
+                  <div className="text-5xl text-black">
+                    {/* <RiCreativeCommonsZeroLine /> */}
+                    &#10048;
                   </div>
                 )
               }

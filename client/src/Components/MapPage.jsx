@@ -78,7 +78,7 @@ export default function MapPage() {
   const [numStars, setNumStars] = usePersistedState("map-numStars", 0)
   const [discoverBy, setDiscoverBy] = usePersistedState(
     "map-discoverBy",
-    "vote_average.desc"
+    "vote_count.desc"
   )
   const [scrollPosition, setScrollPosition] = usePersistedState(
     "map-scrollPosition",

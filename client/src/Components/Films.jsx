@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import { AuthContext } from "../Utils/authContext"
 import { queryFilmFromTMDB, fetchListByParams } from "../Utils/apiCalls"
 import useCommandK from "../Hooks/useCommandK"
+import { usePersistedState } from "../Hooks/usePersistedState"
 
 /* Components */
 import NavBar from "./Shared/Navigation-Search/NavBar"
@@ -23,24 +24,69 @@ import LoadingPage from "./Shared/Navigation-Search/LoadingPage"
 import { FaSortNumericDown, FaSortNumericDownAlt } from "react-icons/fa"
 
 export default function Films() {
-  const [searchInput, setSearchInput] = useState("")
+  const [searchInput, setSearchInput] = usePersistedState(
+    "films-searchInput",
+    ""
+  )
   const [searchResult, setSearchResult] = useState([])
   const [userFilmList, setUserFilmList] = useState([])
-  const [isSearching, setIsSearching] = useState(false)
-  const [sortBy, setSortBy] = useState("added_date")
-  const [sortDirection, setSortDirection] = useState("desc")
-  const [numStars, setNumStars] = useState(0)
-  const [queryString, setQueryString] = useState("watched")
+  const [isSearching, setIsSearching] = usePersistedState(
+    "films-isSearching",
+    false
+  )
+  const [sortBy, setSortBy] = usePersistedState("films-sortBy", "added_date")
+  const [sortDirection, setSortDirection] = usePersistedState(
+    "films-sortDirection",
+    "desc"
+  )
+  const [numStars, setNumStars] = usePersistedState("films-numStars", 0)
+  const [queryString, setQueryString] = usePersistedState(
+    "film-queryString",
+    "watched"
+  )
+  const [scrollPosition, setScrollPosition] = usePersistedState(
+    "films-scrollPosition",
+    0
+  )
   const { authState, searchModalOpen, setSearchModalOpen } =
     useContext(AuthContext)
   const [isLoading, setIsLoading] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate()
 
   function toggleSearchModal() {
     setSearchModalOpen((status) => !status)
   }
   useCommandK(toggleSearchModal)
+
+  /* Hook for scroll restoration */
+  useEffect(() => {
+    // console.log("Loading state: ", isLoading)
+    if (!isLoading) {
+      if (scrollPosition) {
+        // use setTimeout as a temporary solution to make sure page content fully loads before scroll restoration starts. When watched/rated films become a lot, the 300ms second might not be enough and a new solution will be required.
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(scrollPosition, 10))
+        }, 50)
+      } else {
+        setTimeout(() => {
+          window.scrollTo(0, 0)
+        }, 0)
+      }
+
+      const handleScroll = () => {
+        setScrollPosition(window.scrollY)
+      }
+
+      const scrollTimer = setTimeout(() => {
+        window.addEventListener("scroll", handleScroll)
+      }, 500)
+
+      return () => {
+        clearTimeout(scrollTimer)
+        window.removeEventListener("scroll", handleScroll)
+      }
+    }
+  }, [isLoading])
 
   /* Query films from TMDB when user clicks Enter while Quick Search Modal's Search Bar is focused. AKA do an exhaustive search instead of a quick search with limited results */
   useEffect(() => {
@@ -140,95 +186,100 @@ export default function Films() {
           placeholderString={"Search by title (or \u2318K) ..."}
         />
 
-        <div className="flex flex-col items-start justify-center mt-20">
-          <Toggle_Three
-            label="View Mode"
-            width={`20rem`}
-            height={`2.5rem`}
-            state={queryString}
-            setState={setQueryString}
-            stateDetails={{
-              1: { value: "watched", label: "Watched" },
-              2: { value: "watchlisted", label: "Watchlist" },
-              3: { value: "watched/rated", label: "Rated" },
-            }}
-          />
+        {!isSearching && (
+          <div className="flex flex-col items-start justify-center mt-20">
+            <span className="font-bold text-2xl mb-2">Your Films:</span>
 
-          <Toggle_Two
-            label="Sort By"
-            width={`20rem`}
-            height={`2.5rem`}
-            state={sortBy}
-            setState={setSortBy}
-            stateDetails={{
-              1: { value: "added_date", label: "Recently Added" },
-              2: { value: "released_date", label: "Released Year" },
-            }}
-          />
-
-          <Toggle_Two
-            label="Sort Order"
-            width={`10rem`}
-            height={`2.5rem`}
-            state={sortDirection}
-            setState={setSortDirection}
-            stateDetails={{
-              1: {
-                value: "desc",
-                label: (
-                  <FaSortNumericDownAlt className="text-xl mt-0 w-[5rem]" />
-                ),
-              },
-              2: {
-                value: "asc",
-                label: <FaSortNumericDown className="text-xl mt-0 w-[5rem]" />,
-              },
-            }}
-          />
-
-          {queryString === "watched/rated" && (
-            <Toggle_Four
-              label="Rating"
+            <Toggle_Three
+              label="View Mode"
               width={`20rem`}
               height={`2.5rem`}
-              state={numStars}
-              setState={setNumStars}
+              state={queryString}
+              setState={setQueryString}
+              stateDetails={{
+                1: { value: "watched", label: "Watched" },
+                2: { value: "watchlisted", label: "Watchlist" },
+                3: { value: "watched/rated", label: "Rated" },
+              }}
+            />
+
+            <Toggle_Two
+              label="Sort By"
+              width={`20rem`}
+              height={`2.5rem`}
+              state={sortBy}
+              setState={setSortBy}
+              stateDetails={{
+                1: { value: "added_date", label: "Recently Added" },
+                2: { value: "released_date", label: "Released Year" },
+              }}
+            />
+
+            <Toggle_Two
+              label="Sort Order"
+              width={`10rem`}
+              height={`2.5rem`}
+              state={sortDirection}
+              setState={setSortDirection}
               stateDetails={{
                 1: {
-                  value: 0,
-                  label: <span className="">All</span>,
+                  value: "desc",
+                  label: (
+                    <FaSortNumericDownAlt className="text-xl mt-0 w-[5rem]" />
+                  ),
                 },
                 2: {
-                  value: 3,
+                  value: "asc",
                   label: (
-                    <span className="text-2xl text-pink-600">
-                      &#10048;&#10048;&#10048;
-                    </span>
-                  ),
-                },
-                3: {
-                  value: 2,
-                  label: (
-                    <span className="text-2xl text-pink-600">
-                      &#10048;&#10048;
-                    </span>
-                  ),
-                },
-                4: {
-                  value: 1,
-                  label: (
-                    <span className="text-2xl text-pink-600">&#10048;</span>
+                    <FaSortNumericDown className="text-xl mt-0 w-[5rem]" />
                   ),
                 },
               }}
             />
-          )}
-        </div>
+
+            {queryString === "watched/rated" && (
+              <Toggle_Four
+                label="Rating"
+                width={`20rem`}
+                height={`2.5rem`}
+                state={numStars}
+                setState={setNumStars}
+                stateDetails={{
+                  1: {
+                    value: 0,
+                    label: <span className="">All</span>,
+                  },
+                  2: {
+                    value: 3,
+                    label: (
+                      <span className="text-2xl text-pink-600">
+                        &#10048;&#10048;&#10048;
+                      </span>
+                    ),
+                  },
+                  3: {
+                    value: 2,
+                    label: (
+                      <span className="text-2xl text-pink-600">
+                        &#10048;&#10048;
+                      </span>
+                    ),
+                  },
+                  4: {
+                    value: 1,
+                    label: (
+                      <span className="text-2xl text-pink-600">&#10048;</span>
+                    ),
+                  },
+                }}
+              />
+            )}
+          </div>
+        )}
 
         {/* If user logged in and is not searching, show them list of liked films */}
         {!isSearching && authState.status && (
           <div className="mt-10">
-            {/* <span>Your Films:</span> */}
             <FilmUser_Gallery
               listOfFilmObjects={userFilmList}
               queryString={queryString}
