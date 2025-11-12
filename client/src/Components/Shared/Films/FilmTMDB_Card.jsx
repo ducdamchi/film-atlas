@@ -93,7 +93,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
   return (
     <div
       id={`film-card-${filmObject.id}`}
-      className="film-item w-[30rem] min-w-[20rem] aspect-16/10 flex flex-col justify-center items-start gap-0 bg-zinc-200">
+      className="film-item w-[22rem] md:w-[30rem] md:min-w-[20rem] aspect-16/10 flex flex-col justify-center items-center md:items-start gap-0 bg-zinc-200">
       {/* Poster */}
       <div
         className="group/thumbnail overflow-hidden relative"
@@ -105,7 +105,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
         }}>
         <img
           id={`thumbnail-${filmObject.id}`}
-          className="w-[30rem] min-w-[20rem] aspect-16/10 object-cover transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03]"
+          className="w-[22rem] md:w-[30rem] min-w-[20rem] aspect-16/10 object-cover transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03]"
           src={
             filmObject.backdrop_path !== null
               ? `${imgBaseUrl}${filmObject.backdrop_path}`
@@ -118,7 +118,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
           }}
         />
         {hoverId === filmObject.id && (
-          <div className="border-red-500 absolute bottom-0 left-0 w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 flex items-center justify-center">
+          <div className="border-red-500 absolute bottom-0 left-0 w-[20rem] md:w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 flex items-center justify-center">
             <InteractionConsole
               tmdbId={hoverId}
               directors={directors}

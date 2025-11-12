@@ -17,7 +17,7 @@ export default function CustomSlider({
   rangeSlideDisabled,
 }) {
   return (
-    <div className={`w-[${width}] flex items-center gap-2`}>
+    <div className={`w-[${width}] flex items-center justify-center gap-2`}>
       <div className="text-xs font-semibold text-gray-600">{min}</div>
       <div className="w-full flex justify-center">
         <RangeSlider

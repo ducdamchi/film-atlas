@@ -78,7 +78,7 @@ export default function MapPage() {
   const [numStars, setNumStars] = usePersistedState("map-numStars", 0)
   const [discoverBy, setDiscoverBy] = usePersistedState(
     "map-discoverBy",
-    "vote_count.desc"
+    "vote_average.desc"
   )
   const [scrollPosition, setScrollPosition] = usePersistedState(
     "map-scrollPosition",
@@ -529,7 +529,7 @@ export default function MapPage() {
   }, [onData])
 
   return (
-    <div className="flex flex-col justify-center">
+    <div className="flex flex-col justify-center w-[100vw]">
       {isLoading && <LoadingPage />}
 
       {/* Quick Search Modal */}
@@ -540,7 +540,7 @@ export default function MapPage() {
         />
       )}
       <NavBar />
-      <div className="w-screen h-[40rem] flex flex-col items-center relative border-30 border-l-35 border-r-35">
+      <div className="w-screen h-[30rem] md:h-[40rem] flex flex-col items-center relative  border-7 border-t-0 md:border-30 md:border-t-30 border-[#b8d5e5]">
         <Map
           className=""
           ref={mapRef}
@@ -650,10 +650,10 @@ export default function MapPage() {
         {popupInfo &&
           popupInfo.iso_a2 !== null &&
           popupInfo.iso_a2 !== undefined && (
-            <div className="uppercase font-bold text-3xl flex items-center justify-center w-full mt-10">{`${getCountryName(popupInfo.iso_a2)}`}</div>
+            <div className="uppercase font-bold text-xl md:text-3xl flex items-center justify-center w-full md:mt-10 mt-5">{`${getCountryName(popupInfo.iso_a2)}`}</div>
           )}
 
-        <div className="flex flex-col items-center justify-center mt-10 w-[30rem] border-1">
+        <div className="flex flex-col items-center justify-center md:mt-10 mt-5 w-[90%] min-w-[20rem] md:w-[30rem">
           <Toggle_Three
             label="View Mode"
             width={`20rem`}
@@ -749,36 +749,19 @@ export default function MapPage() {
                 state={discoverBy}
                 setState={setDiscoverBy}
                 stateDetails={{
-                  2: { value: "vote_average.desc", label: "Average Rating" },
-                  1: { value: "vote_count.desc", label: "Vote Count" },
+                  1: { value: "vote_average.desc", label: "Average Rating" },
+                  2: { value: "vote_count.desc", label: "Vote Count" },
                 }}
               />
 
-              <div className="flex items-center p-2 gap-5 w-full border-1">
-                <div className="border-1 w-[7rem] flex justify-end uppercase text-sm">
+              {/* Custom Slider */}
+              <div className="flex flex-col items-center md:flex-row p-2 gap-2 md:gap-5 w-full">
+                <div className="w-[7rem] self-start md:self-center flex ml-1 md:ml-0 justify-start md:justify-end uppercase md:text-sm text-[11px]">
                   Filter
                 </div>
-                <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[20rem]">
+                <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[18rem] md:w-[20rem]">
                   <div className="w-full flex flex-col items-center justify-center gap-2">
-                    <div className="text-xs uppercase font-bold text-gray-600">
-                      Vote Count &#x2265; {`${tempVoteCountRange[1]}`}
-                    </div>
-                    <CustomSlider
-                      width="15rem"
-                      id="slider-simple"
-                      min={0}
-                      max={500}
-                      step={20}
-                      tempRange={tempVoteCountRange}
-                      setTempRange={setTempVoteCountRange}
-                      range={voteCountRange}
-                      setRange={setVoteCountRange}
-                      thumbsDisabled={[true, false]}
-                      rangeSlideDisabled={true}
-                    />
-                  </div>
-                  <div className="w-full flex flex-col items-center justify-center gap-2">
-                    <div className="text-xs uppercase font-semibold text-gray-600">
+                    <div className="text-[10px] md:text-xs uppercase font-semibold text-gray-600">
                       Average Rating &#x2265; {`${tempRatingRange[1]}`}
                     </div>
                     <CustomSlider
@@ -791,6 +774,24 @@ export default function MapPage() {
                       setTempRange={setTempRatingRange}
                       range={ratingRange}
                       setRange={setRatingRange}
+                      thumbsDisabled={[true, false]}
+                      rangeSlideDisabled={true}
+                    />
+                  </div>
+                  <div className="w-full flex flex-col items-center justify-center gap-2">
+                    <div className="text-[10px] md:text-xs uppercase font-bold text-gray-600">
+                      Vote Count &#x2265; {`${tempVoteCountRange[1]}`}
+                    </div>
+                    <CustomSlider
+                      width="15rem"
+                      id="slider-simple"
+                      min={0}
+                      max={500}
+                      step={20}
+                      tempRange={tempVoteCountRange}
+                      setTempRange={setTempVoteCountRange}
+                      range={voteCountRange}
+                      setRange={setVoteCountRange}
                       thumbsDisabled={[true, false]}
                       rangeSlideDisabled={true}
                     />

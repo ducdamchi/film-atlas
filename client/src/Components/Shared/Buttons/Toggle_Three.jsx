@@ -32,12 +32,12 @@ export default function Toggle_Three({
   }, [state])
 
   return (
-    <div className="flex items-center p-2 gap-5 w-full border-1">
-      <div className="border-1 w-[7rem] flex justify-end uppercase text-sm">
+    <div className="flex flex-col p-2 w-full gap-2 md:flex-row items-center md:gap-5">
+      <div className="w-[7rem] flex self-start md:self-center ml-1 md:ml-0 md:justify-end uppercase text-[11px]">
         {label}
       </div>
       <div
-        className={`relative bg-gray-200 rounded-full w-[${width}] h-[${height}]`}>
+        className={`relative bg-gray-200 rounded-full md:w-[20rem] w-[18rem] h-[2.5rem] text-[13px]`}>
         <div className="relative flex w-full h-full">
           {/* Slider background */}
           <div
