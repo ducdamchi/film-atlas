@@ -124,7 +124,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                 likeColor: "oklch(63.7% 0.237 25.331)",
                 saveColor: "oklch(72.3% 0.219 149.579)",
               }}
-              isLandingPage={false}
+              showOverview={false}
             />
             <div
               className="border-red-500 absolute w-full h-full z-10"

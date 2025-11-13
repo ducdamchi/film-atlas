@@ -210,7 +210,7 @@ export default function NavBar() {
 
         {/* LAPTOP - APP NAME*/}
         <div className="hidden md:flex h-full items-center justify-center pt-1">
-          <span className="text-md uppercase">The Film Atlas</span>
+          <span className="font-black uppercase">The Film Atlas</span>
         </div>
 
         {/* LAPTOP - HORIZONTAL MENU */}

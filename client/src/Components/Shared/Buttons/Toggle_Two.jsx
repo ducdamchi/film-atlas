@@ -30,7 +30,7 @@ export default function Toggle_Two({
 
   return (
     <div className="flex flex-col p-2 w-full gap-2 md:flex-row items-center md:gap-5">
-      <div className="w-[7rem] flex self-start md:self-center ml-1 md:ml-0 md:justify-end uppercase text-[11px]">
+      <div className="w-[7rem] flex self-center mr-45 md:self-center md:ml-0 md:justify-end uppercase text-[11px]">
         {label}
       </div>
       <div

@@ -35,7 +35,7 @@ export default function InteractionConsole({
   setIsLoading,
   isLoading,
   css,
-  isLandingPage,
+  showOverview,
 }) {
   const [isLiked, setIsLiked] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
@@ -257,7 +257,7 @@ export default function InteractionConsole({
         <div
           className={`flex flex-col z-30 items-center justify-center gap-0`}
           style={{ color: css.textColor }}>
-          {!isLandingPage && (
+          {showOverview && (
             <div
               className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2"
               onClick={() => {
@@ -270,7 +270,10 @@ export default function InteractionConsole({
 
           <div
             className={`flex items-center h-[4rem] justify-center w-[85%]`}
-            style={{ flexGap: css.flexGap }}>
+            style={{
+              gap: css.flexGap,
+              height: css.height ? css.height : "4rem",
+            }}>
             <button
               alt="Add to watched"
               title="Add to watched"

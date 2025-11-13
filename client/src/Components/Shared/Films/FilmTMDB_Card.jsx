@@ -38,6 +38,26 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
     fetchPageData()
   }, [hoverId])
 
+  useEffect(() => {
+    const fetchPageData = async () => {
+      try {
+        setIsLoading(true)
+        const result = await fetchFilmFromTMDB(filmObject.id)
+        const directorsList = result.credits.crew.filter(
+          (crewMember) => crewMember.job === "Director"
+        )
+        setMovieDetails(result)
+        setDirectors(directorsList)
+      } catch (err) {
+        console.error("Error loading film data: ", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPageData()
+  }, [])
+
   // useEffect(() => {
   //   const filmCard = document.getElementById(`film-card-${filmObject.id}`)
 
@@ -93,7 +113,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
   return (
     <div
       id={`film-card-${filmObject.id}`}
-      className="film-item w-[22rem] md:w-[30rem] md:min-w-[20rem] aspect-16/10 flex flex-col justify-center items-center md:items-start gap-0 bg-zinc-200">
+      className="film-item w-[22rem] md:w-[30rem] md:min-w-[20rem] aspect-16/10 flex flex-col justify-center items-center md:items-start gap-0 bg-gray-200 text-black rounded-md">
       {/* Poster */}
       <div
         className="group/thumbnail overflow-hidden relative"
@@ -137,7 +157,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
                 likeColor: "oklch(44.4% 0.177 26.899)",
                 saveColor: "oklch(44.8% 0.119 151.328)",
               }}
-              isLandingPage={false}
+              showOverview={false}
             />
             <div
               className="border-red-500 absolute w-full h-full z-10"
@@ -150,11 +170,11 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
       </div>
 
       {/* Text below poster */}
-      <div className="text-black w-full md:p-4m md:pb-4 p-2 pb-3 flex justify-between">
+      <div className=" w-full md:p-4 md:pb-4 p-2 pb-0 flex justify-between">
         {/* Left side - Title, year*/}
-        <div className="border-amber-400 flex flex-col items-start justify-center gap-0 ml-1">
-          {/* Film Title */}
-          <div>
+        <div className="border-amber-400 flex flex-row items-center md:flex-col md:items-start justify-center gap-0 ml-1">
+          {/* Film Title - LAPTOP*/}
+          <div className="hidden md:block">
             <span
               onClick={() => {
                 navigate(`/films/${filmObject.id}`)
@@ -169,8 +189,28 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
               </span>
             )}
           </div>
-          {/* Release year & Director's name */}
-          <div className="flex items-center uppercase md:text-sm text-xs gap-1">
+          <div className="md:hidden">
+            <span
+              onClick={() => {
+                navigate(`/films/${filmObject.id}`)
+                setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+              }}
+              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 md:text-lg text-sm">
+              {`${filmObject.title.slice(0, 15)}`}
+            </span>
+            {filmObject.title.length >= 15 && (
+              <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-sm">
+                ...
+              </span>
+            )}
+            {filmObject.release_date && (
+              <span className="ml-1 text-sm font-light">
+                {`${getReleaseYear(filmObject.release_date)}`}
+              </span>
+            )}
+          </div>
+          {/* Release year */}
+          <div className="hidden md:flex items-center justify-center uppercase text-sm gap-1">
             {filmObject.release_date && (
               <span className="">
                 {`${getReleaseYear(filmObject.release_date)}`}
@@ -191,6 +231,36 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
             <div className="md:text-base text-sm">{filmObject.vote_count}</div>
           </div>
         </div>
+      </div>
+
+      <div className="md:hidden pb-4 w-full">
+        <div className="p-0 pr-3 pl-3 mb-4 w-full">
+          <span className="text-xs italic">
+            {filmObject.overview?.slice(0, 50)}
+          </span>
+          {filmObject.overview?.length >= 50 && <span>{`...`}</span>}
+        </div>
+        <InteractionConsole
+          tmdbId={filmObject.id}
+          directors={directors}
+          movieDetails={movieDetails}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          css={{
+            height: "1.4rem",
+            textColor: "black",
+            hoverBg: "none",
+            hoverTextColor: "none",
+            fontSize: "0.8rem",
+            likeSize: "1.3rem",
+            saveSize: "1.7rem",
+            starSize: "1.5rem",
+            flexGap: "0.4rem",
+            likeColor: "oklch(44.4% 0.177 26.899)",
+            saveColor: "oklch(44.8% 0.119 151.328)",
+          }}
+          showOverview={false}
+        />
       </div>
     </div>
   )

@@ -157,7 +157,7 @@ export default function FilmLanding() {
               likeColor: "oklch(44.4% 0.177 26.899)",
               saveColor: "oklch(44.8% 0.119 151.328)",
             }}
-            isLandingPage={true}
+            showOverview={true}
           />
 
           {movieDetails.overview && (

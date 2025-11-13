@@ -756,7 +756,7 @@ export default function MapPage() {
 
               {/* Custom Slider */}
               <div className="flex flex-col items-center md:flex-row p-2 gap-2 md:gap-5 w-full">
-                <div className="w-[7rem] self-start md:self-center flex ml-1 md:ml-0 justify-start md:justify-end uppercase md:text-sm text-[11px]">
+                <div className="w-[7rem] self-center mr-45 md:self-center flex md:ml-0 justify-start md:justify-end uppercase md:text-sm text-[11px]">
                   Filter
                 </div>
                 <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[18rem] md:w-[20rem]">
