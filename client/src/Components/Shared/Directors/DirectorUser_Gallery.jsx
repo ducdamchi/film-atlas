@@ -55,7 +55,7 @@ export default function DirectorUser_Gallery({
               targetKey = director.WatchedDirectors.highest_star
               if (targetKey === 3) {
                 groupName = (
-                  <div className="text-5xl text-pink-600 flex flex-col items-center justify-center">
+                  <div className="md:text-5xl text-3xl text-pink-600 flex flex-col items-center justify-center">
                     <div className="">&#10048;</div>
                     <div className="flex gap-2">
                       <div>&#10048;</div>
@@ -65,15 +65,19 @@ export default function DirectorUser_Gallery({
                 )
               } else if (targetKey === 2) {
                 groupName = (
-                  <div className="text-5xl text-pink-600">&#10048;&#10048;</div>
+                  <div className="md:text-5xl text-3xl text-pink-600">
+                    &#10048;&#10048;
+                  </div>
                 )
               } else if (targetKey === 1) {
                 groupName = (
-                  <div className="text-5xl text-pink-600">&#10048;</div>
+                  <div className="md:text-5xl text-3xl text-pink-600">
+                    &#10048;
+                  </div>
                 )
               } else if (targetKey === 0) {
                 groupName = (
-                  <div className="text-5xl text-black">
+                  <div className="md:text-5xl text-3xl text-black">
                     {/* <RiCreativeCommonsZeroLine /> */}
                     &#10048;
                   </div>
@@ -127,17 +131,18 @@ export default function DirectorUser_Gallery({
   return (
     <div>
       {listOfDirectorObjects.length === 0 && (
-        <div className="mt-10">No directors found.</div>
+        <div className="mt-10 mb-20">No directors found.</div>
       )}
 
       {listOfDirectorObjects.length > 0 && groupedDirectors !== undefined && (
-        <div className="grid grid-cols-4 gap-2 mt-10 border-0">
+        <div className="border-1 grid grid-cols-4 items-start md:gap-2 gap-1 md:mt-10 mt-0 border-0 mb-20">
           {groupedDirectors.map((groupObject, key) => {
             if (!groupObject.id) {
               return (
                 <div
                   key={key}
-                  className="font-bold text-6xl flex items-center justify-center border-0 w-[7rem] aspect-4/5 min-w-[5rem] animate-[spin-y_10s_linear_infinite] [transform-style:preserve-3d] text-shadow-lg">
+                  className="font-bold md:text-6xl text-[3rem] flex items-center justify-center border-0 md:w-[7rem] w-[4.5rem] h-[7.5rem] aspect-4/5 min-w-[4.5rem] animate-[spin-y_10s_linear_infinite] [transform-style:preserve-3d] text-shadow-lg border-1"
+                  style={{ animationDelay: `${key * 0.23}s` }}>
                   {groupObject}
                 </div>
               )
@@ -145,12 +150,12 @@ export default function DirectorUser_Gallery({
               return (
                 <div
                   key={key}
-                  className="flex flex-col gap-1 items-center justify-center border-0 w-[7rem] aspect-4/5 group/thumbnail"
+                  className="border-1 flex flex-col gap-1 items-center justify-start border-0 md:w-[7rem] w-[4.5rem] h-[7.5rem] aspect-4/5 group/thumbnail"
                   onClick={() => {
                     navigate(`/directors/${groupObject.id}`)
                   }}>
                   <div
-                    className="relative aspect-4/5 overflow-hidden w-[85%] min-w-[5rem] border-3 rounded-none  flex justify-center items-center"
+                    className="relative aspect-4/5 overflow-hidden w-[85%] min-w-[4rem] md:min-w-[5rem] border-3 rounded-none  flex justify-center items-center"
                     onMouseEnter={() => {
                       setHoverId(key)
                     }}
@@ -179,8 +184,9 @@ export default function DirectorUser_Gallery({
                       </div>
                     )}
                   </div>
-                  <div className="text-xs italic border-0 text-center">
-                    {groupObject.name}
+                  <div className="md:text-xs text-[10px] italic border-0 text-center pr-2 pl-2">
+                    <span>{groupObject.name?.slice(0, 15)}</span>
+                    {groupObject.name?.length >= 15 && <span>...</span>}
                   </div>
                 </div>
               )

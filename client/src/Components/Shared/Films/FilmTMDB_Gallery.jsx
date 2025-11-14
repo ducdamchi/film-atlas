@@ -30,11 +30,11 @@ export default function FilmTMDB_Gallery({ listOfFilmObjects, setPage }) {
   return (
     <div>
       {listOfFilmObjects && listOfFilmObjects.length === 0 && (
-        <div className="mt-10">No films found.</div>
+        <div className="mt-10 mb-20">No films found.</div>
       )}
 
       {listOfFilmObjects && listOfFilmObjects.length > 0 && (
-        <div className="flex flex-col justify-center gap-0 mt-10">
+        <div className="flex flex-col justify-center gap-0 mt-5 mb-20">
           <div className="grid grid-cols-1 gap-6">
             {listOfFilmObjects.map((filmObject, key) => (
               /* Each film item */

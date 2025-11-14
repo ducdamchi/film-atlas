@@ -29,17 +29,12 @@ export default function Toggle_Two({
   }, [state])
 
   return (
-    <div className="flex flex-col p-2 w-full gap-2 md:flex-row items-center md:gap-5">
-      <div className="w-[7rem] flex self-center mr-45 md:self-center md:ml-0 md:justify-end uppercase text-[11px]">
-        {label}
-      </div>
-      <div
-        className={`relative bg-gray-200 rounded-full md:w-[20rem] w-[18rem] h-[2.5rem] text-[13px]`}>
+    <div className="toggleButton-whole">
+      <div className="toggleButton-label">{label}</div>
+      <div className="toggleButton-buttonsContainer">
         <div className="relative flex h-full w-full">
           {/* Slider background */}
-          <div
-            className={`absolute h-full bg-white rounded-full shadow-md transition-all duration-400 ease-in-out w-1/2 ${getSliderTransform()}`}
-          />
+          <div className={`toggleButton-bg w-1/2 ${getSliderTransform()}`} />
 
           {/* Options */}
           <button
@@ -47,8 +42,8 @@ export default function Toggle_Two({
               setActiveOption(1)
               setState(stateDetails[1].value)
             }}
-            className={`flex-1 text-center py-2 rounded-full transition-colors duration-300 z-10 flex items-center justify-center ${
-              activeOption === 1 ? "text-black font-semibold" : "text-gray-600"
+            className={`toggleButton-button ${
+              activeOption === 1 ? "toggleButton-buttonActive" : ""
             }`}>
             {stateDetails[1].label}
           </button>
@@ -57,8 +52,8 @@ export default function Toggle_Two({
               setActiveOption(2)
               setState(stateDetails[2].value)
             }}
-            className={`flex-1 text-center py-2 rounded-full transition-colors duration-300 z-10 flex items-center justify-center ${
-              activeOption === 2 ? "text-black font-semibold" : "text-gray-600"
+            className={`toggleButton-button ${
+              activeOption === 2 ? "toggleButton-buttonActive" : ""
             }`}>
             {stateDetails[2].label}
           </button>

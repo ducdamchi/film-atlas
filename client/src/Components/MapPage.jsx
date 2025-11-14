@@ -540,7 +540,7 @@ export default function MapPage() {
         />
       )}
       <NavBar />
-      <div className="w-screen h-[30rem] md:h-[40rem] relative border-7 border-t-0 md:border-30 md:border-t-30 border-[#b8d5e5]">
+      <div className="w-screen h-[25rem] md:h-[40rem] relative border-7 border-t-0 md:border-30 md:border-t-30 border-[#b8d5e5]">
         <Map
           className=""
           ref={mapRef}
@@ -650,7 +650,7 @@ export default function MapPage() {
         {popupInfo &&
           popupInfo.iso_a2 !== null &&
           popupInfo.iso_a2 !== undefined && (
-            <div className="uppercase font-bold text-xl md:text-3xl flex items-center justify-center w-full md:mt-10 mt-5">{`${getCountryName(popupInfo.iso_a2)}`}</div>
+            <div className="page-title">{`${getCountryName(popupInfo.iso_a2)}`}</div>
           )}
 
         <div className="flex flex-col items-center justify-center md:mt-10 mt-5 w-[90%] min-w-[20rem] md:w-[30rem">
@@ -741,7 +741,7 @@ export default function MapPage() {
             />
           )}
           {isDiscoverMode && (
-            <div className="w-full flex flex-col items-center gap-0">
+            <div className="w-full flex flex-col items-center gap-0 mb-7">
               <Toggle_Two
                 label="Sort By"
                 width="20rem"
@@ -755,10 +755,8 @@ export default function MapPage() {
               />
 
               {/* Custom Slider */}
-              <div className="flex flex-col items-center md:flex-row p-2 gap-2 md:gap-5 w-full">
-                <div className="w-[7rem] self-center mr-45 md:self-center flex md:ml-0 justify-start md:justify-end uppercase md:text-sm text-[11px]">
-                  Filter
-                </div>
+              <div className="toggleButton-whole">
+                <div className="toggleButton-label">Filter</div>
                 <div className="flex flex-col items-center justify-center gap-6 p-6 rounded-3xl bg-gray-200 w-[18rem] md:w-[20rem]">
                   <div className="w-full flex flex-col items-center justify-center gap-2">
                     <div className="text-[10px] md:text-xs uppercase font-semibold text-gray-600">
@@ -798,9 +796,9 @@ export default function MapPage() {
                   </div>
                 </div>
               </div>
-              <div className="text-xs italic mt-5">
+              {/* <div className="text-xs italic mt-5">
                 Results are automatically displayed in descending order.
-              </div>
+              </div> */}
             </div>
           )}
         </div>

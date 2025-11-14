@@ -81,7 +81,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
   return (
     <div
       id={`film-card-${filmObject.id}`}
-      className="film-item w-[30rem] min-w-[20rem] aspect-16/10 flex flex-col justify-center items-start gap-0 bg-gray-200">
+      className="film-item w-[22rem] md:w-[30rem] md:min-w-[20rem] aspect-16/10 flex flex-col justify-center items-center md:items-start gap-0 bg-gray-200 text-black rounded-md">
       {/* Poster */}
       <div
         className="group/thumbnail overflow-hidden relative"
@@ -93,7 +93,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
         }}>
         <img
           id={`thumbnail-${filmObject.id}`}
-          className="w-[30rem] min-w-[20rem] aspect-16/10 object-cover transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03]"
+          className="w-[22rem] md:w-[30rem] min-w-[20rem] aspect-16/10 object-cover transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03]"
           src={
             filmObject.backdrop_path !== null
               ? `${imgBaseUrl}${filmObject.backdrop_path}`
@@ -105,7 +105,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
           }}
         />
         {hoverId === filmObject.id && (
-          <div className="border-red-500 absolute bottom-0 left-0 w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 flex items-center justify-center">
+          <div className="hidden md:flex border-red-500 absolute bottom-0 left-0 w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 items-center justify-center">
             <InteractionConsole
               tmdbId={hoverId}
               directors={directors}
@@ -136,7 +136,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
       </div>
 
       {/* Text below poster */}
-      <div className="text-gray-900 w-full p-3 flex justify-between ">
+      <div className="text-gray-900 w-full p-2 md:p-3 flex justify-between ">
         {/* Left side - Title, year, directors name*/}
         <div className="border-amber-400 flex flex-col items-start justify-center gap-0 ml-1">
           {/* Film Title */}
@@ -145,17 +145,17 @@ export default function FilmUser_Card({ filmObject, queryString }) {
               onClick={() => {
                 navigate(`/films/${filmObject.id}`)
               }}
-              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
+              className="md:text-lg text-sm font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800">
               {`${filmObject.title.slice(0, 25)}`}
             </span>
             {filmObject.title.length >= 25 && (
-              <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
+              <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 md:text-lg text-sm">
                 ...
               </span>
             )}
           </div>
           {/* Release year & Director's name */}
-          <div className="flex items-center uppercase text-sm gap-1">
+          <div className="flex items-center uppercase md:text-sm text-xs font-light gap-1">
             {filmObject.release_date && (
               <span className="">
                 {`${getReleaseYear(filmObject.release_date)}`}
@@ -190,7 +190,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                   <div
                     key={key}
                     className="flex flex-col items-center justify-center gap-1">
-                    <div className="relative max-w-[8rem] h-[3rem] aspect-1/1 overflow-hidden rounded-full">
+                    <div className="relative max-w-[8rem] h-[2.5rem] md:h-[3rem] aspect-1/1 overflow-hidden rounded-full">
                       <img
                         className="object-cover grayscale transform -translate-y-2/11 hover:scale-[1.05] transition-all duration-300 ease-out"
                         src={
@@ -201,7 +201,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                         onClick={() => navigate(`/directors/${dir.tmdbId}`)}
                       />
                     </div>
-                    <div className="text-xs uppercase text-center">
+                    <div className="text-[9px] md:text-xs md:uppercase text-center">
                       {`${getNameParts(dir.name)?.firstNameInitial}. ${getNameParts(dir.name)?.lastName}`}
                     </div>
                   </div>

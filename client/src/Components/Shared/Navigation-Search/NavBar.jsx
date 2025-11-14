@@ -159,7 +159,7 @@ export default function NavBar() {
             The Film Atlas
           </span>
           <button
-            className="flex items-center justify-center ml-2 p-[2px] pl-[10px] pr-[10px] rounded-full bg-gray-200 text-gray-600 cursor-pointer"
+            className="flex items-center justify-center ml-2 p-[5px] pl-[10px] pr-[10px] rounded-full bg-stone-200 text-stone-900 cursor-pointer"
             onClick={() => {
               setSearchModalOpen(true)
             }}>
@@ -227,7 +227,7 @@ export default function NavBar() {
             </CustomLink>
           </ul>
           <button
-            className="flex items-center justify-center gap-1 border-0 p-1 pl-2 pr-2 rounded-full bg-gray-200 text-gray-600 cursor-pointer"
+            className="flex items-center justify-center gap-1 border-0 p-1 pl-2 pr-2 rounded-full bg-stone-200 text-gray-600 cursor-pointer"
             onClick={() => {
               setSearchModalOpen(true)
             }}>

@@ -20,7 +20,7 @@
 
 #slider-simple .range-slider__range {
   border-radius: 0.75rem;
-  background: rgb(0, 0, 0);
+  background: oklch(21.6% 0.006 56.043);
 }
 #slider-simple .range-slider__thumb {
   width: 1.5rem;

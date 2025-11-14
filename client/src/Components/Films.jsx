@@ -176,19 +176,17 @@ export default function Films() {
       <div className="flex flex-col items-center">
         <NavBar />
 
-        <div className="text-black text-3xl mt-10 font-bold uppercase">
-          Films
-        </div>
+        <div className="page-title">Films</div>
 
         <SearchBar
           searchInput={searchInput}
           setSearchInput={setSearchInput}
-          placeholderString={"Search by title (or \u2318K) ..."}
+          placeholderString={"Search by film's title ..."}
         />
 
         {!isSearching && (
-          <div className="flex flex-col items-start justify-center mt-20">
-            <span className="font-bold text-2xl mb-2">Your Films:</span>
+          <div className="yourListConsole">
+            <div className="page-subtitle mb-2">Your Films:</div>
 
             <Toggle_Three
               label="View Mode"
@@ -290,8 +288,10 @@ export default function Films() {
         )}
         {/* If user is searching (even when they're not logged in), show them list of search results */}
         {isSearching && (
-          <div className="mt-10">
-            <span className="font-bold text-2xl">Search Results:</span>
+          <div className="mt-10 md:mt-20 flex flex-col items-center border-red-500 w-full relative">
+            <div className="page-subtitle md:m-0 self-start ml-8">
+              Search Results:
+            </div>
             <FilmTMDB_Gallery listOfFilmObjects={searchResult} />
           </div>
         )}

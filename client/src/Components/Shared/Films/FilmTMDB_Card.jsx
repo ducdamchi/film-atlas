@@ -189,6 +189,8 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
               </span>
             )}
           </div>
+
+          {/* Film Title - MOBILE*/}
           <div className="md:hidden">
             <span
               onClick={() => {
@@ -196,9 +198,9 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
                 setPage((prevPage) => ({ ...prevPage, loadMore: false }))
               }}
               className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 md:text-lg text-sm">
-              {`${filmObject.title.slice(0, 15)}`}
+              {`${filmObject.title.slice(0, 18)}`}
             </span>
-            {filmObject.title.length >= 15 && (
+            {filmObject.title.length >= 18 && (
               <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-sm">
                 ...
               </span>
@@ -219,7 +221,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
           </div>
         </div>
         {/* Right side - TMDB rating and vote count */}
-        <div className="flex items-center gap-5 justify-center mr-1">
+        <div className="flex items-center gap-2 md:gap-5 justify-center mr-1">
           <div className="flex items-center justify-center gap-1">
             <MdStars className="md:text-xl text-base" />
             <div className="md:text-base text-sm">
@@ -233,8 +235,8 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
         </div>
       </div>
 
-      <div className="md:hidden pb-4 w-full">
-        <div className="p-0 pr-3 pl-3 mb-4 w-full">
+      <div className="md:hidden mt-[-5px] pb-4 w-full">
+        <div className="p-0 pr-3 pl-3 mb-3 w-full">
           <span className="text-xs italic">
             {filmObject.overview?.slice(0, 50)}
           </span>
