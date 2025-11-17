@@ -286,6 +286,14 @@ export default function Films() {
             />
           </div>
         )}
+
+        {/* If user logged in and is not searching, show them list of liked films */}
+        {!authState.status && !isSearching && (
+          <div className="mt-10 mb-20 text-sm md:text-base">
+            Log in to interact with films!
+          </div>
+        )}
+
         {/* If user is searching (even when they're not logged in), show them list of search results */}
         {isSearching && (
           <div className="mt-10 md:mt-20 flex flex-col items-center border-red-500 w-full relative">

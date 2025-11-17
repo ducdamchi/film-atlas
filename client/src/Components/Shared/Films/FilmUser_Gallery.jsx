@@ -125,11 +125,11 @@ export default function FilmUser_Gallery({
   return (
     <div>
       {(listOfFilmObjects.length === 0 || listOfFilmObjects.error) && (
-        <div className="mt-5 mb-20">No films found.</div>
+        <div className="mt-5 mb-20 text-sm md:text-base">No films found.</div>
       )}
 
       {listOfFilmObjects.length > 0 && groupedFilms !== undefined && (
-        <div className="flex flex-col justify-center gap-10 mt-0 md:mt-10 mb-20">
+        <div className="flex flex-col justify-center gap-10 mt-10 mb-20">
           {groupedFilms.map(([groupKey, groupObject]) => {
             return (
               <div key={`${groupKey}`} className="flex flex-col gap-2">

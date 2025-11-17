@@ -157,7 +157,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
                 likeColor: "oklch(44.4% 0.177 26.899)",
                 saveColor: "oklch(44.8% 0.119 151.328)",
               }}
-              showOverview={false}
+              showOverview={true}
             />
             <div
               className="border-red-500 absolute w-full h-full z-10"
@@ -262,6 +262,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
             flexGap: "0rem",
             likeColor: "oklch(44.4% 0.177 26.899)",
             saveColor: "oklch(44.8% 0.119 151.328)",
+            buttonPadding: "8px",
           }}
           showOverview={false}
         />

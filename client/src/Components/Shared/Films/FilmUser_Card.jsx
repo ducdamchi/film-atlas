@@ -124,7 +124,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                 likeColor: "oklch(63.7% 0.237 25.331)",
                 saveColor: "oklch(72.3% 0.219 149.579)",
               }}
-              showOverview={false}
+              showOverview={true}
             />
             <div
               className="border-red-500 absolute w-full h-full z-10"
@@ -166,14 +166,17 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                 <span className="flex gap-1">
                   <span>|</span>
                   {filmObject.origin_country.map((country, key) => {
-                    return (
+                    return key < 2 ? (
                       <span key={key}>
                         <span>{`${getCountryName(country)}`}</span>
                         {/* Add a comma if it's not the last country on the list */}
-                        {key !== filmObject.origin_country.length - 1 && (
+                        {key < 1 && filmObject.origin_country.length > 1 && (
                           <span>,</span>
                         )}
+                        {key === 1 && <span> ...</span>}
                       </span>
+                    ) : (
+                      <span key={key} className="hidden"></span>
                     )
                   })}
                 </span>
@@ -186,7 +189,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
           {queryString && filmObject.directors && (
             <div className="border-amber-400 flex items-start gap-1 justify-center">
               {filmObject.directors.map((dir, key) => {
-                return (
+                return key < 2 ? (
                   <div
                     key={key}
                     className="flex flex-col items-center justify-center gap-1">
@@ -205,11 +208,37 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                       {`${getNameParts(dir.name)?.firstNameInitial}. ${getNameParts(dir.name)?.lastName}`}
                     </div>
                   </div>
+                ) : (
+                  <span key={key} className="hidden"></span>
                 )
               })}
             </div>
           )}
         </div>
+      </div>
+      <div className="w-full pb-3">
+        <InteractionConsole
+          tmdbId={filmObject.id}
+          directors={directors}
+          movieDetails={movieDetails}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          css={{
+            height: "1.4rem",
+            textColor: "black",
+            hoverBg: "none",
+            hoverTextColor: "none",
+            fontSize: "0.8rem",
+            likeSize: "1.2rem",
+            saveSize: "1.6rem",
+            starSize: "1.4rem",
+            flexGap: "0rem",
+            likeColor: "oklch(44.4% 0.177 26.899)",
+            saveColor: "oklch(44.8% 0.119 151.328)",
+            buttonPadding: "8px",
+          }}
+          showOverview={false}
+        />
       </div>
     </div>
   )

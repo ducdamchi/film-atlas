@@ -251,6 +251,13 @@ export default function Directors() {
             />
           </div>
         )}
+
+        {!authState.status && !isSearching && (
+          <div className="mt-10 mb-20 text-sm md:text-base">
+            Log in to interact with directors!
+          </div>
+        )}
+
         {/* If user is searching (even when they're not logged in), show them list of search results */}
         {isSearching && (
           <div className="mt-10 md:mt-20 flex flex-col items-center border-red-500 w-full relative">

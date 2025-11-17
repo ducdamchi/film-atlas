@@ -1,5 +1,5 @@
 import { useContext, useState, useRef, useEffect } from "react"
-import { Link, useMatch, useResolvedPath } from "react-router-dom"
+import { Link, useMatch, useResolvedPath, useNavigate } from "react-router-dom"
 import { AuthContext } from "../../../Utils/authContext"
 import { BiSearchAlt2, BiMenu, BiSolidMessageRoundedDots } from "react-icons/bi"
 import { MdClose, MdMenu, MdOutlineSettings, MdSearch } from "react-icons/md"
@@ -25,6 +25,7 @@ export default function NavBar() {
   const settingsRef = useRef(null)
   const settingsBorderBottom = useRef(null)
   const settingsBorderRight = useRef(null)
+  const navigate = useNavigate()
 
   function CustomLink({ to, children, exact = true, ...props }) {
     // to: URL path (e.g., "/about", "/contact")
@@ -49,6 +50,7 @@ export default function NavBar() {
   const logOut = () => {
     localStorage.removeItem("accessToken")
     setAuthState({ username: "", id: 0, status: false })
+    navigate("/login")
   }
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export default function NavBar() {
       menuBorderBottom.current &&
       menuBorderRight.current
     ) {
-      console.log("Menu Opened: ", menuOpened)
+      // console.log("Menu Opened: ", menuOpened)
       let timer1, timer2
       if (menuOpened) {
         menuRef.current.style.display = "flex"
@@ -99,7 +101,7 @@ export default function NavBar() {
       settingsBorderBottom.current &&
       settingsBorderRight.current
     ) {
-      console.log("Settings Opened: ", settingsOpened)
+      // console.log("Settings Opened: ", settingsOpened)
 
       let timer1, timer2
       if (settingsOpened) {

@@ -36,7 +36,7 @@ export function fetchFilmFromTMDB(tmdbId) {
 
   return axios
     .get(
-      `${movieDetailsUrl}${tmdbId}?append_to_response=credits,videos,watch/providers&api_key=${apiKey}`
+      `${movieDetailsUrl}${tmdbId}?append_to_response=credits,videos,images&api_key=${apiKey}`
     )
     .then((response) => {
       return response.data

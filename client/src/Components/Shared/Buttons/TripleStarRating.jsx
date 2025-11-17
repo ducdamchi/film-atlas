@@ -9,10 +9,10 @@ export default function TripleStarRating({
 
   return (
     <div
-      className={`flex items-center gap-1 hover:bg-[var(--hover-bg-color)] transition-all duration-200 ease-out p-3 h-full flex group`}
-      style={{ "--hover-bg-color": css.hoverBg }}>
+      className={`flex items-center justify-center gap-1 hover:bg-[var(--hover-bg-color)] transition-all duration-200 ease-out h-full flex group`}
+      style={{ "--hover-bg-color": css.hoverBg, padding: css.buttonPadding }}>
       <div
-        className={`flex items-center hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out`}
+        className={`flex items-center justify-center hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out`}
         style={{
           "--hover-text-color": css.hoverTextColor,
           fontSize: css.starSize,
@@ -80,7 +80,7 @@ export default function TripleStarRating({
               onClick={() => {
                 setRequestedRating(0)
               }}
-              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out text-pink-600`}
+              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out text-pink-600 mb-[3px]`}
               style={{
                 "--hover-text-color": css.hoverTextColor,
                 fontSize: css.fontSize,
@@ -92,7 +92,7 @@ export default function TripleStarRating({
           officialRating === undefined ||
           officialRating === null) && (
           <span
-            className={` group-hover:text-[var(--hover-text-color)]`}
+            className={` group-hover:text-[var(--hover-text-color)] mb-[3px]`}
             style={{
               "--hover-text-color": css.hoverTextColor,
               fontSize: css.fontSize,

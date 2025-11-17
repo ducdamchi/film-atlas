@@ -219,7 +219,7 @@ export default function InteractionConsole({
   /* Fetch film info for Landing Page */
   useEffect(() => {
     const fetchPageData = async () => {
-      if (tmdbId) {
+      if (authState.status && tmdbId) {
         setIsLoading(true)
         try {
           const likeResult = await checkLikeStatus(tmdbId)
@@ -269,7 +269,7 @@ export default function InteractionConsole({
           )}
 
           <div
-            className={`flex items-center h-[4rem] justify-center w-[85%]`}
+            className={`flex items-center h-[4rem] justify-center w-full`}
             style={{
               gap: css.flexGap,
               height: css.height ? css.height : "4rem",
@@ -277,10 +277,11 @@ export default function InteractionConsole({
             <button
               alt="Add to watched"
               title="Add to watched"
-              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out hover:bg-[var(--hover-bg-color)] p-3 h-full flex items-center`}
+              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out hover:bg-[var(--hover-bg-color)] h-full flex items-center`}
               style={{
                 "--hover-text-color": css.hoverTextColor,
                 "--hover-bg-color": css.hoverBg,
+                padding: css.buttonPadding,
               }}
               onClick={handleLike}>
               {isLiked ? (
@@ -313,10 +314,11 @@ export default function InteractionConsole({
             <button
               alt="Add to watchlist"
               title="Add to watchlist"
-              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out hover:bg-[var(--hover-bg-color)] p-3 h-full flex items-center`}
+              className={`hover:text-[var(--hover-text-color)] transition-all duration-200 ease-out hover:bg-[var(--hover-bg-color)] h-full flex items-center`}
               style={{
                 "--hover-text-color": css.hoverTextColor,
                 "--hover-bg-color": css.hoverBg,
+                padding: css.buttonPadding,
               }}
               onClick={handleSave}>
               {isSaved ? (

@@ -811,6 +811,11 @@ export default function MapPage() {
             sortBy={sortBy}
           />
         )}
+        {!authState.status && !isDiscoverMode && (
+          <div className="mt-10 mb-20 text-sm md:text-base">
+            Log in and like a film to start!
+          </div>
+        )}
         {isDiscoverMode && suggestedFilmList && (
           <FilmTMDB_Gallery
             listOfFilmObjects={suggestedFilmList}
