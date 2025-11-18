@@ -177,7 +177,6 @@ export function fetchDirectorListByParams({
 /* Check the Like status of a film for logged in users from App's DB
 @params:
 - tmdbId: unique TMDB id assigned to film
-- setLike: useState() method that updates the like status in the calling component
 */
 export function checkLikeStatus(tmdbId) {
   return axios
@@ -198,7 +197,6 @@ export function checkLikeStatus(tmdbId) {
 /* Check the Saved status of a film for logged in users from App's DB
 @params:
 - tmdbId: unique TMDB id assigned to film
-- setLike: useState() method that updates the like status in the calling component
 */
 export function checkSaveStatus(tmdbId) {
   return axios
@@ -253,7 +251,7 @@ export function unlikeFilm(tmdbId) {
     })
 }
 
-/* Make API call to App's DB when user 'like' a film */
+/* Make API call to App's DB when user 'save' a film */
 export function saveFilm(req) {
   return axios
     .post(`http://localhost:3002/profile/me/watchlisted`, req, {
@@ -269,7 +267,7 @@ export function saveFilm(req) {
       throw err
     })
 }
-/* Make API call to App's DB when user 'unlike' a film */
+/* Make API call to App's DB when user 'unsave' a film */
 export function unsaveFilm(tmdbId) {
   return axios
     .delete(`http://localhost:3002/profile/me/watchlisted`, {
@@ -302,6 +300,26 @@ export function rateFilm(req) {
     })
     .catch((err) => {
       console.error("Client: Error rating film", err)
+      throw err
+    })
+}
+
+/* Check the status of a director (how many watched, starred, score, etc.) for logged in users from App's DB
+@params:
+- tmdbId: unique TMDB id assigned to director
+*/
+export function checkDirectorStatus(tmdbId) {
+  return axios
+    .get(`http://localhost:3002/profile/me/directors/${tmdbId}`, {
+      headers: {
+        accessToken: localStorage.getItem("accessToken"),
+      },
+    })
+    .then((response) => {
+      return response.data
+    })
+    .catch((err) => {
+      console.error("Client: Error checking director status", err)
       throw err
     })
 }

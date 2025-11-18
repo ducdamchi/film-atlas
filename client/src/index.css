@@ -106,4 +106,40 @@
   .landing-page-title {
     @apply font-black text-2xl mb-2;
   }
+
+  .landing-main-img-container {
+    @apply md:hidden overflow-hidden relative text-stone-200;
+  }
+
+  .landing-main-img {
+    @apply w-screen aspect-4/5 object-cover scale-[1];
+  }
+
+  .landing-transparent-layer {
+    @apply border-0 border-red-500 absolute top-0 left-0 h-[15rem] md:h-[15rem] w-full bg-linear-to-b from-black to-transparent;
+  }
+
+  .landing-img-text-container {
+    @apply absolute top-0 left-0 h-[25rem] p-5 w-full border-0;
+  }
+
+  .landing-img-text-right {
+    @apply text-xs/5 font-extralight mb-2 text-right;
+  }
+
+  .landing-img-text-right-title {
+    @apply font-thin text-[10px] mr-0;
+  }
+
+  .landing-img-text-right-content {
+    @apply border-b-2 border-r-4 p-[4px] pt-0 inline-block decoration-3 underline-offset-2 drop-shadow-md;
+  }
+
+  .landing-transparent-layer-bottom {
+    @apply border-0 border-red-500 absolute bottom-0 left-0 h-[5rem] md:h-[15rem] w-full bg-gradient-to-t from-black/100 to-transparent;
+  }
+
+  .landing-img-text-belowTitle {
+    @apply w-full flex mb-5 text-xs font-extralight;
+  }
 }

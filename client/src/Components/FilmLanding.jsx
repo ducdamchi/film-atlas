@@ -211,10 +211,6 @@ export default function FilmLanding() {
     // const cast = document.getElementById(`cast`)
   }, [tmdbId, posterRef, overviewRef, castRef])
 
-  useEffect(() => {
-    console.log("Main cast: ", mainCast)
-  }, [mainCast])
-
   if (!movieDetails) {
     return <div>Error loading film. Please try again.</div>
   }
@@ -248,9 +244,9 @@ export default function FilmLanding() {
             />
           </div>
 
-          <div className="md:hidden overflow-hidden relative">
+          <div className="landing-main-img-container">
             <img
-              className="w-screen aspect-4/5 object-cover scale-[1]"
+              className="landing-main-img"
               src={
                 movieDetails.backdrop_path !== null
                   ? `${imgBaseUrl}${movieDetails.backdrop_path}`
@@ -258,41 +254,42 @@ export default function FilmLanding() {
               }
               alt=""
             />
-            <div className="border-0 border-red-500 absolute top-0 left-0 h-[20rem] md:h-[15rem] w-full bg-linear-to-b from-black to-transparent"></div>
+            <div className="landing-transparent-layer"></div>
             <div className="">
-              <div className="absolute top-0 left-0 h-[25rem] p-5 w-full border-0">
+              <div className="landing-img-text-container">
                 {/* Title */}
                 {movieDetails.title && (
                   <div className="landing-page-title">{movieDetails.title}</div>
                 )}
 
                 {/* Release Date */}
-                {movieDetails.release_date && (
-                  <div className="w-full flex gap-2 mb-5 text-xs font-extralight">
+                <div className="landing-img-text-belowTitle gap-2">
+                  {movieDetails.release_date && (
                     <div className="flex gap-1 items-center">
                       <IoMdCalendar />
                       <span className="">{`${getReleaseYear(movieDetails.release_date)}`}</span>
                     </div>
+                  )}
+                  {movieDetails.runtime && (
                     <div className="flex gap-1 items-center">
                       <IoIosTimer />
                       <span className="">{`${movieDetails.runtime} minutes`}</span>
                     </div>
-                    {/* <span className="font-black text-base">&nbsp;|&nbsp;</span> */}
-                  </div>
-                )}
+                  )}
+                </div>
 
                 {/* Director name(s) */}
                 {directors.length > 0 && (
-                  <div className="text-xs/5 font-extralight mb-2 text-right">
+                  <div className="landing-img-text-right">
                     {/* <span className="font-black text-base">|&nbsp;</span> */}
-                    <span className="font-thin text-[10px] mr-0">
+                    <span className="landing-img-text-right-title">
                       directed by
                     </span>
                     {directors.map((director, key) => {
                       return (
                         <span key={key}>
                           <span
-                            className="border-b-2 border-r-4 p-[4px] pt-0 inline-block decoration-3 underline-offset-2 drop-shadow-md"
+                            className="landing-img-text-right-content"
                             style={{ cursor: "pointer" }}
                             onClick={() => {
                               navigate(`/directors/${director.id}`)
@@ -308,13 +305,15 @@ export default function FilmLanding() {
                 {/* Origin Country */}
                 {movieDetails.origin_country &&
                   movieDetails.origin_country.length > 0 && (
-                    <div className="text-xs/5 font-extralight text-right">
-                      <span className="font-thin text-[10px] mr-0">origin</span>
+                    <div className="landing-img-text-right">
+                      <span className="landing-img-text-right-title">
+                        origin
+                      </span>
 
                       {movieDetails.origin_country.map((country, key) => {
                         return (
                           <span key={key} className="whitespace-nowrap">
-                            <span className="border-b-2 border-r-4 p-[4px] pt-0 inline-block decoration-3 underline-offset-2 drop-shadow-md">{`${getCountryName(country)}`}</span>
+                            <span className="landing-img-text-right-content">{`${getCountryName(country)}`}</span>
                             {/* Add a comma if it's not the last country on the list */}
                             {/* {key !== movieDetails.origin_country.length - 1 && (
                               <span className="inline-block">,&nbsp;</span>
@@ -326,7 +325,7 @@ export default function FilmLanding() {
                   )}
               </div>
             </div>
-            <div className="border-0 border-red-500 absolute bottom-0 left-0 h-[5rem] md:h-[15rem] w-full bg-gradient-to-t from-black/100 to-transparent"></div>
+            <div className="landing-transparent-layer-bottom"></div>
             <div className="absolute bottom-0 w-full">
               <InteractionConsole
                 tmdbId={tmdbId}

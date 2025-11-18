@@ -93,7 +93,50 @@ router.get("/", validateToken, async (req, res) => {
     }
   } catch (err) {
     console.error(err)
-    return res.status(500).json({ error: "Error Fetching Content" })
+    return res.status(500).json({ error: "Error Fetching All Directors Info" })
+  }
+})
+
+router.get("/:tmdbId", validateToken, async (req, res) => {
+  try {
+    const tmdbId = req.params.tmdbId //Director's tmdbId used in URL
+    const jwtUserId = req.user.id //UserId in signed JWT
+
+    /* Find Director instance */
+    const director = await Directors.findOne({ where: { id: tmdbId } })
+    /* If director not already in app's db, User couldn't have watched films by them*/
+    if (!director) {
+      return res
+        .status(200)
+        .json({ watched: 0, starred: 0, highest_star: 0, score: 0 })
+    }
+
+    /* Find User instance */
+    const user = await Users.findByPk(jwtUserId)
+    if (!user) {
+      return res.status(404).json({ error: "User Not Found" })
+    }
+
+    const watchedDirector = await WatchedDirectors.findOne({
+      where: {
+        directorId: tmdbId,
+        userId: jwtUserId,
+      },
+    })
+    if (!watchedDirector) {
+      return res
+        .status(200)
+        .json({ watched: 0, starred: 0, highest_star: 0, score: 0 })
+    }
+    return res.status(200).json({
+      watched: watchedDirector.num_watched_films,
+      starred: watchedDirector.num_starred_films,
+      highest_star: watchedDirector.highest_star,
+      score: watchedDirector.score,
+    })
+  } catch (err) {
+    console.error(err)
+    return res.status(500).json({ error: "Error Fetching Director Info" })
   }
 })
 

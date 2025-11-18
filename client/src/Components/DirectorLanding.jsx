@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom"
 
 /* Custom functions */
 import { getNiceMonthDateYear, getAge } from "../Utils/helperFunctions"
-import { fetchDirectorFromTMDB } from "../Utils/apiCalls"
+import { fetchDirectorFromTMDB, checkDirectorStatus } from "../Utils/apiCalls"
 import useCommandK from "../Hooks/useCommandK"
 import { usePersistedState } from "../Hooks/usePersistedState"
 
@@ -25,6 +25,10 @@ export default function DirectorLanding() {
     "directorLanding-scrollPosition",
     0
   )
+  const [numWatched, setNumWatched] = useState(0)
+  const [numStarred, setNumStarred] = useState(0)
+  const [highestStar, setHighestStar] = useState(0)
+  const [score, setScore] = useState(0)
 
   function toggleSearchModal() {
     setSearchModalOpen((status) => !status)
@@ -61,7 +65,7 @@ export default function DirectorLanding() {
     }
   }, [isLoading])
 
-  /* Fetch film info for Landing Page */
+  /* Fetch director's info for Landing Page */
   useEffect(() => {
     const fetchPageData = async () => {
       if (tmdbId) {
@@ -109,6 +113,32 @@ export default function DirectorLanding() {
     fetchPageData()
   }, [tmdbId])
 
+  /* Fetch director's info from App's DB */
+  useEffect(() => {
+    const fetchUserInteraction = async () => {
+      if (authState.status && tmdbId) {
+        setIsLoading(true)
+        try {
+          const result = await checkDirectorStatus(tmdbId)
+
+          if (result.error) {
+            console.error("Server: ", saveResult.error)
+          } else {
+            setNumWatched(result.watched)
+            setNumStarred(result.starred)
+            setHighestStar(result.highest_star)
+            setScore(result.score)
+          }
+        } catch (err) {
+          console.error("Error loading director data: ", err)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+    }
+    fetchUserInteraction()
+  }, [tmdbId])
+
   if (!directorDetails) {
     return <div>Error loading director. Please try again.</div>
   }
@@ -128,51 +158,64 @@ export default function DirectorLanding() {
       {/* Landing Page content */}
       <NavBar />
 
-      {/* Director's Info */}
-      <div>
-        <div className="landing-page-title">{directorDetails.name}</div>
-        <div className="border-1 flex flex-col items-center">
-          <div className="relative group/thumbnail aspect-10/13 overflow-hidden w-[25rem] min-w-[20rem] border-3">
-            <img
-              className="object-cover w-full transition-all duration-300 ease-out group-hover/thumbnail:scale-[1.03] grayscale transform -translate-y-1/10 z-10 brightness-110"
-              src={
-                directorDetails.profile_path !== null
-                  ? `${imgBaseUrl}${directorDetails.profile_path}`
-                  : `profilepicnotfound.jpg`
-              }
-              alt=""
-            />
-          </div>
+      <div className="landing-main-img-container">
+        <img
+          className="landing-main-img"
+          src={
+            directorDetails.profile_path !== null
+              ? `${imgBaseUrl}${directorDetails.profile_path}`
+              : `profilepicnotfound.jpg`
+          }
+          alt=""
+        />
+        <div className="landing-transparent-layer"></div>
+        <div className="">
+          <div className="landing-img-text-container">
+            {/* Title */}
+            {directorDetails.name && (
+              <div className="landing-page-title">{directorDetails.name}</div>
+            )}
 
-          <div className="flex italic">
-            {directorDetails.birthday && (
-              <div className="">
-                {/* <span className="font-bold uppercase">Birthday:&nbsp;</span> */}
-                <span>{`${getNiceMonthDateYear(directorDetails.birthday)}`}</span>
+            {/* Birthday, deathday, age */}
+            <div className="landing-img-text-belowTitle gap-0">
+              {directorDetails.birthday && (
+                <div className="">
+                  <span>{`${getNiceMonthDateYear(directorDetails.birthday)}`}</span>
+                </div>
+              )}
+
+              {directorDetails.deathday && (
+                <div className="">
+                  <span className="">&nbsp;-&nbsp;</span>
+                  <span>{`${getNiceMonthDateYear(directorDetails.deathday)}`}</span>
+                  <span>&nbsp;</span>
+                </div>
+              )}
+
+              <span>{`(${getAge(directorDetails.birthday, directorDetails.deathday)})`}</span>
+            </div>
+
+            {/* Birthplace*/}
+            {directorDetails.place_of_birth && (
+              <div className="landing-img-text-right">
+                <span className="landing-img-text-right-title">born in</span>
+
+                <span className="landing-img-text-right-content">{`${directorDetails.place_of_birth}`}</span>
               </div>
             )}
-
-            {directorDetails.deathday && (
-              <div className="">
-                <span className="font-bold uppercase">
-                  &nbsp;&nbsp;-&nbsp;&nbsp;
-                </span>
-                <span>{`${getNiceMonthDateYear(directorDetails.deathday)}`}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-1">
-            {directorDetails.deathday !== null && (
-              <span className="font-bold uppercase">Aged:</span>
-            )}
-            {directorDetails.deathday === null && (
-              <span className="font-bold uppercase">Age:</span>
-            )}
-            <span>{`${getAge(directorDetails.birthday, directorDetails.deathday)}`}</span>
           </div>
         </div>
+        <div className="landing-transparent-layer-bottom"></div>
+        <div className="absolute bottom-0 w-full flex items-center justify-center gap-2 text-stone-200 text-xs mb-3">
+          <div className="border-1 p-2 rounded-full">{`Watched: ${numWatched}`}</div>
+          <div className="border-1 p-2 rounded-full">{`Starred: ${numStarred}`}</div>
+          <div className="border-1 p-2 rounded-full">{`Highest Star: ${highestStar}`}</div>
+          <div className="border-1 p-2 rounded-full">{`Score: ${score}`}</div>
+        </div>
+      </div>
 
+      {/* Director's Info */}
+      <div>
         {directorDetails.biography && (
           <div className="border-1">
             <span className="font-bold uppercase">Biography:&nbsp;</span>
