@@ -259,7 +259,7 @@ export default function InteractionConsole({
           style={{ color: css.textColor }}>
           {showOverview && (
             <div
-              className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2"
+              className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2 mb-5"
               onClick={() => {
                 navigate(`/films/${movieDetails.id}`)
               }}>

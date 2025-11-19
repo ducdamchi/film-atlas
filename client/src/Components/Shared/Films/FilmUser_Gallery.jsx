@@ -136,7 +136,7 @@ export default function FilmUser_Gallery({
                 <div className="page-subtitle ml-0">
                   {groupObject.groupName}
                 </div>
-                <div className="grid grid-cols-1 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {groupObject.films.map((filmObject, filmKey) => (
                     /* Each film item */
                     <FilmUser_Card

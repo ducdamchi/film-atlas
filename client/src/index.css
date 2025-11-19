@@ -42,9 +42,13 @@ stone-100: off-white background color
 /* Google Fonts candidates for "THE FILM ATLAS" page title:
 Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
 
+/* :root {
+  background-color:;
+} */
+
 .font-heading {
   /* font-family: "Black Ops One", sans-serif; */
-  font-family: "Red Rose", sans-serif;
+  font-family: "Red Rose", "Optima", "Helvetica", sans-serif;
   /* font-family: "Russo One", sans-serif; */
 }
 
@@ -61,23 +65,23 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .page-subtitle {
-    @apply font-bold text-base md:text-2xl w-[10rem];
+    @apply font-bold text-base md:text-2xl w-auto;
   }
 
   .yourListConsole {
-    @apply flex flex-col items-start justify-center mt-10 md:mt-20;
+    @apply flex flex-col items-start justify-center mt-10 md:mt-20 md:mr-5 lg:mr-8;
   }
 
   .toggleButton-whole {
-    @apply flex flex-col p-2 w-full gap-2 md:flex-row items-center md:gap-5;
+    @apply flex flex-col items-center p-2 w-full gap-2 md:flex-row md:justify-center md:gap-5 md:mr-20;
   }
 
   .toggleButton-label {
-    @apply w-[7rem] flex self-center mr-45 md:self-center md:ml-0 md:justify-end uppercase text-[11px];
+    @apply w-[7rem] flex self-center mr-45 md:mr-0 md:ml-0 md:justify-end uppercase text-[11px] md:text-[13px];
   }
 
   .toggleButton-buttonsContainer {
-    @apply relative bg-gray-200 rounded-full md:w-[20rem] w-[18rem] h-[2.5rem] text-[13px];
+    @apply relative bg-gray-200 rounded-full md:w-[20rem] w-[18rem] h-[2.5rem] text-[13px] md:text-[16px];
   }
 
   .toggleButton-bg {
@@ -133,7 +137,7 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-main-img-container {
-    @apply md:hidden overflow-hidden relative text-stone-200;
+    @apply overflow-hidden relative text-stone-200;
   }
 
   .landing-main-img {

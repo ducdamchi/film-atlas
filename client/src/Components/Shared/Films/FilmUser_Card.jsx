@@ -110,6 +110,8 @@ export default function FilmUser_Card({ filmObject, queryString }) {
             navigate(`/films/${filmObject.id}`)
           }}
         />
+
+        {/* LAPTOP >768PX INTERACTION CONSOLE */}
         {hoverId === filmObject.id && (
           <div className="hidden md:flex border-red-500 absolute bottom-0 left-0 w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 items-center justify-center">
             <InteractionConsole
@@ -119,16 +121,23 @@ export default function FilmUser_Card({ filmObject, queryString }) {
               setIsLoading={setIsLoading}
               isLoading={isLoading}
               css={{
+                height: "1.4rem",
                 textColor: "white",
-                hoverBg: "oklch(92% 0.004 286.32 / 0.3)",
-                hoverTextColor: "oklch(88.2% 0.059 254.128)",
-                fontSize: "1rem",
-                likeSize: "1.4rem",
-                saveSize: "1.8rem",
-                starSize: "1.6rem",
-                flexGap: "1rem",
-                likeColor: "oklch(63.7% 0.237 25.331)",
-                saveColor: "oklch(72.3% 0.219 149.579)",
+                hoverBg: "none",
+                hoverTextColor: "none",
+                fontSize: "13px",
+                likeSize: "1.2rem",
+                saveSize: "1.6rem",
+                starSize: "1.4rem",
+                flexGap: "5px",
+                likeColor: "white",
+                saveColor: "white",
+                likedBgColor: "oklch(44.4% 0.177 26.899)",
+                savedBgColor: "oklch(44.8% 0.119 151.328)",
+                buttonPadding: "4px",
+                paddingTopBottom: "10px",
+                paddingLeftRight: "10px",
+                buttonHeight: "2.2rem",
               }}
               showOverview={true}
             />
@@ -142,7 +151,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
       </div>
 
       {/* Text below poster */}
-      <div className="text-gray-900 w-full pt-1 pb-1 md:p-3 flex justify-between p-2">
+      <div className="text-gray-900 w-full pt-1 pb-1 md:p-4 flex justify-between p-2">
         {/* Left side - Title, year, directors name*/}
         <div className="border-amber-400 flex flex-col items-start justify-center gap-0 ml-1">
           {/* Film Title */}
@@ -199,7 +208,7 @@ export default function FilmUser_Card({ filmObject, queryString }) {
                   <div
                     key={key}
                     className="flex flex-col items-center justify-center gap-1">
-                    <div className="relative max-w-[8rem] h-[2rem] md:h-[3rem] aspect-1/1 overflow-hidden rounded-full">
+                    <div className="relative max-w-[8rem] h-[2rem] md:h-[3.5rem] aspect-1/1 overflow-hidden rounded-full">
                       <img
                         className="object-cover grayscale transform -translate-y-1 hover:scale-[1.05] transition-all duration-300 ease-out"
                         src={
@@ -222,7 +231,11 @@ export default function FilmUser_Card({ filmObject, queryString }) {
           )}
         </div>
       </div>
-      <div className="w-full pb-5 pt-3" id={`console-${filmObject.id}`}>
+
+      {/* MOBILE <768px, interaction console at bottom */}
+      <div
+        className="md:hidden w-full pb-5 pt-3"
+        id={`console-${filmObject.id}`}>
         <InteractionConsole
           tmdbId={filmObject.id}
           directors={directors}

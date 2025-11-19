@@ -183,7 +183,7 @@ export default function Directors() {
 
         {!isSearching && (
           <div className="yourListConsole">
-            <span className="page-subtitle mb-2">Your Directors:</span>
+            <span className="page-subtitle mb-2 md:ml-12">Your Directors:</span>
             <Toggle_Three
               label="Sort By"
               width={`20rem`}
@@ -261,7 +261,7 @@ export default function Directors() {
         {/* If user is searching (even when they're not logged in), show them list of search results */}
         {isSearching && (
           <div className="mt-10 md:mt-20 flex flex-col items-center border-red-500 w-full relative">
-            <div className="page-subtitle md:m-0 self-start ml-8">
+            <div className="page-subtitle flex items-center justify-center">
               Search Results:
             </div>
             <DirectorTMDB_Gallery listOfDirectorObjects={searchResult} />

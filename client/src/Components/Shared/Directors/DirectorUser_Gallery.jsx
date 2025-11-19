@@ -137,13 +137,13 @@ export default function DirectorUser_Gallery({
       )}
 
       {listOfDirectorObjects.length > 0 && groupedDirectors !== undefined && (
-        <div className="border-1 grid grid-cols-4 items-start md:gap-2 gap-1 md:mt-10 mt-0 border-0 mb-20">
+        <div className="border-0 grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 items-start gap-1 md:mt-10 mt-0 border-0 mb-20">
           {groupedDirectors.map((groupObject, key) => {
             if (!groupObject.id) {
               return (
                 <div
                   key={key}
-                  className="font-bold md:text-6xl text-[3rem] flex items-center justify-center border-0 md:w-[7rem] w-[4.5rem] h-[7.5rem] aspect-4/5 min-w-[4.5rem] animate-[spin-y_10s_linear_infinite] [transform-style:preserve-3d] text-shadow-lg border-1"
+                  className="font-bold md:text-6xl text-[3rem] flex items-center justify-center border-0 md:h-[10rem] md:w-[8rem] h-[7rem] w-[5.4rem] min-w-[5.4rem] min-h-[7rem] animate-[spin-y_10s_linear_infinite] [transform-style:preserve-3d] text-shadow-lg border-0"
                   style={{ animationDelay: `${key * 0.23}s` }}>
                   {groupObject}
                 </div>
@@ -152,12 +152,12 @@ export default function DirectorUser_Gallery({
               return (
                 <div
                   key={key}
-                  className="border-1 flex flex-col gap-1 items-center justify-start border-0 md:w-[7rem] w-[4.5rem] h-[7.5rem] aspect-4/5 group/thumbnail"
+                  className="border-0 flex flex-col gap-1 items-center justify-start border-0 md:h-[10rem] md:w-[8rem] h-[7rem] w-[5.4rem] min-h-[7rem] aspect-4/5 group/thumbnail overflow-hidden"
                   onClick={() => {
                     navigate(`/directors/${groupObject.id}`)
                   }}>
                   <div
-                    className="relative aspect-4/5 overflow-hidden w-[85%] min-w-[4rem] md:min-w-[5rem] border-3 rounded-none  flex justify-center items-center"
+                    className="relative aspect-4/5 overflow-hidden min-h-[80%] md:min-w-[5rem] border-3 rounded-none flex justify-center items-center"
                     onMouseEnter={() => {
                       setHoverId(key)
                     }}
@@ -173,7 +173,7 @@ export default function DirectorUser_Gallery({
                       }
                     />
                     {hoverId === key && (
-                      <div className="absolute text-xs w-full h-full bg-black/60 text-white p-1 flex flex-col justify-center items-start">
+                      <div className="absolute text-xs w-full h-full bg-black/60 text-white p-1 flex flex-col justify-center items-center">
                         <span>
                           {`Watched: ${groupObject.WatchedDirectors.num_watched_films}`}
                         </span>
@@ -186,10 +186,12 @@ export default function DirectorUser_Gallery({
                       </div>
                     )}
                   </div>
-                  <div className="md:text-xs text-[10px] italic border-0 text-center pr-2 pl-2">
-                    <span>{groupObject.name?.slice(0, 15)}</span>
-                    {groupObject.name?.length >= 15 && <span>...</span>}
-                  </div>
+                  <span className="md:text-xs text-[10px] italic border-0 text-center pr-2 pl-2 whitespace-normal wrap-break-word break-all">
+                    <span className="">{groupObject.name?.slice(0, 14)}</span>
+                    <span>
+                      {groupObject.name?.length >= 15 && <span>...</span>}
+                    </span>
+                  </span>
                 </div>
               )
             }

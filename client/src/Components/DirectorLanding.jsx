@@ -31,6 +31,8 @@ export default function DirectorLanding() {
   const [numStarred, setNumStarred] = useState(0)
   const [highestStar, setHighestStar] = useState(0)
   const [score, setScore] = useState(0)
+  const [avgRating, setAvgRating] = useState(0)
+
   const { authState } = useContext(AuthContext)
 
   function toggleSearchModal() {
@@ -90,6 +92,7 @@ export default function DirectorLanding() {
         setNumStarred(result.starred)
         setHighestStar(result.highest_star)
         setScore(result.score)
+        setAvgRating(result.avg_rating)
       }
     } catch (err) {
       console.error("Error loading director data: ", err)
@@ -219,7 +222,7 @@ export default function DirectorLanding() {
         <div className="absolute bottom-0 w-full flex items-center justify-center gap-2 text-stone-200 text-[10px] mb-4">
           <div className="border-1 p-2 rounded-full">{`Watched: ${numWatched}`}</div>
           <div className="border-1 p-2 rounded-full">{`Starred: ${numStarred}`}</div>
-          <div className="border-1 p-2 rounded-full">{`Highest Star: ${highestStar}`}</div>
+          <div className="border-1 p-2 rounded-full">{`Avg. Stars: ${avgRating}`}</div>
           <div className="border-1 p-2 rounded-full">{`Score: ${score}`}</div>
         </div>
       </div>

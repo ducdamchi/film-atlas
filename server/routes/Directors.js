@@ -133,6 +133,7 @@ router.get("/:tmdbId", validateToken, async (req, res) => {
       starred: watchedDirector.num_starred_films,
       highest_star: watchedDirector.highest_star,
       score: watchedDirector.score,
+      avg_rating: watchedDirector.avg_rating,
     })
   } catch (err) {
     console.error(err)

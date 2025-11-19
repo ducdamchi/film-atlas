@@ -111,7 +111,7 @@ export default function QuickSearchModal({
   }, [searchModalOpen, searchInput])
 
   return (
-    <div className="absolute top-[30%] left-0 border-green-700 w-screen h-auto z-100 flex justify-center ">
+    <div className="font-primary absolute top-[30%] left-0 border-green-700 w-screen h-auto z-100 flex justify-center ">
       <div
         className="relative w-[60%] h-auto min-w-[20rem] max-w-[45rem] bg-stone-900/80 text-stone-200 backdrop-blur-sm border-1 border-stone-500/80 rounded-md"
         ref={modalRef}>

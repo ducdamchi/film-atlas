@@ -77,14 +77,14 @@ export default function NavBar() {
         // menuRef.current.style.borderWidth = "3px"
       } else {
         timer1 = setTimeout(() => {
-          menuRef.current.style.transform = "translateX(-200px)"
+          menuRef.current.style.transform = "translateX(-400px)"
         }, 200)
         timer2 = setTimeout(() => {
           menuRef.current.style.display = "none"
           menuBorderBottom.current.style.display = "none"
           menuBorderRight.current.style.display = "none"
         }, 400)
-        menuBorderBottom.current.style.transform = "translateX(-200px)"
+        menuBorderBottom.current.style.transform = "translateX(-400px)"
         menuBorderRight.current.style.transform = "translateY(-180px)"
         // settingsRef.current.style.borderWidth = "0px"
       }
@@ -121,14 +121,14 @@ export default function NavBar() {
       } else {
         // settingsRef.current.style.display = "block"
         timer1 = setTimeout(() => {
-          settingsRef.current.style.transform = "translateX(200px)"
+          settingsRef.current.style.transform = "translateX(400px)"
         }, 200)
         timer2 = setTimeout(() => {
           settingsRef.current.style.display = "none"
           settingsBorderBottom.current.style.display = "none"
           settingsBorderRight.current.style.display = "none"
         }, 400)
-        settingsBorderBottom.current.style.transform = "translateX(200px)"
+        settingsBorderBottom.current.style.transform = "translateX(400px)"
         settingsBorderRight.current.style.transform = "translateY(-180px)"
         // settingsRef.current.style.borderWidth = "0px"
       }

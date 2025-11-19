@@ -60,58 +60,6 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
     fetchPageData()
   }, [])
 
-  // useEffect(() => {
-  //   const filmCard = document.getElementById(`film-card-${filmObject.id}`)
-
-  //   const proxyUrl = `https://cors-anywhere.com/${encodeURIComponent(`https://image.tmdb.org/t/p/w500${filmObject.backdrop_path}`)}`
-
-  //   fetch(proxyUrl)
-  //     .then((response) => {
-  //       console.log(response)
-  //       // response.json()
-  //     })
-  //     .then((data) => {
-  //       const base64Image = btoa(data.contents)
-  //       const img = new Image()
-  //       img.crossOrigin = "anonymous"
-  //       img.src = `data:image/jpeg;base64,${base64Image}`
-  //       img.onload = () => {
-  //         const colorThief = new ColorThief()
-  //         let domColor
-  //         let brightness
-  //         try {
-  //           domColor = colorThief.getColor(img)
-  //           /* Check brightness of dominant color to ensure readability
-  //       Formula: https://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx */
-  //           brightness = Math.round(
-  //             Math.sqrt(
-  //               domColor[0] * domColor[0] * 0.241 +
-  //                 domColor[1] * domColor[1] * 0.691 +
-  //                 domColor[2] * domColor[2] * 0.068
-  //             )
-  //           )
-  //           /* If bg dark enough, font can be white */
-  //           if (brightness > 194) {
-  //             filmCard.style.backgroundColor = `rgba(${domColor[0]}, ${domColor[1]}, ${domColor[2]}, 0.4)`
-  //             /* If bg a little light, reduce each rgb value by 33% */
-  //           } else if (130 < brightness <= 194) {
-  //             filmCard.style.backgroundColor = `rgba(${domColor[0] * 1.2}, ${domColor[1] * 1.2}, ${domColor[2] * 1.2}, 0.4)`
-  //             /* If bg too light, reduce each rgb value by 66% */
-  //           } else {
-  //             filmCard.style.backgroundColor = `rgba(${domColor[0] * 1.8}, ${domColor[1] * 1.8}, ${domColor[2] * 1.8}, 0.4)`
-  //           }
-  //         } catch (err) {
-  //           console.log(err)
-  //         }
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.log("Error fetching image with AllOrigins: ", err)
-  //     })
-
-  //   // console.log(filmCard)
-  // }, [])
-
   return (
     <div
       id={`film-card-${filmObject.id}`}
@@ -142,7 +90,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
 
         {/* Laptop Interaction Console */}
         {hoverId === filmObject.id && (
-          <div className="hidden border-red-500 absolute bottom-0 left-0 w-[20rem] md:w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70 flex items-center justify-center">
+          <div className="hidden md:flex border-red-500 absolute bottom-0 left-0 w-[20rem] md:w-[30rem] min-w-[20rem] aspect-16/10 object-cover bg-black/70  items-center justify-center">
             <InteractionConsole
               tmdbId={hoverId}
               directors={directors}
@@ -150,16 +98,23 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
               isLoading={isLoading}
               setIsLoading={setIsLoading}
               css={{
+                height: "1.4rem",
                 textColor: "white",
-                hoverBg: "oklch(92% 0.004 286.32 / 0.3)",
-                hoverTextColor: "oklch(88.2% 0.059 254.128)",
-                fontSize: "1rem",
-                likeSize: "1.4rem",
-                saveSize: "1.8rem",
-                starSize: "1.6rem",
-                flexGap: "1rem",
-                likeColor: "oklch(44.4% 0.177 26.899)",
-                saveColor: "oklch(44.8% 0.119 151.328)",
+                hoverBg: "none",
+                hoverTextColor: "none",
+                fontSize: "13px",
+                likeSize: "1.2rem",
+                saveSize: "1.6rem",
+                starSize: "1.4rem",
+                flexGap: "5px",
+                likeColor: "white",
+                saveColor: "white",
+                likedBgColor: "oklch(44.4% 0.177 26.899)",
+                savedBgColor: "oklch(44.8% 0.119 151.328)",
+                buttonPadding: "4px",
+                paddingTopBottom: "10px",
+                paddingLeftRight: "10px",
+                buttonHeight: "2.2rem",
               }}
               showOverview={true}
             />

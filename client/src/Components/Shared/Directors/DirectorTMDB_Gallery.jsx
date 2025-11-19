@@ -19,7 +19,7 @@ export default function DirectorTMDB_Gallery({ listOfDirectorObjects }) {
 
       {listOfDirectorObjects.length > 0 && (
         <div className="flex flex-col justify-center gap-0 mt-10 mb-20">
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {listOfDirectorObjects.map((directorObject, key) => (
               /* Each film item */
               <div

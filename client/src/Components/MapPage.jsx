@@ -329,6 +329,10 @@ export default function MapPage() {
     } else {
       setIsDiscoverMode(false)
     }
+
+    if (queryString !== "watched/rated/by_country") {
+      setNumStars(null)
+    }
   }, [queryString])
 
   /* Fetch New Page Hook */
@@ -393,7 +397,7 @@ export default function MapPage() {
     fetchNewPage()
   }, [page])
 
-  /* Fetch Initial Page Hook */
+  /* Fetch Initial Page Hook for discover mode*/
   useEffect(() => {
     /* This IF detects a page refresh and skips a unnecessary rerender. Thus, the API call for suggetions only fire when user selects a new country or adjust any of the dependecies array below. */
     if (isPageRefresh.current) {
@@ -508,7 +512,6 @@ export default function MapPage() {
             const result = await fetchListByParams({
               queryString: "watched/by_country",
               countryCode: popupInfo.iso_a2,
-              setUserFilmList: setUserFilmList,
               sortBy: sortBy,
               sortDirection: sortDirection,
               numStars: numStars,
@@ -662,7 +665,7 @@ export default function MapPage() {
             <div className="page-title font-heading">{`${getCountryName(popupInfo.iso_a2)}`}</div>
           )}
 
-        <div className="flex flex-col items-center justify-center md:mt-10 mt-5 w-[90%] min-w-[20rem] md:w-[30rem">
+        <div className="flex flex-col items-center justify-center md:mt-10 mt-5 w-[90%] min-w-[20rem] md:w-[30rem]">
           <Toggle_Three
             label="View Mode"
             width={`20rem`}
@@ -677,7 +680,7 @@ export default function MapPage() {
           />
 
           {!isDiscoverMode && (
-            <div className="w-full">
+            <div className="flex flex-col items-center justify-center">
               <Toggle_Two
                 label="Sort By"
                 width={`20rem`}
@@ -750,7 +753,7 @@ export default function MapPage() {
             />
           )}
           {isDiscoverMode && (
-            <div className="w-full flex flex-col items-center gap-0 mb-7">
+            <div className="flex flex-col items-center gap-0 mb-7">
               <Toggle_Three
                 label="Sort By"
                 width="20rem"
