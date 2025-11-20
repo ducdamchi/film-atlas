@@ -238,7 +238,7 @@ export default function FilmLanding() {
 
             {/* All the text displayed over main backdrop */}
             <div className="">
-              <div className="landing-img-text-container">
+              <div className="landing-img-text-container z-30">
                 {/* Title */}
                 {movieDetails.title && (
                   <div className="landing-page-title font-heading">
@@ -264,7 +264,7 @@ export default function FilmLanding() {
 
                 {/* Director name(s) */}
                 {directors.length > 0 && (
-                  <div className="landing-img-text-right">
+                  <div className="landing-img-text-right z-100">
                     {/* <span className="font-black text-base">|&nbsp;</span> */}
                     <span className="landing-img-text-right-title">
                       directed by
@@ -308,24 +308,23 @@ export default function FilmLanding() {
                     </div>
                   )}
               </div>
+              {/* trailer play button */}
+              {trailerLink !== null && (
+                <div className="absolute w-full h-full border-0 border-red-500 z-0 top-0 left-0 flex items-center justify-center">
+                  <button
+                    onClick={() => {
+                      setOpenTrailer(true)
+                    }}
+                    className="flex items-center z-40 rounded-full p-3 pt-2 pb-2 drop-shadow-lg bg-white text-[var(--backdropColor)] hover:text-white hover:bg-[var(--backdropColor)] transition-all duration-300 ease-out"
+                    style={{
+                      "--backdropColor": `rgb(${backdropColor[0]}, ${backdropColor[1]}, ${backdropColor[2]})`,
+                    }}>
+                    <BiPlay className="text-xl" />
+                    <span className="text-[11px]">Trailer</span>
+                  </button>
+                </div>
+              )}
             </div>
-
-            {/* trailer play button */}
-            {trailerLink !== null && (
-              <div className="absolute w-full h-full border-0 border-red-500 z-20 top-0 left-0 flex items-center justify-center">
-                <button
-                  onClick={() => {
-                    setOpenTrailer(true)
-                  }}
-                  className="flex items-center z-40 rounded-full p-3 pt-2 pb-2 drop-shadow-lg bg-white text-[var(--backdropColor)] hover:text-white hover:bg-[var(--backdropColor)] transition-all duration-300 ease-out"
-                  style={{
-                    "--backdropColor": `rgb(${backdropColor[0]}, ${backdropColor[1]}, ${backdropColor[2]})`,
-                  }}>
-                  <BiPlay className="text-xl" />
-                  <span className="text-[11px]">Trailer</span>
-                </button>
-              </div>
-            )}
 
             {/* Transparent layer bottom */}
             <div className="landing-transparent-layer-bottom"></div>
@@ -376,7 +375,7 @@ export default function FilmLanding() {
                 )}
               </div>
               {/* Cast and crew section */}
-              <div className="flex flex-col lg:flex-row items-center justify-start gap-2">
+              <div className="flex flex-col items-start justify-start gap-2">
                 {mainCast.length > 0 && (
                   <PersonList
                     title="main cast"
@@ -384,7 +383,7 @@ export default function FilmLanding() {
                     type="cast"
                   />
                 )}
-                {dops.length > 0 && (
+                {crew.length > 0 && (
                   <PersonList
                     title="main crew"
                     listOfPeople={crew}

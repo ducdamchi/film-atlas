@@ -259,12 +259,14 @@ export default function InteractionConsole({
           style={{ color: css.textColor }}>
           {showOverview && (
             <div
-              className="text-white text-sm w-[85%] text-justify pr-4 pl-4 pb-2 mb-5"
+              className="text-white w-[85%] pr-4 pl-4 pb-2 mb-5"
               onClick={() => {
                 navigate(`/films/${movieDetails.id}`)
               }}>
-              <span className="">{movieDetails.overview?.slice(0, 250)}</span>
-              {movieDetails.overview?.length >= 250 && <span>{`...`}</span>}
+              <span className="text-[9.5px]/1">
+                {movieDetails.overview?.slice(0, 180)}
+              </span>
+              {movieDetails.overview?.length >= 181 && <span>{`...`}</span>}
             </div>
           )}
 

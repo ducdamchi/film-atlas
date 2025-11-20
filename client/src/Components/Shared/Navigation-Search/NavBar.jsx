@@ -140,7 +140,7 @@ export default function NavBar() {
   }, [settingsOpened])
 
   return (
-    <div className="font-primary flex items-center justify-between w-screen p-0 md:p-3 md:pl-[2rem] md:pr-[2rem] h-[4rem] md:h-[5rem] bg-black text-stone-200 border-b-5 border-[#b8d5e5] z-100">
+    <div className="font-primary flex items-center justify-between w-screen p-0 md:p-3 md:pl-[2rem] md:pr-[2rem] h-[4rem] bg-black text-stone-200 border-b-5 border-[#b8d5e5] z-100">
       <div className="flex items-center justify-center gap-7 min-w-[12rem] ml-3">
         {/* MOBILE - APP NAME */}
         <div className="md:hidden h-full flex items-center justify-center pt-0 z-30">
@@ -216,7 +216,7 @@ export default function NavBar() {
         </div>
 
         {/* LAPTOP - HORIZONTAL MENU */}
-        <div className="hidden md:flex text-sm flex h-full mt-1 items-center gap-5">
+        <div className="hidden md:flex text-xs flex h-full mt-1 items-center gap-5">
           <ul className="flex gap-7 p-2">
             <CustomLink to="/map" exact={false}>
               MAP
@@ -299,13 +299,13 @@ export default function NavBar() {
 
       {/* LAPTOP - USER INFO / AUTH */}
       {authState.status ? (
-        <div className="hidden md:flex items-center justify-end gap-2">
-          <div className="text-sm h-full flex items-center justify-center">
+        <div className="hidden md:flex items-center justify-end gap-2 text-xs">
+          <div className="h-full flex items-center justify-center">
             <span>welcome,&nbsp;</span>
             <span className="font-bold">{`${authState.username}!`}</span>
           </div>
           <div className="font-thin text-base ">|</div>
-          <button className=" text-sm" onClick={logOut}>
+          <button className="" onClick={logOut}>
             log out
           </button>
         </div>

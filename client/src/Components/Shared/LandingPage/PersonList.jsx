@@ -10,12 +10,12 @@ export default function PersonList({ title, listOfPeople, type }) {
   return (
     <div className="flex flex-col justify-start items-center pl-3 pr-3 pt-2 drop-shadow-2xl mr-0 ">
       <div className="landing-sectionTitle mb-2 w-full">{title}</div>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-2">
         {listOfPeople.map((person, key) => {
           return (
             <div
               key={key}
-              className="relative w-[4.5rem] md:w-[6rem] aspect-2/3 flex flex-col mb-1 bg-white rounded-none">
+              className="relative w-[4.5rem] sm:w-[6rem] lg:w-[8rem] aspect-2/3 flex flex-col mb-1 bg-white rounded-none">
               {/* <div className="overflow-hidden w-full relative text-wrap whitespace-wrap rounded-md bg-white border-1"> */}
               {/* <div
                 className="absolute bottom-0 left-0 w-full h-full bg-linear-to-t from-[var(--overlayColor-bottom)] via-[var(--overlayColor-top)] via-45% to-transparent z-10"
@@ -34,13 +34,13 @@ export default function PersonList({ title, listOfPeople, type }) {
                 />
               </div>
               {/* <div className="border-red-500 absolute bottom-0 left-0 h-[2rem] w-full bg-gradient-to-t from-black/90 to-transparent z-20"></div> */}
-              <div className="font-bold h-auto w-full flex flex-col items-start justify-start text-[7px] md:text-[10px] text-center  max-w-[4.5rem] text-left text-stone-900 p-[7px]">
-                <div className="uppercase">{person.name}</div>
+              <div className="font-bold h-auto w-full flex flex-col items-start justify-start text-[7px] sm:text-[10px] text-center text-left text-stone-900 p-[7px]">
+                <div className="uppercase w-full">{person.name}</div>
                 {type === "cast" && (
                   <div className="font-extralight ">{`as ${person.character}`}</div>
                 )}
                 {type === "crew" && (
-                  <div className="font-extralight text-[7px]/2">
+                  <div className="font-extralight text-[7px]/2 sm:text-[10px]/3">
                     {person.jobs.map((job, key) => (
                       <span key={key}>
                         {job}

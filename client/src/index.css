@@ -66,15 +66,15 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
 
 @layer components {
   .page-title {
-    @apply uppercase font-bold text-xl md:text-3xl flex items-center justify-center w-full md:mt-10 mt-5;
+    @apply uppercase font-bold text-xl md:text-xl flex items-center justify-center w-full md:mt-10 mt-5;
   }
 
   .page-subtitle {
-    @apply font-bold text-base md:text-2xl w-auto;
+    @apply font-bold text-base md:text-lg w-auto;
   }
 
   .yourListConsole {
-    @apply flex flex-col items-start justify-center mt-10 md:mt-20 md:mr-5 lg:mr-8;
+    @apply flex flex-col items-start justify-center mt-10 md:mr-5 lg:mr-8;
   }
 
   .toggleButton-whole {
@@ -82,11 +82,11 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .toggleButton-label {
-    @apply w-[7rem] flex self-center mr-45 md:mr-0 md:ml-0 md:justify-end uppercase text-[11px] md:text-[13px];
+    @apply w-[7rem] flex self-center mr-45 md:mr-0 md:ml-0 md:justify-end uppercase text-[11px] md:text-[11px];
   }
 
   .toggleButton-buttonsContainer {
-    @apply relative bg-gray-200 rounded-full md:w-[20rem] w-[18rem] h-[2.5rem] text-[13px] md:text-[16px];
+    @apply relative bg-gray-200 rounded-full md:w-[20rem] w-[18rem] h-[2.5rem] text-[13px] md:text-[13px];
   }
 
   .toggleButton-bg {
@@ -138,7 +138,7 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-page-title {
-    @apply font-black text-[20px]/6 md:text-[25px]/7;
+    @apply font-black text-[20px]/6 md:text-[25px]/7 md:mt-5 md:ml-5;
   }
 
   .landing-main-img-container {
@@ -158,7 +158,7 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-img-text-right {
-    @apply text-xs/5 font-extralight mb-2 text-right;
+    @apply text-xs/5 font-extralight mb-2 text-right md:mr-5;
   }
 
   .landing-img-text-right-title {
@@ -174,10 +174,10 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-img-text-belowTitle {
-    @apply w-full flex mb-5 mt-1 text-xs font-extralight;
+    @apply w-full flex mb-5 mt-1 text-xs font-extralight md:ml-5;
   }
 
   .landing-sectionTitle {
-    @apply uppercase font-extralight text-[9px] text-stone-900;
+    @apply uppercase font-extralight text-[9px] text-stone-900 md:text-xs;
   }
 }
