@@ -23,6 +23,7 @@ import PersonList from "./Shared/LandingPage/PersonList"
 
 import { MdSunny, MdOutlineTimelapse } from "react-icons/md"
 import { IoMdCalendar, IoIosTimer } from "react-icons/io"
+import { BiPlay } from "react-icons/bi"
 
 export default function FilmLanding() {
   const imgBaseUrl = "https://image.tmdb.org/t/p/original"
@@ -36,6 +37,7 @@ export default function FilmLanding() {
   const [trailerLink, setTrailerLink] = useState(null)
   const [overlayColor, setOverlayColor] = useState([0, 0, 0])
   const [overlayTextColor, setOverlayTextColor] = useState([255, 255, 255])
+  const [backdropColor, setBackdropColor] = useState([0, 0, 0])
 
   const { authState, searchModalOpen, setSearchModalOpen } =
     useContext(AuthContext)
@@ -133,10 +135,20 @@ export default function FilmLanding() {
 
     /* Once movie detail loads, set the overlay color based on poster dominant color */
     try {
+      const backdrop = new Image()
       const poster = new Image()
+      backdrop.crossOrigin = "anonymous"
       poster.crossOrigin = "anonymous"
+      const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(`https://image.tmdb.org/t/p/w500${movieDetails.backdrop_path}`)}`
       const proxyUrl2 = `https://corsproxy.io/?${encodeURIComponent(`https://image.tmdb.org/t/p/w500${movieDetails.poster_path}`)}`
+      backdrop.src = proxyUrl
       poster.src = proxyUrl2
+
+      backdrop.onload = () => {
+        const colorThief = new ColorThief()
+        let domColor = colorThief.getColor(backdrop)
+        setBackdropColor(domColor)
+      }
 
       poster.onload = () => {
         const colorThief2 = new ColorThief()
@@ -273,6 +285,18 @@ export default function FilmLanding() {
                   )}
               </div>
             </div>
+            {trailerLink !== null && (
+              <div className="absolute w-full h-full border-2 border-red-500 z-40 top-0 left-0 flex items-center justify-center">
+                <div
+                  className="flex items-center z-40 rounded-full p-2 pt-1 pb-1 drop-shadow-lg bg-white text-[var(--backdropColor)] hover:text-white hover:bg-[var(--backdropColor)] transition-all duration-300 ease-out"
+                  style={{
+                    "--backdropColor": `rgb(${backdropColor[0]}, ${backdropColor[1]}, ${backdropColor[2]})`,
+                  }}>
+                  <BiPlay className="text-xl" />
+                  <span className="text-[11px]">Trailer</span>
+                </div>
+              </div>
+            )}
             <div className="landing-transparent-layer-bottom"></div>
             <div className="absolute bottom-0 w-full flex items-center justify-center mb-1">
               <InteractionConsole
@@ -303,37 +327,10 @@ export default function FilmLanding() {
             </div>
           </div>
 
-          <div
-            // id="landing-bg-1"
-            // ref={overviewRef}
-            className="flex flex-col items-start p-4 text-stone-900 gap-2 relative bg-stone-100">
-            <div className="flex">
-              <div className="flex flex-col items-start justify-start">
-                {movieDetails.overview && (
-                  <div className="p-4 pt-2">
-                    {/* <span className="font-bold uppercase">Overview:&nbsp;</span> */}
-                    <div className="uppercase font-extralight text-[11px] mb-1">
-                      overview
-                    </div>
-                    <div className="text-[17px]/6 font-extrabold text-balance">
-                      {movieDetails.overview}
-                    </div>
-                  </div>
-                )}
-                <div className="p-4 pt-1">
-                  <img
-                    ref={posterRef}
-                    className=" w-[12rem] aspect-2/3 object-cover scale-[1] mb-5 border-0 rounded-md z-30 inset-shadow-white inset-shadow-sm drop-shadow-2xl"
-                    src={
-                      movieDetails.poster_path !== null
-                        ? `${imgBaseUrl}${movieDetails.poster_path}`
-                        : `posternotfound.png`
-                    }
-                    alt=""
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col items-end justify-start gap-0">
+          {/* Section below main backdrop */}
+          <div className="flex flex-col items-start p-4 text-stone-900 gap-2 relative bg-stone-100">
+            <div className="flex flex-row lg:flex-col">
+              <div className="flex flex-col order-1 lg:flex-row lg:order-2 items-center justify-start gap-0">
                 {mainCast.length > 0 && (
                   <PersonList
                     title="main cast"
@@ -351,18 +348,56 @@ export default function FilmLanding() {
                   />
                 )}
               </div>
+              <div className="flex flex-col items-start justify-start order-2 lg:order-1">
+                {movieDetails.overview && (
+                  <div className="p-4 pt-2">
+                    {/* <span className="font-bold uppercase">Overview:&nbsp;</span> */}
+                    <div className="landing-sectionTitle mb-1">overview</div>
+                    <div className="text-[17px]/6 font-bold text-balance">
+                      {movieDetails.overview}
+                    </div>
+                  </div>
+                )}
+                <div className="p-4 pt-1 md:flex md:w-full md:gap-5">
+                  <div className="">
+                    <img
+                      ref={posterRef}
+                      className="w-[12rem] md:w-[auto] md:h-[15rem] aspect-2/3 object-cover scale-[1] mb-5 border-0 rounded-none z-30 drop-shadow-sm"
+                      src={
+                        movieDetails.poster_path !== null
+                          ? `${imgBaseUrl}${movieDetails.poster_path}`
+                          : `posternotfound.png`
+                      }
+                      alt=""
+                    />
+                  </div>
+                  {trailerLink !== null && (
+                    <div className="hidden md:block h-[15rem] aspect-16/9 border-0">
+                      {/* <div className="landing-sectionTitle p-0 pb-2">
+                        trailer
+                      </div> */}
+                      <iframe
+                        className=""
+                        width="100%"
+                        height="100%"
+                        src={`https://www.youtube.com/embed/${trailerLink}`}
+                        title="YouTube video player"
+                        allowFullScreen></iframe>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
             {trailerLink !== null && (
-              <div className="w-full aspect-16/9 md:h-[30rem] border-0 p-4 mb-10">
-                <div className="uppercase font-extralight text-[11px] text-stone-900 bg-stone-100 p-0 pb-2">
-                  trailer
-                </div>
+              <div className="md:hidden w-full aspect-16/9 md:h-[30rem] border-0 p-3 mb-10 bg-stone-100 ">
+                <div className="landing-sectionTitle p-0 pb-2">trailer</div>
                 <iframe
-                  className="rounded-md"
+                  className=""
                   width="100%"
                   height="100%"
-                  src={`https://www.youtube.com/embed/${trailerLink}`}
+                  src={`https://www.youtube.com/embed/${trailerLink}?autoplay=1&mute=1&playsinline=1`}
                   title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen></iframe>
               </div>
             )}

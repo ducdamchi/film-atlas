@@ -46,10 +46,14 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   background-color:;
 } */
 
-.font-heading {
+.font-logo {
   /* font-family: "Black Ops One", sans-serif; */
   font-family: "Red Rose", "Optima", "Helvetica", sans-serif;
   /* font-family: "Russo One", sans-serif; */
+}
+
+.font-heading {
+  font-family: "Sen", "Optima", "Helvetica", sans-serif;
 }
 
 .font-primary {
@@ -133,7 +137,7 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-page-title {
-    @apply font-black text-[1.5rem];
+    @apply font-black text-[20px]/6 md:text-[25px]/7;
   }
 
   .landing-main-img-container {
@@ -141,7 +145,7 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-main-img {
-    @apply w-screen aspect-2/3 object-cover scale-[1];
+    @apply w-screen max-h-[30rem] aspect-2/3 object-cover scale-[1];
   }
 
   .landing-transparent-layer {
@@ -169,6 +173,10 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .landing-img-text-belowTitle {
-    @apply w-full flex mb-5 text-xs font-extralight;
+    @apply w-full flex mb-5 mt-1 text-xs font-extralight;
+  }
+
+  .landing-sectionTitle {
+    @apply uppercase font-extralight text-[9px] text-stone-900;
   }
 }

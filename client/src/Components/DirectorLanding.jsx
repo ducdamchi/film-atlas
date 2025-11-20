@@ -143,6 +143,10 @@ export default function DirectorLanding() {
     // setScrollPosition(0)
   }, [tmdbId])
 
+  useEffect(() => {
+    console.log("Director Details:", directorDetails)
+  }, [directorDetails])
+
   if (!directorDetails) {
     return <div>Error loading director. Please try again.</div>
   }
@@ -217,6 +221,19 @@ export default function DirectorLanding() {
                 </span>
               </div>
             )}
+
+            {/* {directorDetails.known_for.map((filmObject, key) => (
+              <span key={key}>
+                <span className="">
+                  {filmObject?.title ||
+                    filmObject?.name ||
+                    filmObject?.original_title}
+                </span>
+                {key !== directorObject.known_for.length - 1 && (
+                  <span className="">,&nbsp;</span>
+                )}
+              </span>
+            ))} */}
           </div>
         </div>
         <div className="landing-transparent-layer-bottom"></div>
@@ -232,9 +249,7 @@ export default function DirectorLanding() {
       <div className="flex p-4 text-stone-900 bg-stone-100">
         {directorDetails.biography && (
           <div className="flex flex-col items-start justify-start p-4 pt-2">
-            <div className="uppercase font-extralight text-[11px] mb-1 ">
-              Biography
-            </div>
+            <div className="landing-sectionTitle mb-1 ">Biography</div>
             <div className="text-[17px]/6 font-extrabold p-2">{`${directorDetails.biography}`}</div>
           </div>
         )}
@@ -242,7 +257,7 @@ export default function DirectorLanding() {
 
       {/* Directed Films */}
       <div className=" w-screen flex flex-col items-center justify-start bg-stone-100">
-        <div className="uppercase font-extralight text-[11px] mb-[-0.3rem] self-start pl-8">
+        <div className="landing-sectionTitle mb-[-0.3rem] self-start pl-8">
           filmography
         </div>
         <FilmTMDB_Gallery listOfFilmObjects={directedFilms} />

@@ -157,7 +157,7 @@ export default function NavBar() {
               />
             )}
           </button>
-          <span className="font-heading text-[13px] uppercase font-black flex items-center justify-center p-1">
+          <span className="font-logo text-[13px] uppercase font-black flex items-center justify-center p-1">
             The Film Atlas
           </span>
           <button
@@ -212,9 +212,7 @@ export default function NavBar() {
 
         {/* LAPTOP - APP NAME*/}
         <div className="hidden md:flex h-full items-center justify-center pt-1">
-          <span className="font-heading font-black uppercase">
-            The Film Atlas
-          </span>
+          <span className="font-logo font-black uppercase">The Film Atlas</span>
         </div>
 
         {/* LAPTOP - HORIZONTAL MENU */}
