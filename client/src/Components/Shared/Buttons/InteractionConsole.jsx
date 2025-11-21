@@ -271,10 +271,10 @@ export default function InteractionConsole({
           )}
 
           <div
-            className={`flex h-[4rem] justify-center items-end w-full`}
+            className={`flex justify-center items-end w-full`}
             style={{
               gap: css.flexGap,
-              height: css.height ? css.height : "4rem",
+              height: css.height,
             }}>
             <button
               alt="Add to watched"
