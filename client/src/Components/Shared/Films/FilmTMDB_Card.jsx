@@ -63,7 +63,7 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
   return (
     <div
       id={`film-card-${filmObject.id}`}
-      className="film-item w-[20rem]  md:min-w-[20rem] aspect-16/10 flex flex-col justify-center items-center md:items-start gap-0 bg-gray-200 text-black rounded-md">
+      className="film-item w-[20rem]  min-w-[20rem] aspect-16/10 flex flex-col justify-center items-center md:items-start gap-0 bg-gray-200 text-black relative">
       {/* Poster */}
       <div
         className="group/thumbnail overflow-hidden relative"
@@ -129,34 +129,17 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
       </div>
 
       {/* Text below poster */}
-      <div className=" w-full md:p-4 md:pb-4 p-2 pb-0 flex justify-between">
+      <div className="md:absolute md:bottom-0 md:left-0 w-full p-2 pb-0 flex justify-between md:p-3 md:bg-gradient-to-t md:from-black/100 md:to-transparent md:text-stone-100">
         {/* Left side - Title, year*/}
-        <div className="border-amber-400 flex flex-row items-center md:flex-col md:items-start justify-center gap-0 ml-1">
+        <div className="border-amber-400 flex flex-row items-center justify-center gap-0 ml-1">
           {/* Film Title - LAPTOP*/}
-          <div className="hidden md:block">
+          {/* <div className="hidden md:block">
             <span
               onClick={() => {
                 navigate(`/films/${filmObject.id}`)
                 setPage((prevPage) => ({ ...prevPage, loadMore: false }))
               }}
-              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 md:text-lg text-sm">
-              {`${filmObject.title.slice(0, 25)}`}
-            </span>
-            {filmObject.title.length >= 25 && (
-              <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-lg">
-                ...
-              </span>
-            )}
-          </div>
-
-          {/* Film Title - MOBILE*/}
-          <div className="md:hidden flex items-center justify-start">
-            <span
-              onClick={() => {
-                navigate(`/films/${filmObject.id}`)
-                setPage((prevPage) => ({ ...prevPage, loadMore: false }))
-              }}
-              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 md:text-lg text-sm">
+              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 text-sm">
               {`${filmObject.title.slice(0, 17)}`}
             </span>
             {filmObject.title.length >= 17 && (
@@ -164,34 +147,51 @@ export default function FilmTMDB_Card({ filmObject, setPage }) {
                 ...
               </span>
             )}
+          </div> */}
+
+          {/* Film Title - MOBILE*/}
+          <div className="flex items-center justify-start text-xs">
+            <span
+              onClick={() => {
+                navigate(`/films/${filmObject.id}`)
+                setPage((prevPage) => ({ ...prevPage, loadMore: false }))
+              }}
+              className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 ">
+              {`${filmObject.title.slice(0, 17)}`}
+            </span>
+            {filmObject.title.length >= 17 && (
+              <span className="font-bold uppercase transition-all duration-200 ease-out hover:text-blue-800 ">
+                ...
+              </span>
+            )}
             {filmObject.release_date && (
-              <span className="ml-1 text-sm font-thin">
+              <span className="ml-1 font-thin">
                 {`${getReleaseYear(filmObject.release_date)}`}
               </span>
             )}
           </div>
 
           {/* Release year */}
-          <div className="hidden md:flex items-center justify-center uppercase text-sm gap-1">
+          {/* <div className="hidden md:flex items-center justify-center uppercase text-sm gap-1">
             {filmObject.release_date && (
               <span className="">
                 {`${getReleaseYear(filmObject.release_date)}`}
               </span>
             )}
-          </div>
+          </div> */}
         </div>
 
         {/* Right side - TMDB rating and vote count */}
         <div className="flex items-center gap-2 md:gap-5 justify-center mr-1">
           <div className="flex items-center justify-center gap-1">
-            <MdStars className="md:text-xl text-sm" />
-            <div className="md:text-base text-xs">
+            <MdStars className="text-sm" />
+            <div className="text-xs">
               {Number(filmObject.vote_average).toFixed(1)}
             </div>
           </div>
           <div className="flex items-center justify-center gap-1">
-            <MdPeople className="md:text-2xl text-base" />
-            <div className="md:text-base text-xs">{filmObject.vote_count}</div>
+            <MdPeople className="text-base" />
+            <div className="text-xs">{filmObject.vote_count}</div>
           </div>
         </div>
       </div>
