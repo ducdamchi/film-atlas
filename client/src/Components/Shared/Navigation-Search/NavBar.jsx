@@ -27,6 +27,13 @@ export default function NavBar() {
   const settingsBorderRight = useRef(null)
   const navigate = useNavigate()
 
+  //unit: rem
+  const navbarHeight = 3
+  const menuHeight = 6
+  const setttingsHeight_Authed = 2.5
+  const setttingsHeight_Unauthed = 4.2
+  const borderWidth = 0.3
+
   function CustomLink({ to, children, exact = true, ...props }) {
     // to: URL path (e.g., "/about", "/contact")
     // children: Content inside the link (text, icons, etc.)
@@ -140,24 +147,27 @@ export default function NavBar() {
   }, [settingsOpened])
 
   return (
-    <div className="font-primary flex items-center justify-between w-screen p-0 md:p-3 md:pl-[2rem] md:pr-[2rem] h-[4rem] bg-black text-stone-200 border-b-5 border-[#b8d5e5] z-100">
-      <div className="flex items-center justify-center gap-7 min-w-[12rem] ml-3">
+    <div
+      className={`font-primary flex items-center justify-between w-screen p-0 md:p-3 md:pl-[2rem] md:pr-[2rem] bg-black text-stone-200 border-b-[0.3rem] border-[#b8d5e5] z-100`}
+      style={{ height: `${navbarHeight}rem` }}>
+      {/* LEFT SIDE */}
+      <div className="flex items-center justify-center gap-7 min-w-[12rem] ml-0 md:ml-3">
         {/* MOBILE - APP NAME */}
         <div className="md:hidden h-full flex items-center justify-center pt-0 z-30">
-          <button className="mr-1 ">
+          <button className="mr-1">
             {menuOpened ? (
               <MdClose
-                className="text-xl mb-[2px]"
+                className="text-base mb-[1px]"
                 onClick={() => setMenuOpened(false)}
               />
             ) : (
               <MdMenu
-                className="text-xl mb-[2px]"
+                className="text-base mb-[1px]"
                 onClick={() => setMenuOpened(true)}
               />
             )}
           </button>
-          <span className="font-logo text-[13px] uppercase font-black flex items-center justify-center p-1">
+          <span className="font-logo text-[11px] uppercase font-black flex items-center justify-center p-1">
             The Film Atlas
           </span>
           <button
@@ -165,15 +175,19 @@ export default function NavBar() {
             onClick={() => {
               setSearchModalOpen(true)
             }}>
-            <BiSearchAlt2 className="text-xs" />
+            <BiSearchAlt2 className="text-[10px]" />
           </button>
         </div>
 
         {/* MOBILE - HAMBURGER MENU CONTENT */}
         <div
-          className="hidden absolute z-20 top-[59px] left-0 bg-black border-[#b8d5e5] w-[calc(50vw)] h-[6.5rem] pl-5 pb-5 pt-3 transition-all ease-out duration-200 font-light z-100"
+          className={`hidden absolute z-20 left-0 bg-black border-[#b8d5e5] w-[50vw] pl-5 pb-5 pt-3 transition-all ease-out duration-200 font-light z-100`}
+          style={{
+            height: `${menuHeight}rem`,
+            top: `${navbarHeight - borderWidth}rem`,
+          }}
           ref={menuRef}>
-          <ul className="flex flex-col gap-2 text-[13px]">
+          <ul className="flex flex-col gap-2 text-[11px]">
             <CustomLink
               to="/map"
               exact={false}
@@ -204,19 +218,31 @@ export default function NavBar() {
           </ul>
         </div>
         <div
-          className="hidden absolute w-[calc(50vw+0.4rem)] h-[0.4rem] top-[163px] left-0 bg-[#d5e5b8] z-20 transition-all ease-out duration-400"
+          className={`hidden absolute left-0 bg-[#d5e5b8] z-20 transition-all ease-out duration-400`}
+          style={{
+            height: `${borderWidth}rem`,
+            width: `calc(50vw + ${borderWidth}rem)`,
+            top: `${navbarHeight + menuHeight - borderWidth}rem`,
+          }}
           ref={menuBorderBottom}></div>
         <div
-          className="hidden absolute w-[0.4rem] h-[6.5rem] left-[50%] top-[59px] bg-[#e5b8d5] z-20 transition-all ease-out duration-400"
+          className="hidden absolute w-[0.4rem] h-[6rem] left-[50vw] top-[3rem] bg-[#e5b8d5] z-20 transition-all ease-out duration-400"
+          style={{
+            height: `${menuHeight}rem`,
+            width: `${borderWidth}rem`,
+            top: `${navbarHeight - borderWidth}rem`,
+          }}
           ref={menuBorderRight}></div>
 
         {/* LAPTOP - APP NAME*/}
-        <div className="hidden md:flex h-full items-center justify-center pt-1">
-          <span className="font-logo font-black uppercase">The Film Atlas</span>
+        <div className="hidden md:flex h-full items-center justify-center">
+          <span className="font-logo font-black uppercase text-sm">
+            The Film Atlas
+          </span>
         </div>
 
         {/* LAPTOP - HORIZONTAL MENU */}
-        <div className="hidden md:flex text-xs flex h-full mt-1 items-center gap-5">
+        <div className="hidden md:flex text-[10px] font-extralight flex h-full mt-1 items-center gap-5 pb-[5px]">
           <ul className="flex gap-7 p-2">
             <CustomLink to="/map" exact={false}>
               MAP
@@ -239,59 +265,87 @@ export default function NavBar() {
         </div>
       </div>
 
+      {/* RIGHT SIDE */}
       {/* MOBILE - USER INFO / AUTH */}
-      <div className="md:hidden flex items-center justify-end gap-1 mr-3 text-[13px] z-100">
+      <div className="md:hidden flex items-center justify-end gap-1 mr-3 text-[11px] z-100">
         {authState.status ? (
           <div>
             <div className="h-full flex items-center justify-center">
               <span className=" p-1 flex items-center justify-center font-light">{`${authState.username}`}</span>
             </div>
             <div
-              className="hidden absolute z-20 top-[59px] right-0 bg-black border-[#b8d5e5] w-[50vw] h-[2.5rem] pl-5 pb-5 pt-5 transition-all ease-out duration-200 font-light justify-end items-center"
+              className="hidden absolute z-20 right-0 bg-black border-[#b8d5e5] pl-5 pb-5 pt-5 transition-all ease-out duration-200 font-light justify-end items-center"
+              style={{
+                top: `${navbarHeight - borderWidth}rem`,
+                width: `calc(50vw - ${3.1 * borderWidth}rem)`,
+                height: `${setttingsHeight_Authed}rem`,
+              }}
               ref={settingsRef}>
-              <button className="mr-5 gap-2 text-[13px]" onClick={logOut}>
+              <button className="mr-5 gap-2" onClick={logOut}>
                 log out
               </button>
             </div>
             <div
-              className="hidden absolute w-[50vw] h-[0.4rem] top-[99px] right-0 bg-[#e5b8d5] z-20 transition-all ease-out duration-400"
+              className="hidden absolute right-0 bg-[#e5b8d5] z-20 transition-all ease-out duration-400"
+              style={{
+                width: `calc(50vw - ${2.1 * borderWidth}rem)`,
+                height: `${borderWidth}rem`,
+                top: `${navbarHeight + setttingsHeight_Authed - borderWidth}rem`,
+              }}
               ref={settingsBorderBottom}></div>
             <div
-              className="hidden absolute w-[0.4rem] h-[2.5rem] left-[50%] top-[59px] bg-[#d5e5b8] z-20 transition-all ease-out duration-400"
+              className="hidden absolute bg-[#d5e5b8] z-20 transition-all ease-out duration-400"
+              style={{
+                width: `${borderWidth}rem`,
+                height: `${setttingsHeight_Authed}rem`,
+                top: `${navbarHeight - borderWidth}rem`,
+                left: "50vw",
+              }}
               ref={settingsBorderRight}></div>
           </div>
         ) : (
           <div>
-            <div className="h-full flex items-center justify-center">
-              {/* <span className="p-2 font-light text-[8px] italic">
-                {`log in to enjoy all features!`}
-              </span> */}
-            </div>
             <div
-              className="absolute hidden z-20 top-[59px] right-0 bg-black border-[#b8d5e5] w-[50vw] h-[4.8rem] pl-5 pb-5 pt-3 transition-all ease-out duration-200 font-light justify-end"
+              className="absolute hidden z-20 right-0 bg-black border-[#b8d5e5]  pl-5 pb-5 pt-3 transition-all ease-out duration-200 font-light justify-end"
+              style={{
+                top: `${navbarHeight - borderWidth}rem`,
+                width: `calc(50vw - ${borderWidth}rem)`,
+                height: `${setttingsHeight_Unauthed}rem`,
+              }}
               ref={settingsRef}>
-              <ul className="flex flex-col text-right mr-5 gap-2 text-[13px]">
+              <ul className="flex flex-col text-right mr-5 gap-2 text-[11px]">
                 <CustomLink to="/login">log in</CustomLink>
                 <CustomLink to="/register">register</CustomLink>
               </ul>
             </div>
             <div
-              className="hidden absolute w-[50vw] h-[0.4rem] top-[136px] right-0 bg-[#e5b8d5] z-20 transition-all ease-out duration-400"
+              className="hidden absolute right-0 bg-[#e5b8d5] z-20 transition-all ease-out duration-400"
+              style={{
+                width: `50vw`,
+                height: `${borderWidth}rem`,
+                top: `${navbarHeight + setttingsHeight_Unauthed - borderWidth}rem`,
+              }}
               ref={settingsBorderBottom}></div>
             <div
-              className="hidden absolute w-[0.4rem] h-[4.8rem] left-[50%] top-[59px] bg-[#d5e5b8] z-20 transition-all ease-out duration-400"
+              className="hidden absolute bg-[#d5e5b8] z-20 transition-all ease-out duration-400"
+              style={{
+                width: `${borderWidth}rem`,
+                height: `${setttingsHeight_Unauthed}rem`,
+                top: `${navbarHeight - borderWidth}rem`,
+                left: "50vw",
+              }}
               ref={settingsBorderRight}></div>
           </div>
         )}
 
         {!settingsOpened ? (
           <MdOutlineSettings
-            className="text-xl"
+            className="text-base mb-[1px]"
             onClick={() => setSettingsOpened(true)}
           />
         ) : (
           <MdClose
-            className="text-xl"
+            className="text-base mb-[1px]"
             onClick={() => setSettingsOpened(false)}
           />
         )}
@@ -299,7 +353,7 @@ export default function NavBar() {
 
       {/* LAPTOP - USER INFO / AUTH */}
       {authState.status ? (
-        <div className="hidden md:flex items-center justify-end gap-2 text-xs">
+        <div className="hidden md:flex items-center justify-end gap-2 text-[10px] font-extralight pb-[5px]">
           <div className="h-full flex items-center justify-center">
             <span>welcome,&nbsp;</span>
             <span className="font-bold">{`${authState.username}!`}</span>
@@ -310,12 +364,12 @@ export default function NavBar() {
           </button>
         </div>
       ) : (
-        <div className="hidden md:flex flex items-center justify-end gap-2">
-          <CustomLink className="text-sm" to="/login">
+        <div className="hidden md:flex flex items-center justify-end gap-2 text-[10px] font-extralight">
+          <CustomLink className="" to="/login">
             log in
           </CustomLink>
-          <div className="font-thintext-base ">|</div>
-          <CustomLink className="text-sm" to="/register">
+          <div className="">|</div>
+          <CustomLink className="" to="/register">
             register
           </CustomLink>
         </div>

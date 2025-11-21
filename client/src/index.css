@@ -126,7 +126,7 @@ Red Rose, Cal Sans, Paytone One, Bungee Shade, Russo One, Black Ops One */
   }
 
   .auth-formSubmitButton {
-    @apply border-0 rounded-lg w-[15rem] md:w-[7rem] p-[10px] bg-[#d5e5b8] text-stone-900 font-light;
+    @apply rounded-lg w-[15rem] p-[10px] bg-[#d5e5b8] text-stone-900 font-light;
   }
 
   .auth-formErrorMessage {
